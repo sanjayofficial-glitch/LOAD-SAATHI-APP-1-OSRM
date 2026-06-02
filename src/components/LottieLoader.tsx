@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 
 interface LottieLoaderProps {
@@ -14,17 +14,34 @@ const LottieLoader: React.FC<LottieLoaderProps> = ({
   onComplete,
   className = ''
 }) => {
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  useEffect(() => {
+    // Fallback timeout in case animation doesn't complete
+    const timeout = setTimeout(() => {
+      if (isPlaying) {
+        onComplete();
+      }
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [isPlaying, onComplete]);
+
   return (
     <div className={`relative w-full h-screen flex items-center justify-center bg-white ${className}`}>
       <div className="w-full max-w-2xl aspect-square">
         <DotLottiePlayer
           src={src}
           autoplay
+          loop={false}
           onEvent={(event) => {
-            if (event === 'complete') {
+            console.log('Lottie event:', event);
+            if (event === 'animationcomplete') {
+              setIsPlaying(false);
               onComplete();
             }
           }}
+          onPlay={() => setIsPlaying(true)}
           style={{ width: '100%', height: '100%' }}
         />
       </div>
