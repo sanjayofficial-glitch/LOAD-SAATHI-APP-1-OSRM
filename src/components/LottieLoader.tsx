@@ -34,9 +34,9 @@ const LottieLoader: React.FC<LottieLoaderProps> = ({
           src={src}
           autoplay
           loop={false}
-          onEvent={(event) => {
+          onEvent={(event: string) => {
             console.log('Lottie event:', event);
-            if (event === 'animationcomplete') {
+            if (event === 'complete' || event === 'animationcomplete') {
               setIsPlaying(false);
               onComplete();
             }
