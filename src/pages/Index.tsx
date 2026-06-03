@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Truck, Package, CheckCircle, ArrowRight, Calendar, IndianRupee } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
@@ -19,14 +19,21 @@ declare module '@/types' {
 const Index = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const [tripsLoaded, setTripsLoaded] = useState(false);
   const [recentTrips, setRecentTrips] = useState<Trip[]>([]);
   const [videoEnded, setVideoEnded] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
 
-  // Path to the Lottie file in public folder
+  // Synchronously read localStorage — no flash of wrong content on re-render
+  const [showSplash] = useState(() => !localStorage.getItem('hasSeenSplash'));
+
   const lottieUrl = "/loader.lottie";
 
+  const handleAnimationEnd = useCallback(() => {
+    localStorage.setItem('hasSeenSplash', 'true');
+    setVideoEnded(true);
+  }, []);
+
+  // Fetch trips in background during splash — not blocking the splash
   useEffect(() => {
     const fetchRecentTrips = async () => {
       try {
@@ -43,46 +50,25 @@ const Index = () => {
       } catch (err) {
         console.error("Error fetching trips for landing page:", err);
       } finally {
-        setIsLoading(false);
+        setTripsLoaded(true);
       }
     };
 
     fetchRecentTrips();
-
-    // Check if user has already seen splash in this session
-    const hasSeen = localStorage.getItem('hasSeenSplash') === 'true';
-    if (hasSeen) {
-      setShowSplash(false);
-      setVideoEnded(true);
-    } else {
-      // Safety timeout: if animation doesn't finish in 5 seconds, skip it
-      const timer = setTimeout(() => {
-        handleAnimationEnd();
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
   }, []);
 
-  // Handle redirection AFTER animation ends or if splash is skipped
+  // Redirect signed-in users after animation ends (or immediately if no splash)
   useEffect(() => {
-    if (!isLoaded || !videoEnded) return;
+    if (!isLoaded) return;
+    if (showSplash && !videoEnded) return; // Wait for animation to finish first
     
     if (isSignedIn && user) {
       navigate('/auth-sync');
     }
-  }, [isLoaded, isSignedIn, user, navigate, videoEnded]);
+  }, [isLoaded, isSignedIn, user, navigate, videoEnded, showSplash]);
 
-  const handleAnimationEnd = () => {
-    localStorage.setItem('hasSeenSplash', 'true');
-    setVideoEnded(true);
-    setShowSplash(false);
-  };
-
-  if (isLoading || !isLoaded) {
-    return <IndexSkeleton />;
-  }
-
-  // If we are showing the splash (Lottie), we don't show the rest of the content yet
+  // --- Splash screen (first-time visitors only) ---
+  // Show immediately without waiting for auth/trips
   if (showSplash && !videoEnded) {
     return (
       <div className="h-screen w-full bg-white flex flex-col items-center justify-center relative overflow-hidden">
@@ -125,6 +111,11 @@ const Index = () => {
         </button>
       </div>
     );
+  }
+
+  // --- Loading skeleton (only while trips/auth load for the landing page) ---
+  if (!tripsLoaded || !isLoaded) {
+    return <IndexSkeleton />;
   }
 
   return (
