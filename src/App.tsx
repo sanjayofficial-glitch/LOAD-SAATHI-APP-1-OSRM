@@ -9,7 +9,8 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Skeleton } from "./components/ui/skeleton";
 import Layout from "./components/Layout";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
+import VideoSplash from "./components/VideoSplash";
 
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
@@ -41,6 +42,22 @@ const queryClient = new QueryClient();
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 function App() {
+  const [splashDone, setSplashDone] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('splashSeen') === 'true';
+    }
+    return false;
+  });
+
+  const handleSplashComplete = () => {
+    sessionStorage.setItem('splashSeen', 'true');
+    setSplashDone(true);
+  };
+
+  if (!splashDone) {
+    return <VideoSplash onComplete={handleSplashComplete} />;
+  }
+
   if (!CLERK_PUBLISHABLE_KEY) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
