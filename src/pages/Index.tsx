@@ -71,7 +71,7 @@ const Index = () => {
       <div className="h-screen w-full bg-white flex flex-col items-center justify-center relative overflow-hidden">
         {/* Top Branding */}
         <div className="absolute top-20 flex flex-col items-center animate-in fade-in slide-in-from-top duration-1000">
-          <div className="bg-orange-600 p-4 rounded-2xl shadow-lg mb-4 rotate-3">
+          <div className="bg-orange-600 p-4 rounded-2xl shadow-lg mb-4">
             <Truck className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">

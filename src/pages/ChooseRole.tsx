@@ -89,7 +89,7 @@ const ChooseRole = () => {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-blue-50 px-4">
       <div className="max-w-2xl w-full mx-auto">
         <div className="text-center mb-12">
-          <div className="bg-orange-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg rotate-3">
+          <div className="bg-orange-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
             <Truck className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Welcome to LoadSaathi!</h1>
