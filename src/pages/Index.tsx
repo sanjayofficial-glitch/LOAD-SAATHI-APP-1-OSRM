@@ -22,14 +22,12 @@ const Index = () => {
   const [tripsLoaded, setTripsLoaded] = useState(false);
   const [recentTrips, setRecentTrips] = useState<Trip[]>([]);
   const [videoEnded, setVideoEnded] = useState(false);
-
-  // Synchronously read localStorage — no flash of wrong content on re-render
-  const [showSplash] = useState(() => !localStorage.getItem('hasSeenSplash'));
+  const [showSplash, setShowSplash] = useState(true);
 
   const lottieUrl = "/loader.lottie";
 
   const handleAnimationEnd = useCallback(() => {
-    localStorage.setItem('hasSeenSplash', 'true');
+    setShowSplash(false);
     setVideoEnded(true);
   }, []);
 
