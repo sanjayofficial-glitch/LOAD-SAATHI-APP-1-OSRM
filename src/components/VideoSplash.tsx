@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 
 interface VideoSplashProps {
   onComplete: () => void;
 }
 
 const VideoSplash: React.FC<VideoSplashProps> = ({ onComplete }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [show, setShow] = useState(true);
   const completed = useRef(false);
 
@@ -18,23 +18,11 @@ const VideoSplash: React.FC<VideoSplashProps> = ({ onComplete }) => {
     setTimeout(onComplete, 400);
   };
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleEnd = () => finish();
-    const handleError = () => finish();
-
-    video.addEventListener('ended', handleEnd);
-    video.addEventListener('error', handleError);
-
-    video.play().catch(() => finish());
-
-    return () => {
-      video.removeEventListener('ended', handleEnd);
-      video.removeEventListener('error', handleError);
-    };
-  }, []);
+  const handleEvent = (event: string) => {
+    if (event === 'complete' || event === 'animationcomplete') {
+      finish();
+    }
+  };
 
   return (
     <div
@@ -42,13 +30,15 @@ const VideoSplash: React.FC<VideoSplashProps> = ({ onComplete }) => {
         show ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >
-      <video
-        ref={videoRef}
-        src="/splash.webm"
-        muted
-        playsInline
-        className="w-full h-full object-contain"
-      />
+      <div className="w-full h-full flex items-center justify-center p-8">
+        <DotLottiePlayer
+          src="/splash.lottie"
+          autoplay
+          loop={false}
+          onEvent={handleEvent}
+          style={{ width: '100%', height: '100%', maxWidth: '600px', maxHeight: '600px' }}
+        />
+      </div>
 
       <button
         onClick={finish}
