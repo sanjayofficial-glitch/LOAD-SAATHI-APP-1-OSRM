@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSupabase } from '@/hooks/useSupabase';
 import { 
   ResizableHandle, 
@@ -24,7 +22,7 @@ import SystemMetricsPanel from './SystemMetricsPanel';
 import BusinessMetricsPanel from './BusinessMetricsPanel';
 import LiveEventFeed from './LiveEventFeed';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import type { User, Trip, Shipment, Request } from '@/types';
+import type { User, Trip, Shipment } from '@/types';
 
 interface Event {
   id: string;
