@@ -99,7 +99,7 @@ const flagIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3
 
 function MapResizer() {
   const map = useMap();
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     containerRef.current = map.getContainer();
