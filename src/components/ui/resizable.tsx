@@ -14,7 +14,7 @@ const ResizablePanelGroup = React.forwardRef<
     {...props}
   />
 ))
-ResizablePanelGroup.displayName = PanelGroup.displayName
+ResizablePanelGroup.displayName = "ResizablePanelGroup"
 
 const ResizablePanel = React.forwardRef<
   React.ElementRef<typeof Panel>,
@@ -29,11 +29,11 @@ const ResizablePanel = React.forwardRef<
     {...props}
   />
 ))
-ResizablePanel.displayName = Panel.displayName
+ResizablePanel.displayName = "ResizablePanel"
 
 const ResizableHandle = React.forwardRef<
-  React.ElementRef<typeof PanelResizeHandle>,
-  React.ComponentPropsWithoutRef<typeof PanelResizeHandle> & {
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<"div"> & {
     withHandle?: boolean
   }
 >(({ className, withHandle = false, ...props }, ref) => (
@@ -47,6 +47,6 @@ const ResizableHandle = React.forwardRef<
     {...props}
   />
 ))
-ResizableHandle.displayName = PanelResizeHandle.displayName
+ResizableHandle.displayName = "ResizableHandle"
 
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
