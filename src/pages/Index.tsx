@@ -83,13 +83,10 @@ const Index = () => {
         </div>
 
         {/* Main Animation */}
-        <div className="w-full max-w-md px-4">
-          <LottieLoader 
-            src={lottieUrl} 
-            onComplete={handleAnimationEnd} 
-            className="h-auto"
-          />
-        </div>
+        <LottieLoader 
+          src={lottieUrl} 
+          onComplete={handleAnimationEnd} 
+        />
 
         {/* Bottom Tagline */}
         <div className="absolute bottom-24 text-center animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
