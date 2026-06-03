@@ -7,31 +7,31 @@ import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 import IndexSkeleton from '@/components/IndexSkeleton';
 import { Trip } from '@/types';
-import LottieLoader from '@/components/LottieLoader';
-
-// Add type assertion for goods_description
-declare module '@/types' {
-  interface Trip {
-    goods_description?: string;
-  }
-}
+import AnimatedLogo from '@/components/AnimatedLogo';
 
 const Index = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const navigate = useNavigate();
   const [tripsLoaded, setTripsLoaded] = useState(false);
   const [recentTrips, setRecentTrips] = useState<Trip[]>([]);
-  const [videoEnded, setVideoEnded] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
 
-  const lottieUrl = "/loader.lottie";
+  // Splash screen duration (3 seconds)
+  const SPLASH_DURATION = 3000;
 
-  const handleAnimationEnd = useCallback(() => {
+  const handleSplashEnd = useCallback(() => {
     setShowSplash(false);
-    setVideoEnded(true);
   }, []);
 
-  // Fetch trips in background during splash — not blocking the splash
+  // Auto-dismiss splash after timeout
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleSplashEnd();
+    }, SPLASH_DURATION);
+    return () => clearTimeout(timer);
+  }, [handleSplashEnd]);
+
+  // Fetch trips in background during splash
   useEffect(() => {
     const fetchRecentTrips = async () => {
       try {
@@ -55,19 +55,18 @@ const Index = () => {
     fetchRecentTrips();
   }, []);
 
-  // Redirect signed-in users after animation ends (or immediately if no splash)
+  // Redirect signed-in users after splash
   useEffect(() => {
     if (!isLoaded) return;
-    if (showSplash && !videoEnded) return; // Wait for animation to finish first
+    if (showSplash) return;
     
     if (isSignedIn && user) {
       navigate('/auth-sync');
     }
-  }, [isLoaded, isSignedIn, user, navigate, videoEnded, showSplash]);
+  }, [isLoaded, isSignedIn, user, navigate, showSplash]);
 
-  // --- Splash screen (first-time visitors only) ---
-  // Show immediately without waiting for auth/trips
-  if (showSplash && !videoEnded) {
+  // --- Splash screen ---
+  if (showSplash) {
     return (
       <div className="h-screen w-full bg-white flex flex-col items-center justify-center relative overflow-hidden">
         {/* Top Branding */}
@@ -81,10 +80,7 @@ const Index = () => {
         </div>
 
         {/* Main Animation */}
-        <LottieLoader 
-          src={lottieUrl} 
-          onComplete={handleAnimationEnd} 
-        />
+        <AnimatedLogo />
 
         {/* Bottom Tagline */}
         <div className="absolute bottom-24 text-center animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
@@ -99,7 +95,7 @@ const Index = () => {
         </div>
 
         <button 
-          onClick={handleAnimationEnd}
+          onClick={handleSplashEnd}
           className="absolute bottom-8 right-8 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 px-4 py-1.5 rounded-full border border-gray-100 transition-all z-50 text-xs font-bold uppercase tracking-tighter shadow-sm"
         >
           Skip
@@ -108,7 +104,7 @@ const Index = () => {
     );
   }
 
-  // --- Loading skeleton (only while trips/auth load for the landing page) ---
+  // --- Loading skeleton ---
   if (!tripsLoaded || !isLoaded) {
     return <IndexSkeleton />;
   }
@@ -162,8 +158,10 @@ const Index = () => {
                         <Package className="h-6 w-6 text-orange-600" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">From {trip.origin_city}</h3>
-                        <p className="text-sm text-gray-600">{trip.goods_description}</p>
+                        <h3 className="text-lg font-bold text-gray-900">
+                          {trip.origin_city} → {trip.destination_city}
+                        </h3>
+                        <p className="text-sm text-gray-600">{trip.vehicle_type}</p>
                       </div>
                     </div>
                   </div>
