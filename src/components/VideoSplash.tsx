@@ -26,23 +26,23 @@ const VideoSplash: React.FC<VideoSplashProps> = ({ onComplete }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-500 ${
         show ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >
-      <div className="w-full h-full flex items-center justify-center p-8">
+      <div className="w-full h-full flex items-center justify-center">
         <DotLottiePlayer
           src="/splash.lottie"
           autoplay
           loop={false}
           onEvent={handleEvent}
-          style={{ width: '100%', height: '100%', maxWidth: '600px', maxHeight: '600px' }}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
 
       <button
         onClick={finish}
-        className="absolute bottom-8 right-8 px-6 py-2.5 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-medium hover:bg-white/30 transition-all border border-white/30"
+        className="absolute bottom-8 right-8 px-6 py-2.5 rounded-full bg-black/10 backdrop-blur-md text-gray-700 text-sm font-medium hover:bg-black/20 transition-all border border-black/20"
       >
         Skip &rarr;
       </button>
