@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAuth as useClerkAuth } from "@clerk/clerk-react";
@@ -8,15 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ArrowLeft, Truck, Calendar, IndianRupee } from "lucide-react";
+import { Loader2, ArrowLeft, Truck, Calendar, IndianRupee, WifiOff } from "lucide-react";
 import LocationSelector from "@/components/LocationSelector";
 import locationData from "@/data/locations.json";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { showSuccess, showError } from "@/utils/toast";
 
 const PostTrip = () => {
   const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
+  const { isOnline } = useNetworkStatus();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,6 +46,11 @@ const PostTrip = () => {
     
     if (!userProfile?.id) {
       showError('You must be logged in to post a trip.');
+      return;
+    }
+
+    if (!isOnline) {
+      showError('You are offline. Please check your internet connection and try again.');
       return;
     }
 
@@ -81,19 +88,26 @@ const PostTrip = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-6 sm:py-8 max-w-2xl">
       <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" /> Back
       </Button>
 
+      {!isOnline && (
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800">
+          <WifiOff className="h-4 w-4 shrink-0" />
+          <span>You are offline. You cannot post trips until reconnected.</span>
+        </div>
+      )}
+
       <Card className="border-orange-100 shadow-lg">
-        <CardHeader className="bg-orange-50/50 border-b border-orange-100">
-          <CardTitle className="flex items-center text-orange-900">
-            <Truck className="mr-2 text-orange-600" /> Post a New Trip
+        <CardHeader className="bg-orange-50/50 border-b border-orange-100 px-4 sm:px-6">
+          <CardTitle className="flex items-center text-orange-900 text-lg sm:text-xl">
+            <Truck className="mr-2 text-orange-600 h-5 w-5 sm:h-6 sm:w-6" /> Post a New Trip
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="pt-6 px-4 sm:px-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <div className="space-y-2">
               <Label className="text-gray-700 font-medium">Origin Location</Label>
               <LocationSelector
@@ -112,7 +126,7 @@ const PostTrip = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="date">Departure Date</Label>
                 <div className="relative">
@@ -157,7 +171,7 @@ const PostTrip = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="vehicleType">Vehicle Type</Label>
                 <Input
@@ -180,12 +194,25 @@ const PostTrip = () => {
               </div>
             </div>
 
+            {!isOnline && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800">
+                <WifiOff className="h-4 w-4 shrink-0" />
+                <span>Posting trips is unavailable while offline.</span>
+              </div>
+            )}
+
             <Button
               type="submit"
-              className="w-full bg-orange-600 hover:bg-orange-700 h-12 text-lg font-bold"
-              disabled={loading}
+              className="w-full bg-orange-600 hover:bg-orange-700 h-12 text-base sm:text-lg font-bold"
+              disabled={loading || !isOnline}
             >
-              {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Post Trip'}
+              {loading ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : !isOnline ? (
+                <><WifiOff className="mr-2 h-5 w-5" /> Offline</>
+              ) : (
+                'Post Trip'
+              )}
             </Button>
           </form>
         </CardContent>

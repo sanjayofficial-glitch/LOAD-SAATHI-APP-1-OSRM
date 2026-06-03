@@ -1,0 +1,17 @@
+{
+  "name": "LoadSaathi - India's Truck Space Marketplace",
+  "short_name": "LoadSaathi",
+  "description": "Connect directly with truckers and shippers. Fill empty truck space, save on freight costs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ea580c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

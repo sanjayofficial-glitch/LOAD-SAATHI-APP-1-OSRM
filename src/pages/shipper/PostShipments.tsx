@@ -9,14 +9,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { showSuccess, showError } from "@/utils/toast";
-import { Package, MapPin, Calendar, IndianRupee, Loader2, ArrowLeft } from "lucide-react";
+import { Package, MapPin, Calendar, IndianRupee, Loader2, ArrowLeft, WifiOff } from "lucide-react";
 import LocationSelector from "@/components/LocationSelector";
 import locationData from "@/data/locations.json";
 
 const PostShipments = () => {
   const { userProfile } = useAuth();
   const { getAuthenticatedClient } = useSupabase();
+  const { isOnline } = useNetworkStatus();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -45,6 +47,11 @@ const PostShipments = () => {
     
     if (!userProfile?.id) {
       showError('You must be logged in to post a shipment.');
+      return;
+    }
+
+    if (!isOnline) {
+      showError('You are offline. Please check your internet connection and try again.');
       return;
     }
 
@@ -93,20 +100,27 @@ const PostShipments = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-6 sm:py-8 max-w-2xl">
       <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" /> Back
       </Button>
 
+      {!isOnline && (
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800">
+          <WifiOff className="h-4 w-4 shrink-0" />
+          <span>You are offline. You cannot post shipments until reconnected.</span>
+        </div>
+      )}
+
       <Card className="border-blue-100 shadow-lg">
-        <CardHeader className="bg-blue-50/50 border-b border-blue-100">
-          <CardTitle className="flex items-center text-blue-900">
-            <Package className="mr-2 text-blue-600" />
+        <CardHeader className="bg-blue-50/50 border-b border-blue-100 px-4 sm:px-6">
+          <CardTitle className="flex items-center text-blue-900 text-lg sm:text-xl">
+            <Package className="mr-2 text-blue-600 h-5 w-5 sm:h-6 sm:w-6" />
             Post a New Shipment
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="pt-6 px-4 sm:px-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <div className="space-y-2">
               <Label className="text-gray-700 font-medium">Origin Location</Label>
               <LocationSelector
@@ -125,7 +139,7 @@ const PostShipments = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="date">Ready Date</Label>
                 <div className="relative">
@@ -181,7 +195,7 @@ const PostShipments = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="pickup">Pickup Address</Label>
                 <Input 
@@ -204,16 +218,25 @@ const PostShipments = () => {
               </div>
             </div>
 
+            {!isOnline && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800">
+                <WifiOff className="h-4 w-4 shrink-0" />
+                <span>Posting shipments is unavailable while offline.</span>
+              </div>
+            )}
+
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold shadow-md transition-all hover:shadow-lg" 
-              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-base sm:text-lg font-bold shadow-md transition-all hover:shadow-lg" 
+              disabled={loading || !isOnline}
             >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Posting Shipment...
                 </>
+              ) : !isOnline ? (
+                <><WifiOff className="mr-2 h-5 w-5" /> Offline</>
               ) : 'Post Shipment'}
             </Button>
           </form>
