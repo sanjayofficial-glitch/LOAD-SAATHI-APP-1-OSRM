@@ -34,6 +34,8 @@ const TripDetail = lazy(() => import("./pages/TripDetail"));
 const Chat = lazy(() => import("./pages/Chat"));
 const ChatList = lazy(() => import("./pages/ChatList"));
 const Profile = lazy(() => import("./pages/Profile"));
+const MonitoringDashboard = lazy(() => import("./pages/admin/MonitoringDashboard"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -67,15 +69,6 @@ function App() {
                   <Route path="/auth-sync" element={<AuthSync />} />
                   <Route path="/choose-role" element={<ChooseRole />} />
 
-                  {/* Admin routes - Only accessible by admin users */}
-                  <Route element={
-                    <RoleProtectedRoute allowedRole="admin">
-                      <Outlet />
-                    </RoleProtectedRoute>
-                  }>
-                    {/* AdminMonitoringDashboard removed - no route for /admin/monitoring */}
-                  </Route>
-
                   {/* Authenticated routes wrapped with Layout */}
                   <Route
                     element={
@@ -86,6 +79,17 @@ function App() {
                       </Layout>
                     }
                   >
+                    {/* Admin routes */}
+                    <Route path="/admin/monitoring" element={
+                      <RoleProtectedRoute allowedRole="admin">
+                        <MonitoringDashboard />
+                      </RoleProtectedRoute>
+                    } />
+                    <Route path="/admin/dashboard" element={
+                      <RoleProtectedRoute allowedRole="admin">
+                        <AdminDashboard />
+                      </RoleProtectedRoute>
+                    } />
                     {/* Trucker routes */}
                     <Route path="/trucker/dashboard" element={
                       <RoleProtectedRoute allowedRole="trucker">

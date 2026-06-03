@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSupabase } from '@/hooks/useSupabase';
-import { supabase } from '@/lib/supabaseClient';
 import { 
   ResizableHandle, 
   ResizablePanel, 
@@ -16,9 +15,6 @@ import {
   ShieldCheck,
   Briefcase,
   Terminal,
-  Truck,
-  Package,
-  CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +24,7 @@ import SystemMetricsPanel from './SystemMetricsPanel';
 import BusinessMetricsPanel from './BusinessMetricsPanel';
 import LiveEventFeed from './LiveEventFeed';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import type { User, Trip, Shipment, Request } from '@/types';
 
 interface Event {
   id: string;
@@ -39,9 +36,9 @@ interface Event {
 
 const MonitoringDashboard = () => {
   const { getAuthenticatedClient } = useSupabase();
-  const [users, setUsers] = useState([]);
-  const [trips, setTrips] = useState([]);
-  const [shipments, setShipments] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [metrics, setMetrics] = useState({ 
     active_connections: 0, 
@@ -58,43 +55,54 @@ const MonitoringDashboard = () => {
     success_rate: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   const fetchData = useCallback(async () => {
     try {
+      setError(null);
+      const queryTimes: number[] = [];
       const supabaseClient = await getAuthenticatedClient();
 
       // Fetch active users
+      let qs = performance.now();
       const { data: userData } = await supabaseClient
         .from('users')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
+      queryTimes.push(performance.now() - qs);
       
       if (userData) setUsers(userData);
 
       // Fetch trips with trucker info
+      qs = performance.now();
       const { data: tripData } = await supabaseClient
         .from('trips')
         .select('*, trucker:users!trips_trucker_id_fkey(full_name)')
         .order('created_at', { ascending: false });
+      queryTimes.push(performance.now() - qs);
       
       if (tripData) setTrips(tripData);
 
       // Fetch shipments with shipper info
+      qs = performance.now();
       const { data: shipmentData } = await supabaseClient
         .from('shipments')
         .select('*, shipper:users!shipments_shipper_id_fkey(full_name)')
         .order('created_at', { ascending: false });
+      queryTimes.push(performance.now() - qs);
       
       if (shipmentData) setShipments(shipmentData);
 
       // Calculate Business Metrics
+      qs = performance.now();
       const { data: requests } = await supabaseClient.from('requests').select('status, weight_tonnes, trip:trips(price_per_tonne)');
+      queryTimes.push(performance.now() - qs);
       
       const pending = requests?.filter(r => r.status === 'pending').length || 0;
       const accepted = requests?.filter(r => r.status === 'accepted') || [];
-      const revenue = accepted.reduce((sum, r: any) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0);
+      const revenue = accepted.reduce((sum: number, r: any) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0);
       const successRate = requests?.length ? Math.round((accepted.length / requests.length) * 100) : 0;
 
       setBusinessMetrics({
@@ -106,10 +114,25 @@ const MonitoringDashboard = () => {
         success_rate: successRate
       });
 
-      // Historical events
-      const [{ data: hTrips }, { data: hShips }] = await Promise.all([
-        supabaseClient.from('trips').select('id, origin_city, destination_city, created_at').limit(3),
-        supabaseClient.from('shipments').select('id, origin_city, created_at').limit(3)
+      // Compute system metrics from real data
+      const avgLatency = queryTimes.length ? Math.round(queryTimes.reduce((a, b) => a + b, 0) / queryTimes.length) : 0;
+      const cancelledTrips = tripData?.filter(t => t.status === 'cancelled').length || 0;
+      const totalTrips = tripData?.length || 0;
+      const errorRate = totalTrips ? Math.round((cancelledTrips / totalTrips) * 100) : 0;
+      const activeUsers = userData?.length || 0;
+
+      setMetrics({
+        active_connections: activeUsers,
+        api_response_time: avgLatency,
+        error_rate: errorRate,
+        active_requests: pending
+      });
+
+      // Fetch historical events (more items, more types)
+      const [{ data: hTrips }, { data: hShips }, { data: hRequests }] = await Promise.all([
+        supabaseClient.from('trips').select('id, origin_city, destination_city, created_at').limit(10),
+        supabaseClient.from('shipments').select('id, origin_city, created_at').limit(10),
+        supabaseClient.from('requests').select('id, created_at, status').limit(10)
       ]);
 
       const formattedHist: Event[] = [
@@ -122,18 +145,27 @@ const MonitoringDashboard = () => {
         })),
         ...(hShips || []).map(s => ({
           id: `s-${s.id}`,
-          type: 'trip' as const,
+          type: 'booking' as const,
           message: `New load detected at ${s.origin_city}`,
           time: new Date(s.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           raw_date: s.created_at
+        })),
+        ...(hRequests || []).map(r => ({
+          id: `r-${r.id}`,
+          type: (r.status === 'accepted' ? 'booking' : r.status === 'pending' ? 'alert' : 'chat') as Event['type'],
+          message: `Request ${r.status}: ${r.id.slice(0, 8)}...`,
+          time: new Date(r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          raw_date: r.created_at
         }))
       ]
-      .sort((a, b) => new Date(b.raw_date || '').getTime() - new Date(a.raw_date || '').getTime());
+      .sort((a, b) => new Date(b.raw_date || '').getTime() - new Date(a.raw_date || '').getTime())
+      .slice(0, 20);
 
       setEvents(formattedHist);
       setLastUpdated(new Date());
     } catch (err) {
       console.error('[Monitoring] Fetch error:', err);
+      setError('Failed to fetch monitoring data. Check your connection.');
     } finally {
       setLoading(false);
     }
@@ -146,34 +178,36 @@ const MonitoringDashboard = () => {
   }, [fetchData]);
 
   return (
-    <div className="h-screen flex flex-col bg-slate-950 text-slate-50 overflow-hidden font-sans">
-      <header className="h-14 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between px-6 shrink-0 shadow-2xl">
-        <div className="flex items-center gap-4">
-          <div className="bg-orange-600 p-1.5 rounded-lg shadow-[0_0_15px_rgba(234,88,12,0.4)]">
-            <ShieldCheck className="h-5 w-5 text-white" />
+    <div className="h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] flex flex-col bg-slate-950 text-slate-50 overflow-hidden">
+      <header className="h-12 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between px-4 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="bg-orange-600 p-1 rounded-lg">
+            <ShieldCheck className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-black tracking-tight uppercase">Command Center</h1>
+            <h1 className="text-xs font-black tracking-tight uppercase">Command Center</h1>
             <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">System Live</span>
+              <span className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">System Live</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="text-right hidden sm:block border-r border-slate-800 pr-4 mr-2">
-            <p className="text-[9px] text-slate-500 uppercase font-black tracking-tighter">Sync Token</p>
-            <p className="text-[11px] font-mono text-slate-300">ACTIVE_OK</p>
-          </div>
+        <div className="flex items-center gap-3">
+          {error && (
+            <span className="text-[9px] text-red-400 font-mono">{error}</span>
+          )}
+          <span className="text-[9px] text-slate-500 font-mono hidden sm:inline">
+            {lastUpdated.toLocaleTimeString()}
+          </span>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={fetchData}
             disabled={loading}
-            className="border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-[10px] uppercase tracking-widest"
+            className="border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-[9px] uppercase tracking-widest h-8"
           >
-            <RefreshCw className={`h-3 w-3 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3 w-3 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>

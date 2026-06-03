@@ -10,9 +10,6 @@ interface RoleProtectedRouteProps {
   allowedRole?: 'shipper' | 'trucker' | 'both' | 'admin';
 }
 
-// Only this specific user ID is allowed to access admin features
-const ALLOWED_ADMIN_ID = "user_3Cn2O5bwNC0wsSEfGDnTky9rn2S";
-
 const RoleProtectedRoute = ({ children, allowedRole }: RoleProtectedRouteProps) => {
   const { userProfile, loading, isLoaded } = useAuth();
 
@@ -30,9 +27,9 @@ const RoleProtectedRoute = ({ children, allowedRole }: RoleProtectedRouteProps) 
     return <Navigate to="/" replace />;
   }
 
-  // Strict check for admin role: must have the admin type AND the specific allowed ID
+  // Admin check: user must have admin type in the database
   if (allowedRole === 'admin') {
-    if (userProfile.user_type !== 'admin' || userProfile.id !== ALLOWED_ADMIN_ID) {
+    if (userProfile.user_type !== 'admin') {
       console.warn(`[Security] Unauthorized admin access attempt by user: ${userProfile.id}`);
       return <Navigate to="/" replace />;
     }
