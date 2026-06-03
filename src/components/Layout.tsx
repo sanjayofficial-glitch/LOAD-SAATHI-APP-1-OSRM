@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -17,6 +17,7 @@ import {
   Clock, 
   Truck, 
   Menu, 
+  X,
   LogOut, 
   MessageSquare, 
   History,
@@ -25,10 +26,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./NotificationBell";
+import OfflineBanner from "./OfflineBanner";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { userProfile, signOut } = useAuth();
   const navigate = useNavigate();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const getNavItems = () => {
     if (userProfile?.user_type === 'admin') {
@@ -60,66 +63,67 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     navigate("/");
   };
 
+  const NavLinks = ({ onClick }: { onClick?: () => void }) => (
+    <>
+      {navItems.map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          onClick={onClick}
+          className="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2"
+        >
+          {item.icon}
+          {item.label}
+        </Link>
+      ))}
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <OfflineBanner />
       <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-8">
-              <Link to="/" className="flex items-center gap-2">
-                <Truck className="h-8 w-8 text-orange-600" />
-                <span className="text-xl font-bold text-gray-900 hidden sm:block">
-                  LoadSaathi
+          <div className="flex justify-between h-14 sm:h-16">
+            <div className="flex items-center gap-4 sm:gap-8">
+              <Link to="/" className="flex items-center gap-2 shrink-0">
+                <Truck className="h-7 w-7 sm:h-8 sm:w-8 text-orange-600" />
+                <span className="text-lg sm:text-xl font-bold text-gray-900">
+                  <span className="sm:hidden">LS</span>
+                  <span className="hidden sm:inline">LoadSaathi</span>
                 </span>
               </Link>
               
-              <div className="hidden lg:flex space-x-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors flex items-center gap-2"
-                  >
-                    {item.icon}
-                    {item.label}
-                  </Link>
-                ))}
+              <div className="hidden lg:flex items-center gap-1">
+                <NavLinks />
               </div>
             </div>
 
-            <div className="flex items-center space-x-1 sm:space-x-3">
+            <div className="flex items-center gap-1 sm:gap-3">
               <NotificationBell />
 
               <Link to="/messages">
-                <Button variant="ghost" size="icon" className="text-gray-600">
-                  <MessageSquare className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="text-gray-600 h-9 w-9 sm:h-10 sm:w-10">
+                  <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </Link>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-gray-600">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Navigation</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {navItems.map((item) => (
-                    <DropdownMenuItem key={item.path} asChild>
-                      <Link to={item.path} className="flex items-center gap-2 cursor-pointer">
-                        {item.icon}
-                        {item.label}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="lg:hidden">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-600 h-9 w-9 sm:h-10 sm:w-10"
+                  onClick={() => setMobileNavOpen(!mobileNavOpen)}
+                  aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+                >
+                  {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
+              </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-gray-600">
-                    <User className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="text-gray-600 h-9 w-9 sm:h-10 sm:w-10">
+                    <User className="h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -149,22 +153,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
+
+        {mobileNavOpen && (
+          <div className="lg:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
+            <NavLinks onClick={() => setMobileNavOpen(false)} />
+          </div>
+        )}
       </nav>
 
       <main className="flex-grow">
         {children}
       </main>
 
-      <footer className="bg-white border-t py-8 mt-auto">
+      <footer className="bg-white border-t py-6 sm:py-8 mt-auto">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Truck className="h-6 w-6 text-orange-600" />
-            <span className="text-xl font-bold text-gray-900">LoadSaathi</span>
+            <Truck className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
+            <span className="text-lg sm:text-xl font-bold text-gray-900">LoadSaathi</span>
           </div>
-          <p className="text-gray-500 text-sm mb-4">
+          <p className="text-gray-500 text-xs sm:text-sm mb-4">
             Connecting India's truckers with shippers directly.
           </p>
-          <div className="flex justify-center space-x-6 text-sm text-gray-400">
+          <div className="flex justify-center space-x-6 text-xs sm:text-sm text-gray-400">
             <Link to="/" className="hover:text-gray-600">Home</Link>
             <Link to="/profile" className="hover:text-gray-600">Profile</Link>
             <Link to="/messages" className="hover:text-gray-600">Messages</Link>
