@@ -75,7 +75,7 @@ const BusinessMetricsPanel: React.FC<BusinessMetricsProps> = ({ metrics }) => {
             <div className="p-1 rounded-md bg-slate-800 text-purple-400">
               <CheckCircle2 className="h-3.5 w-3.5" />
             </div>
-            <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Active Requests</span>
+            <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Pending Requests</span>
           </div>
           <span className="text-xs font-mono text-slate-200">{metrics.pending_requests}</span>
         </div>

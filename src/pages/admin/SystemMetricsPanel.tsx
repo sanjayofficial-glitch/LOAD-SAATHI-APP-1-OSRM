@@ -22,8 +22,7 @@ interface MetricsProps {
 }
 
 const SystemMetricsPanel: React.FC<MetricsProps> = ({ metrics }) => {
-  // Mocking some health percentages based on metrics
-  const connectionHealth = Math.min(100, (metrics.active_connections / 100) * 100);
+  const connectionHealth = Math.min(100, metrics.active_connections * 5);
   const latencyHealth = Math.max(0, 100 - (metrics.api_response_time / 5));
 
   return (
@@ -72,7 +71,7 @@ const SystemMetricsPanel: React.FC<MetricsProps> = ({ metrics }) => {
             </div>
             <span className="text-[10px] font-mono text-red-400">{metrics.error_rate}%</span>
           </div>
-          <Progress value={metrics.error_rate * 10} className="h-1 bg-slate-800" />
+          <Progress value={metrics.error_rate} className="h-1 bg-slate-800" />
         </div>
       </div>
 
