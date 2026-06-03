@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { 
+import {
   User, 
   Search, 
   Clock, 
@@ -22,7 +22,9 @@ import {
   MessageSquare, 
   History,
   PlusCircle,
-  ShieldCheck
+  ShieldCheck,
+  Users,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./NotificationBell";
@@ -37,6 +39,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     if (userProfile?.user_type === 'admin') {
       return [
         { label: "Command Center", path: "/admin/monitoring", icon: <ShieldCheck className="h-4 w-4" /> },
+        { label: "Users", path: "/admin/users", icon: <Users className="h-4 w-4" /> },
+        { label: "Moderation", path: "/admin/moderation", icon: <FileText className="h-4 w-4" /> },
         { label: "Messages", path: "/messages", icon: <MessageSquare className="h-4 w-4" /> },
       ];
     }

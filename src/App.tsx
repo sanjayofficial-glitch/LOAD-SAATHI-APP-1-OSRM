@@ -36,6 +36,8 @@ const ChatList = lazy(() => import("./pages/ChatList"));
 const Profile = lazy(() => import("./pages/Profile"));
 const MonitoringDashboard = lazy(() => import("./pages/admin/MonitoringDashboard"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
+const Moderation = lazy(() => import("./pages/admin/Moderation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -88,6 +90,16 @@ function App() {
                     <Route path="/admin/dashboard" element={
                       <RoleProtectedRoute allowedRole="admin">
                         <AdminDashboard />
+                      </RoleProtectedRoute>
+                    } />
+                    <Route path="/admin/users" element={
+                      <RoleProtectedRoute allowedRole="admin">
+                        <UserManagement />
+                      </RoleProtectedRoute>
+                    } />
+                    <Route path="/admin/moderation" element={
+                      <RoleProtectedRoute allowedRole="admin">
+                        <Moderation />
                       </RoleProtectedRoute>
                     } />
                     {/* Trucker routes */}
