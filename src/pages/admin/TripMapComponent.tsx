@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Loader2 } from 'lucide-react';
@@ -97,6 +97,25 @@ const truckIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/
 const boxIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/2830/2830305.png', iconSize: [24, 24], iconAnchor: [12, 12] });
 const flagIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3233/3233005.png', iconSize: [24, 24], iconAnchor: [12, 24] });
 
+function MapResizer() {
+  const map = useMap();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    containerRef.current = map.getContainer();
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [map]);
+
+  return null;
+}
+
 interface TripMapProps { trips: any[]; shipments: any[]; }
 
 const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
@@ -158,6 +177,7 @@ const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
   return (
     <div className="h-full w-full bg-slate-900 overflow-hidden relative">
       <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: '100%', width: '100%', background: '#020617' }} scrollWheelZoom={false}>
+        <MapResizer />
         <TileLayer attribution='&copy; OSM' url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
         
         {resolvedTrips.map(t => (
