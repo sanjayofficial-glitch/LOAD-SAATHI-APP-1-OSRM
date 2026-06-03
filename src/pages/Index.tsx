@@ -1,37 +1,20 @@
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Truck, Package, CheckCircle, ArrowRight, Calendar, IndianRupee } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 import IndexSkeleton from '@/components/IndexSkeleton';
 import { Trip } from '@/types';
-import AnimatedLogo from '@/components/AnimatedLogo';
 
 const Index = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const navigate = useNavigate();
   const [tripsLoaded, setTripsLoaded] = useState(false);
   const [recentTrips, setRecentTrips] = useState<Trip[]>([]);
-  const [showSplash, setShowSplash] = useState(true);
 
-  // Splash screen duration (3 seconds)
-  const SPLASH_DURATION = 3000;
-
-  const handleSplashEnd = useCallback(() => {
-    setShowSplash(false);
-  }, []);
-
-  // Auto-dismiss splash after timeout
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      handleSplashEnd();
-    }, SPLASH_DURATION);
-    return () => clearTimeout(timer);
-  }, [handleSplashEnd]);
-
-  // Fetch trips in background during splash
+  // Fetch trips in background before showing the landing page
   useEffect(() => {
     const fetchRecentTrips = async () => {
       try {
@@ -55,54 +38,14 @@ const Index = () => {
     fetchRecentTrips();
   }, []);
 
-  // Redirect signed-in users after splash
+  // Redirect signed-in users after auth loads
   useEffect(() => {
     if (!isLoaded) return;
-    if (showSplash) return;
-    
+
     if (isSignedIn && user) {
       navigate('/auth-sync');
     }
-  }, [isLoaded, isSignedIn, user, navigate, showSplash]);
-
-  // --- Splash screen ---
-  if (showSplash) {
-    return (
-      <div className="h-screen w-full bg-white flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Top Branding */}
-        <div className="absolute top-20 flex flex-col items-center animate-in fade-in slide-in-from-top duration-1000">
-          <div className="bg-orange-600 p-4 rounded-2xl shadow-lg mb-4">
-            <Truck className="h-10 w-10 text-white" />
-          </div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-            Load<span className="text-orange-600">Saathi</span>
-          </h1>
-        </div>
-
-        {/* Main Animation */}
-        <AnimatedLogo />
-
-        {/* Bottom Tagline */}
-        <div className="absolute bottom-24 text-center animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
-          <p className="text-gray-400 font-medium tracking-widest uppercase text-xs">
-            India's Logistics Marketplace
-          </p>
-          <div className="mt-4 flex justify-center space-x-1">
-            <div className="w-1.5 h-1.5 bg-orange-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-1.5 h-1.5 bg-orange-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-1.5 h-1.5 bg-orange-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
-        </div>
-
-        <button 
-          onClick={handleSplashEnd}
-          className="absolute bottom-8 right-8 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 px-4 py-1.5 rounded-full border border-gray-100 transition-all z-50 text-xs font-bold uppercase tracking-tighter shadow-sm"
-        >
-          Skip
-        </button>
-      </div>
-    );
-  }
+  }, [isLoaded, isSignedIn, user, navigate]);
 
   // --- Loading skeleton ---
   if (!tripsLoaded || !isLoaded) {
