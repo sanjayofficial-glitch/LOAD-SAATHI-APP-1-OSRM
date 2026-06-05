@@ -12,6 +12,8 @@ import { Loader2, ArrowLeft, Truck, Calendar, IndianRupee, WifiOff } from "lucid
 import LocationSelector from "@/components/LocationSelector";
 import locationData from "@/data/locations.json";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
+import { geocodeCity } from "@/utils/geocode";
+import { getRoute } from "@/utils/osrm";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -68,15 +70,41 @@ const PostTrip = () => {
       if (!supabaseToken) throw new Error('No Supabase token');
 
       const supabaseClient = createClerkSupabaseClient(supabaseToken);
-      const { error } = await supabaseClient.from('trips').insert({
+      const { data: tripData, error } = await supabaseClient.from('trips').insert({
         ...formData,
         trucker_id: userProfile.id,
         available_capacity_tonnes: capacity,
         price_per_tonne: price,
         status: 'active'
-      });
+      }).select('id').single();
 
       if (error) throw error;
+
+      // Save coordinates — runs after trip is already created, non-blocking
+      if (tripData?.id) {
+        try {
+          const [originCoords, destCoords] = await Promise.all([
+            geocodeCity(formData.origin_city),
+            geocodeCity(formData.destination_city)
+          ]);
+          if (originCoords && destCoords) {
+            const route = await getRoute(
+              originCoords.lon, originCoords.lat,
+              destCoords.lon, destCoords.lat
+            );
+            await supabaseClient.from('trips').update({
+              origin_lat: originCoords.lat,
+              origin_lng: originCoords.lon,
+              destination_lat: destCoords.lat,
+              destination_lng: destCoords.lon,
+              estimated_distance_km: route?.distance_km ?? null,
+              estimated_duration_min: route?.duration_min ?? null,
+            }).eq('id', tripData.id);
+          }
+        } catch {
+          // Silently ignore — coordinates are optional enhancement
+        }
+      }
 
       showSuccess('Trip posted successfully!');
       navigate('/trucker/dashboard');

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabaseClient';
+import { useAuth as useClerkAuth } from '@clerk/clerk-react';
+import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';  
 import { Label } from '@/components/ui/label';  
@@ -10,8 +11,8 @@ import { showSuccess, showError } from '@/utils/toast';
 import { Truck, MapPin, Calendar, IndianRupee, Loader2, ArrowLeft } from 'lucide-react';  
 import LocationSelector from '@/components/LocationSelector';  
 import locationData from '@/data/locations.json';  const EditTrip = () => {  
-  const { tripId } = useParams();  
-  const { userProfile } = useAuth();  
+  const { tripId } = useParams();  const { userProfile } = useAuth();
+  const { getToken } = useClerkAuth();
   const navigate = useNavigate();  
   const [loading, setLoading] = useState(true);  
   const [saving, setSaving] = useState(false);  
@@ -22,16 +23,22 @@ import locationData from '@/data/locations.json';  const EditTrip = () => {
     price_per_tonne: '',  
     vehicle_type: '',  
     vehicle_number: ''  
-  });  
+  });  useEffect(() => {
+    const fetchTrip = async () => {
+      if (!tripId) return;
 
-  useEffect(() => {  
-    const fetchTrip = async () => {  
-      if (!tripId) return;  
+      const token = await getToken({ template: 'supabase' });
+      if (!token) {
+        showError('Authentication required');
+        navigate('/trucker/my-trips');
+        return;
+      }
+      const supabase = createClerkSupabaseClient(token);
       
-      const { data, error } = await supabase  
-        .from('trips')  
-        .select('*')  
-        .eq('id', tripId)  
+      const { data, error } = await supabase
+        .from('trips')
+        .select('*')
+        .eq('id', tripId)
         .single();  
 
       if (error) {  
@@ -81,6 +88,9 @@ import locationData from '@/data/locations.json';  const EditTrip = () => {
 
     setSaving(true);  
     try {  
+      const token = await getToken({ template: 'supabase' });
+      if (!token) throw new Error('No auth token');
+      const supabase = createClerkSupabaseClient(token);
       const { error } = await supabase  
         .from('trips')  
         .update({  

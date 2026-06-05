@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import { notifyShipperOfTruckerOffer } from '@/utils/notifications';
+import { generateWhatsAppLink } from '@/utils/whatsapp';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
@@ -33,6 +34,7 @@ const ShipmentDetail = () => {
   const [loading, setLoading] = useState(true);
   const [offerCount, setOfferCount] = useState(0);
   const [hasReview, setHasReview] = useState(false);
+  const [acceptedTrucker, setAcceptedTrucker] = useState<any | null>(null);
 
   // Offer dialog state (for truckers)
   const [offerOpen, setOfferOpen] = useState(false);
@@ -66,6 +68,19 @@ const ShipmentDetail = () => {
           .select('*', { count: 'exact', head: true })
           .eq('shipment_id', id);
         setOfferCount(count ?? 0);
+
+        // Fetch accepted trucker info for WhatsApp button
+        if (shipmentData.status === 'matched' || shipmentData.status === 'completed') {
+          const { data: acceptedReq } = await supabase
+            .from('shipment_requests')
+            .select('*, trucker:users!shipment_requests_trucker_id_fkey(*)')
+            .eq('shipment_id', id)
+            .eq('status', 'accepted')
+            .maybeSingle();
+          if (acceptedReq?.trucker) {
+            setAcceptedTrucker(acceptedReq.trucker);
+          }
+        }
         
         // Check if already reviewed if completed
         if (shipmentData.status === 'completed') {
@@ -300,6 +315,41 @@ const ShipmentDetail = () => {
           )}
 
           {/* Status card for owner */}
+          {/* Accepted Trucker Contact (for shipper) */}
+          {isOwner && acceptedTrucker && acceptedTrucker.phone && (
+            <Card className="border-green-100">
+              <CardHeader className="bg-green-50/50 pb-3">
+                <CardTitle className="text-sm font-bold uppercase text-gray-500">Trucker Contact</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-600">
+                    {acceptedTrucker.full_name?.charAt(0) || 'T'}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{acceptedTrucker.full_name || 'Trucker'}</p>
+                    <p className="text-xs text-gray-500">{acceptedTrucker.phone}</p>
+                  </div>
+                </div>
+                <a
+                  href={generateWhatsAppLink(acceptedTrucker.phone, {
+                    id: shipment.id,
+                    goods_description: shipment.goods_description,
+                    pickup_city: shipment.origin_city,
+                    drop_city: shipment.destination_city,
+                    weight: shipment.weight_tonnes * 1000,
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button className="bg-green-600 hover:bg-green-700 w-full">
+                    💬 Chat on WhatsApp
+                  </Button>
+                </a>
+              </CardContent>
+            </Card>
+          )}
+
           {isOwner && (
             <Card>
               <CardHeader><CardTitle>Shipment Status</CardTitle></CardHeader>

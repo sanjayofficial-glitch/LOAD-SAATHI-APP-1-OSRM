@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { showSuccess, showError } from '@/utils/toast';
+import { generateWhatsAppLink } from '@/utils/whatsapp';
 import { MapPin, Calendar, Truck, IndianRupee, ArrowLeft, CheckCircle, AlertCircle, MessageSquare, Loader2, Flag } from 'lucide-react';
 import Star from '@/components/Star';
 import RouteMap from '@/components/RouteMap';
@@ -171,6 +172,25 @@ const TripDetail = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* WhatsApp Contact Button */}
+              {userProfile?.user_type === 'shipper' && trip.trucker?.phone && (
+                <a
+                  href={generateWhatsAppLink(trip.trucker.phone, {
+                    id: trip.id,
+                    cargo_type: trip.vehicle_type,
+                    pickup_city: trip.origin_city,
+                    drop_city: trip.destination_city,
+                    weight: trip.available_capacity_tonnes * 1000,
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <Button className="bg-green-600 hover:bg-green-700 w-full mb-4">
+                    💬 Chat on WhatsApp
+                  </Button>
+                </a>
+              )}
               <div className="space-y-2">
                 <div className="flex items-center text-xl font-bold text-gray-900">
                   <MapPin className="mr-2 text-orange-600" /> {trip.origin_city} → {trip.destination_city}

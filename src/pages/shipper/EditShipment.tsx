@@ -3,15 +3,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth as useClerkAuth } from "@clerk/clerk-react";
+import { createClerkSupabaseClient } from "@/utils/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Loader2, ArrowLeft } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
 import { showSuccess, showError } from "@/utils/toast";
 
 const EditShipment = () => {
+  const { getToken } = useClerkAuth();
   const { shipmentId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -24,6 +26,9 @@ const EditShipment = () => {
   const { data: shipment, isLoading } = useQuery({
     queryKey: ["shipment", shipmentId],
     queryFn: async () => {
+      const token = await getToken({ template: 'supabase' });
+      if (!token) throw new Error('No auth token');
+      const supabase = createClerkSupabaseClient(token);
       const { data, error } = await supabase
         .from('shipments')
         .select('*')
@@ -48,6 +53,9 @@ const EditShipment = () => {
 
   const mutation = useMutation({
     mutationFn: async (updatedData: any) => {
+      const token = await getToken({ template: 'supabase' });
+      if (!token) throw new Error('No auth token');
+      const supabase = createClerkSupabaseClient(token);
       const { error } = await supabase
         .from('shipments')
         .update(updatedData)

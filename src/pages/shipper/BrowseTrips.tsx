@@ -24,7 +24,7 @@ import {
   Plus
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
-import { supabase } from '@/lib/supabaseClient';
+import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
 
 const TripList = () => {
   const { userProfile } = useAuth();
@@ -34,6 +34,7 @@ const TripList = () => {
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [myShipment, setMyShipment] = useState<any | null>(null);
   const [filters, setFilters] = useState({
     origin: '',
     destination: '',
@@ -54,6 +55,19 @@ const TripList = () => {
       }
 
       const supabaseClient = createClerkSupabaseClient(token);
+
+      // Fetch shipper's first active shipment for match scoring
+      if (userProfile.user_type === 'shipper') {
+        const { data: shipmentData } = await supabaseClient
+          .from('shipments')
+          .select('*')
+          .eq('shipper_id', userProfile.id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        setMyShipment(shipmentData || null);
+      }
 
       // Build query with proper filtering
       let query = supabaseClient
@@ -280,6 +294,22 @@ const TripList = () => {
                         >
                           {trip.status.toUpperCase()}
                         </Badge>
+                        {myShipment && (() => {
+                          const score = calculateMatchScore(
+                            myShipment.origin_city,
+                            myShipment.destination_city,
+                            trip.origin_city,
+                            trip.destination_city,
+                            myShipment.weight_tonnes,
+                            trip.available_capacity_tonnes
+                          );
+                          const { label, color } = getMatchLabel(score);
+                          return score > 0 ? (
+                            <Badge className={`${color} text-xs font-semibold ml-1`}>
+                              {label}
+                            </Badge>
+                          ) : null;
+                        })()}
                       </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">

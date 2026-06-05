@@ -36,6 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { showSuccess, showError } from '@/utils/toast';
+import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
 import { parseNaturalLanguageSearch } from '@/lib/gemini';
 import {
   Dialog,
@@ -59,6 +60,7 @@ const BrowseShipments = () => {
   const [shipments, setShipments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [myActiveTrip, setMyActiveTrip] = useState<any | null>(null);
   const [aiSearchQuery, setAiSearchQuery] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
@@ -83,6 +85,19 @@ const BrowseShipments = () => {
       const token = await getToken({ template: 'supabase' });
       if (!token) return;
       const supabaseClient = createClerkSupabaseClient(token);
+
+      // Fetch trucker's active trip for match scoring
+      if (userProfile?.user_type === 'trucker') {
+        const { data: tripData } = await supabaseClient
+          .from('trips')
+          .select('*')
+          .eq('trucker_id', userProfile.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        setMyActiveTrip(tripData || null);
+      }
       
       // Fetch all pending shipments and join with the users table
       // Using a simpler join syntax for better compatibility
@@ -100,7 +115,7 @@ const BrowseShipments = () => {
     } finally {
       setLoading(false);
     }
-  }, [getToken]);
+  }, [getToken, userProfile?.id]);
 
   useEffect(() => {
     fetchShipments();
@@ -281,22 +296,39 @@ const BrowseShipments = () => {
                 <Card key={shipment.id} className="overflow-hidden border-orange-100 hover:shadow-lg transition-all">
                   <CardContent className="p-0">
                     <div className="flex flex-col md:flex-row">
-                      <div className="flex-1 p-6 space-y-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="bg-orange-100 p-3 rounded-full">
-                              <Package className="h-6 w-6 text-orange-600" />
+                      <div className="flex-1 p-6 space-y-4">                          <div className="flex items-start justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className="bg-orange-100 p-3 rounded-full">
+                                <Package className="h-6 w-6 text-orange-600" />
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900">
+                                  {shipment.origin_city} <ArrowRight className="h-4 w-4 inline mx-1 text-gray-400" /> {shipment.destination_city}
+                                </h3>
+                                <p className="text-sm text-gray-600">{shipment.goods_description}</p>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="text-lg font-bold text-gray-900">
-                                {shipment.origin_city} <ArrowRight className="h-4 w-4 inline mx-1 text-gray-400" /> {shipment.destination_city}
-                              </h3>
-                              <p className="text-sm text-gray-600">{shipment.goods_description}</p>
+                            <div className="flex flex-col items-end gap-1">
+                              {myActiveTrip && (() => {
+                                const score = calculateMatchScore(
+                                  shipment.origin_city,
+                                  shipment.destination_city,
+                                  myActiveTrip.origin_city,
+                                  myActiveTrip.destination_city,
+                                  shipment.weight_tonnes,
+                                  myActiveTrip.available_capacity_tonnes
+                                );
+                                const { label, color } = getMatchLabel(score);
+                                return score > 0 ? (
+                                  <Badge className={`${color} text-xs font-semibold`}>
+                                    {label}
+                                  </Badge>
+                                ) : null;
+                              })()}
+                              <Badge className="bg-blue-100 text-blue-700">
+                                {shipment.weight_tonnes} Tonnes
+                              </Badge>
                             </div>
-                          </div>
-                          <Badge className="bg-blue-100 text-blue-700">
-                            {shipment.weight_tonnes} Tonnes
-                          </Badge>
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">

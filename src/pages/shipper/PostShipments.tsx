@@ -14,6 +14,8 @@ import { showSuccess, showError } from "@/utils/toast";
 import { Package, MapPin, Calendar, IndianRupee, Loader2, ArrowLeft, WifiOff } from "lucide-react";
 import LocationSelector from "@/components/LocationSelector";
 import locationData from "@/data/locations.json";
+import { geocodeCity } from "@/utils/geocode";
+import { getRoute } from "@/utils/osrm";
 
 const PostShipments = () => {
   const { userProfile } = useAuth();
@@ -70,8 +72,8 @@ const PostShipments = () => {
 
     setLoading(true);
     try {
-      const supabase = await getAuthenticatedClient();
-      const { error } = await supabase.from('shipments').insert({
+      const supabaseClient = await getAuthenticatedClient();
+      const { data: shipmentData, error } = await supabaseClient.from('shipments').insert({
         shipper_id: userProfile.id,
         origin_city: formData.origin_city.trim(),
         origin_state: formData.origin_state,
@@ -84,14 +86,41 @@ const PostShipments = () => {
         delivery_address: formData.delivery_address.trim(),
         budget_per_tonne: budget,
         status: 'pending'
-      });
+      }).select('id').single();
 
       if (error) {
         showError(error.message);
-      } else {
-        showSuccess('Shipment posted successfully!');
-        navigate('/shipper/dashboard');
+        return;
       }
+
+      // Save coordinates — runs after shipment is already created, non-blocking
+      if (shipmentData?.id) {
+        try {
+          const [originCoords, destCoords] = await Promise.all([
+            geocodeCity(formData.origin_city),
+            geocodeCity(formData.destination_city)
+          ]);
+          if (originCoords && destCoords) {
+            const route = await getRoute(
+              originCoords.lon, originCoords.lat,
+              destCoords.lon, destCoords.lat
+            );
+            await supabaseClient.from('shipments').update({
+              origin_lat: originCoords.lat,
+              origin_lng: originCoords.lon,
+              destination_lat: destCoords.lat,
+              destination_lng: destCoords.lon,
+              estimated_distance_km: route?.distance_km ?? null,
+              estimated_duration_min: route?.duration_min ?? null,
+            }).eq('id', shipmentData.id);
+          }
+        } catch {
+          // Silently ignore — coordinates are optional enhancement
+        }
+      }
+
+      showSuccess('Shipment posted successfully!');
+      navigate('/shipper/dashboard');
     } catch (err: any) {
       showError(err.message || 'An unexpected error occurred.');
     } finally {
