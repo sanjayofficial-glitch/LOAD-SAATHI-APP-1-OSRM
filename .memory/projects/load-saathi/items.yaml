@@ -1,0 +1,102 @@
+facts:
+  - id: clerk-integration
+    type: architecture
+    description: Clerk Auth fully integrated with React (not Next.js)
+    details: Uses @clerk/clerk-react (NOT @clerk/nextjs). ClerkProvider wraps entire app in App.tsx. SignIn/SignUp via Clerk components at /login and /register routes.
+    status: active
+
+  - id: clerk-publishable-key
+    type: configuration
+    description: Current Clerk publishable key
+    value: pk_test_aW4tb2FyZmlzaC0xNi5jbGVyay5hY2NvdW50cy5kZXYk
+    env_var: VITE_CLERK_PUBLISHABLE_KEY
+    status: active
+    updated: 2026-06-05
+
+  - id: supabase-project
+    type: configuration
+    description: Supabase project connection details
+    details:
+      url: https://aejvxilhydyfbwkhjpdt.supabase.co
+      project_ref: aejvxilhydyfbwkhjpdt
+    status: active
+    updated: 2026-06-05
+
+  - id: supabase-client-dual
+    type: architecture
+    description: Two Supabase client files exist intentionally
+    details: >
+      src/utils/supabaseClient.ts has createClerkSupabaseClient() for authenticated requests.
+      src/lib/supabaseClient.ts has anonymous client for Realtime subscriptions (NotificationBell.tsx, utils/chat.ts, Chat.tsx).
+      Do NOT merge — anonymous client is needed for Realtime.
+    status: active
+
+  - id: route-map-osrm
+    type: architecture
+    description: RouteMap uses OSRM road geometry
+    details: >
+      RouteMap.tsx accepts pre-stored coordinate props to skip Nominatim geocoding.
+      OSRM getRoute() only called when no pre-stored coords are provided (avoids API calls on display-only loads).
+      Shows distance/ETA below map via GeoJSON.
+    status: active
+
+  - id: match-scoring
+    type: feature
+    description: Match scoring on browse pages
+    details: >
+      BrowseTrips and BrowseShipments sort results by match score descending.
+      calculateMatchScore() in matching.ts compares origin/destination city overlap + weight capacity.
+      Badges show match percentage (green >60, yellow 30-60, gray <30).
+    status: active
+
+  - id: coordinate-saving
+    type: feature
+    description: Coordinates saved on trip/shipment creation
+    details: >
+      PostTrip.tsx and PostShipments.tsx geocode origin/destination via Nominatim,
+      get OSRM route for distance/duration, then update the DB row with lat/lng/est_distance/est_duration.
+    status: active
+
+  - id: whatsapp-integration
+    type: feature
+    description: WhatsApp deep links on trip/shipment detail pages
+    details: >
+      generateWhatsAppLink() in whatsapp.ts creates wa.me deep links.
+      ShipmentDetail shows green WhatsApp button when accepted trucker has a phone.
+      TripDetail shows WhatsApp button when trip has trucker contact.
+    status: active
+
+  - id: gemini-not-dead
+    type: architecture
+    description: src/lib/gemini.ts IS in use (not dead code)
+    details: Imported by BrowseShipments.tsx for AI-powered shipment search. Do not delete.
+    status: active
+
+  - id: cleanup-done
+    type: maintenance
+    description: Various cleanup tasks completed
+    details:
+      - Deleted src/pages/tripper/EditTrip.tsx (duplicate, moved to trucker/)
+      - Deleted src/components/NotificationService.tsx (dead WebSocket component using wss://echo.websocket.org)
+      - Fixed TripStatusButton.module.css (removed JS string quotes)
+      - Added empty states to BrowseShipments, BrowseTrips, MyShipments, TruckerHub
+    status: active
+    completed: 2026-06-05
+
+  - id: deferred-shipment-requests
+    type: architecture
+    description: shipment_requests → requests consolidation NOT done
+    details: >
+      16 files still read/write shipment_requests table. Original plan said not to consolidate.
+      Deferred due to risk — messages and notifications FK to shipment_requests.
+      Revisit if schema changes are needed.
+    status: deferred
+    defer_reason: High risk — FKs from messages and notifications tables
+
+  - id: clerk-after-signup-deprecation
+    type: issue
+    description: Clerk afterSignUpUrl prop deprecated
+    details: >
+      Register page passes afterSignUpUrl to <SignUp> component, which shows a dev warning.
+      Should replace with fallbackRedirectUrl or forceRedirectUrl.
+    status: open
