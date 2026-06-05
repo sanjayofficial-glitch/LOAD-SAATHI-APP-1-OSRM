@@ -122,21 +122,34 @@ const BrowseShipments = () => {
   }, [fetchShipments]);
 
   const filteredShipments = useMemo(() => {
-    return shipments.filter(s => {
-      const search = searchTerm.toLowerCase();
-      const matchesSearch = s.origin_city.toLowerCase().includes(search) || 
-                           s.destination_city.toLowerCase().includes(search) ||
-                           s.goods_description.toLowerCase().includes(search);
-      
-      const matchesOrigin = filters.originState === 'Any' || (s.origin_state && s.origin_state === filters.originState);
-      const matchesDest = filters.destinationState === 'Any' || (s.destination_state && s.destination_state === filters.destinationState);
-      const matchesWeight = !filters.minWeight || s.weight_tonnes >= parseFloat(filters.minWeight);
-      const matchesPrice = !filters.maxPrice || s.budget_per_tonne <= parseFloat(filters.maxPrice);
-      const matchesDate = !filters.departureDate || new Date(s.departure_date) >= new Date(filters.departureDate);
-      
-      return matchesSearch && matchesOrigin && matchesDest && matchesWeight && matchesPrice && matchesDate;
-    });
-  }, [shipments, searchTerm, filters]);
+    return shipments
+      .filter(s => {
+        const search = searchTerm.toLowerCase();
+        const matchesSearch = s.origin_city.toLowerCase().includes(search) || 
+                             s.destination_city.toLowerCase().includes(search) ||
+                             s.goods_description.toLowerCase().includes(search);
+        
+        const matchesOrigin = filters.originState === 'Any' || (s.origin_state && s.origin_state === filters.originState);
+        const matchesDest = filters.destinationState === 'Any' || (s.destination_state && s.destination_state === filters.destinationState);
+        const matchesWeight = !filters.minWeight || s.weight_tonnes >= parseFloat(filters.minWeight);
+        const matchesPrice = !filters.maxPrice || s.budget_per_tonne <= parseFloat(filters.maxPrice);
+        const matchesDate = !filters.departureDate || new Date(s.departure_date) >= new Date(filters.departureDate);
+        
+        return matchesSearch && matchesOrigin && matchesDest && matchesWeight && matchesPrice && matchesDate;
+      })
+      .map(s => ({
+        ...s,
+        _matchScore: myActiveTrip ? calculateMatchScore(
+          s.origin_city,
+          s.destination_city,
+          myActiveTrip.origin_city,
+          myActiveTrip.destination_city,
+          s.weight_tonnes,
+          myActiveTrip.available_capacity_tonnes
+        ) : 0
+      }))
+      .sort((a, b) => b._matchScore - a._matchScore);
+  }, [shipments, searchTerm, filters, myActiveTrip]);
 
   const handleAiSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -309,21 +322,9 @@ const BrowseShipments = () => {
                               </div>
                             </div>
                             <div className="flex flex-col items-end gap-1">
-                              {myActiveTrip && (() => {
-                                const score = calculateMatchScore(
-                                  shipment.origin_city,
-                                  shipment.destination_city,
-                                  myActiveTrip.origin_city,
-                                  myActiveTrip.destination_city,
-                                  shipment.weight_tonnes,
-                                  myActiveTrip.available_capacity_tonnes
-                                );
-                                const { label, color } = getMatchLabel(score);
-                                return score > 0 ? (
-                                  <Badge className={`${color} text-xs font-semibold`}>
-                                    {label}
-                                  </Badge>
-                                ) : null;
+                              {shipment._matchScore > 0 && (() => {
+                                const { label, color } = getMatchLabel(shipment._matchScore);
+                                return <Badge className={`${color} text-xs font-semibold`}>{label}</Badge>;
                               })()}
                               <Badge className="bg-blue-100 text-blue-700">
                                 {shipment.weight_tonnes} Tonnes

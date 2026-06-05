@@ -1,15 +1,22 @@
 /**
  * RouteMap — Free map using react-leaflet + OpenStreetMap (no API key needed!)
- * Geocodes city names using Nominatim (free, no signup) and draws a route line.
+ * Geocodes city names using Nominatim (free, no signup) and draws the actual
+ * OSRM driving route when possible.
  *
  * Usage:
  *   <RouteMap originCity="Mumbai" destinationCity="Delhi" />
+ *   <RouteMap originCity="Mumbai" destinationCity="Delhi" 
+ *             originLat={19.076} originLng={72.877} 
+ *             destLat={28.704} destLng={77.102}
+ *             distanceKm={1400} durationMin={1200} />
  */
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Skeleton } from '@/components/ui/skeleton';
+import { geocodeCity } from '@/utils/geocode';
+import { getRoute, RouteResult } from '@/utils/osrm';
 
 // Fix Leaflet's default marker icon (broken in Vite builds)
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -33,48 +40,85 @@ const destIcon = new L.Icon({
 
 interface Coords { lat: number; lon: number; }
 
-// Free Nominatim geocoding — no API key needed
-async function geocodeCity(city: string, country = 'India'): Promise<Coords | null> {
-  try {
-    const query = encodeURIComponent(`${city}, ${country}`);
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`,
-      { headers: { 'Accept-Language': 'en' } }
-    );
-    const data = await res.json();
-    if (data.length > 0) return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 interface RouteMapProps {
   originCity: string;
   destinationCity: string;
+  originLat?: number;
+  originLng?: number;
+  destLat?: number;
+  destLng?: number;
+  distanceKm?: number;
+  durationMin?: number;
   height?: string;
 }
 
-const RouteMap = ({ originCity, destinationCity, height = '300px' }: RouteMapProps) => {
+const RouteMap = ({
+  originCity,
+  destinationCity,
+  originLat: propOriginLat,
+  originLng: propOriginLng,
+  destLat: propDestLat,
+  destLng: propDestLng,
+  distanceKm: propDistanceKm,
+  durationMin: propDurationMin,
+  height = '300px'
+}: RouteMapProps) => {
   const [origin, setOrigin] = useState<Coords | null>(null);
   const [destination, setDestination] = useState<Coords | null>(null);
+  const [route, setRoute] = useState<RouteResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  const hasPreStoredCoords = propOriginLat !== undefined && propOriginLng !== undefined &&
+                             propDestLat !== undefined && propDestLng !== undefined;
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(false);
 
-    Promise.all([geocodeCity(originCity), geocodeCity(destinationCity)]).then(([orig, dest]) => {
+    const loadMapData = async () => {
+      let originCoords: Coords | null = null;
+      let destCoords: Coords | null = null;
+
+      if (hasPreStoredCoords) {
+        originCoords = { lat: propOriginLat!, lon: propOriginLng! };
+        destCoords = { lat: propDestLat!, lon: propDestLng! };
+      } else {
+        [originCoords, destCoords] = await Promise.all([
+          geocodeCity(originCity),
+          geocodeCity(destinationCity)
+        ]);
+      }
+
       if (cancelled) return;
-      if (!orig || !dest) { setError(true); }
-      else { setOrigin(orig); setDestination(dest); }
-      setLoading(false);
-    });
+
+      if (!originCoords || !destCoords) {
+        setError(true);
+        setLoading(false);
+        return;
+      }
+
+      setOrigin(originCoords);
+      setDestination(destCoords);
+
+      // Only fetch OSRM route if we had to geocode (no pre-stored coords)
+      // OSRM is expensive — never call it just for display, only at creation time
+      if (!hasPreStoredCoords) {
+        const routeResult = await getRoute(
+          originCoords.lon, originCoords.lat,
+          destCoords.lon, destCoords.lat
+        );
+        if (!cancelled) setRoute(routeResult);
+      }
+
+      if (!cancelled) setLoading(false);
+    };
+
+    loadMapData();
 
     return () => { cancelled = true; };
-  }, [originCity, destinationCity]);
+  }, [originCity, destinationCity, propOriginLat, propOriginLng, propDestLat, propDestLng, hasPreStoredCoords]);
 
   if (loading) return <Skeleton className="w-full rounded-lg" style={{ height }} />;
   if (error || !origin || !destination) {
@@ -90,27 +134,49 @@ const RouteMap = ({ originCity, destinationCity, height = '300px' }: RouteMapPro
     (origin.lon + destination.lon) / 2,
   ];
 
+  const displayDistanceKm = propDistanceKm || route?.distance_km;
+  const displayDurationMin = propDurationMin || route?.duration_min;
+
   return (
-    <div className="rounded-lg overflow-hidden border border-gray-200" style={{ height }}>
-      <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={[origin.lat, origin.lon]} icon={originIcon}>
-          <Popup>🟢 From: {originCity}</Popup>
-        </Marker>
-        <Marker position={[destination.lat, destination.lon]} icon={destIcon}>
-          <Popup>🔴 To: {destinationCity}</Popup>
-        </Marker>
-        <Polyline
-          positions={[
-            [origin.lat, origin.lon],
-            [destination.lat, destination.lon],
-          ]}
-          pathOptions={{ color: '#f97316', weight: 3, dashArray: '8, 8' }}
-        />
-      </MapContainer>
+    <div>
+      <div className="rounded-lg overflow-hidden border border-gray-200" style={{ height }}>
+        <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Marker position={[origin.lat, origin.lon]} icon={originIcon}>
+            <Popup>🟢 From: {originCity}</Popup>
+          </Marker>
+          <Marker position={[destination.lat, destination.lon]} icon={destIcon}>
+            <Popup>🔴 To: {destinationCity}</Popup>
+          </Marker>
+          {route?.geometry ? (
+            <GeoJSON
+              key={JSON.stringify(route.geometry)}
+              data={route.geometry}
+              style={() => ({
+                color: '#f97316',
+                weight: 3,
+                opacity: 0.85,
+              })}
+            />
+          ) : (
+            <Polyline
+              positions={[
+                [origin.lat, origin.lon],
+                [destination.lat, destination.lon],
+              ]}
+              pathOptions={{ color: '#f97316', weight: 3, dashArray: '8, 8' }}
+            />
+          )}
+        </MapContainer>
+      </div>
+      {displayDistanceKm && displayDurationMin && (
+        <div className="mt-2 text-sm text-gray-500 text-center">
+          📍 {displayDistanceKm.toLocaleString()} km &nbsp; ⏱ ~{displayDurationMin} min (~{Math.round(displayDurationMin / 60)} hrs)
+        </div>
+      )}
     </div>
   );
 };

@@ -65,7 +65,7 @@ const TripList = () => {
           .eq('status', 'pending')
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
         setMyShipment(shipmentData || null);
       }
 
@@ -122,20 +122,33 @@ const TripList = () => {
   }, [fetchTrips]);
 
   const filteredTrips = useMemo(() => {
-    return trips.filter(t => {
-      const matchesSearch = !searchTerm || 
-        t.origin_city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.destination_city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (t.trucker?.full_name || '').toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesOrigin = !filters.origin || t.origin_city.toLowerCase().includes(filters.origin.toLowerCase());
-      const matchesDest = !filters.destination || t.destination_city.toLowerCase().includes(filters.destination.toLowerCase());
-      const matchesCapacity = !filters.minCapacity || t.available_capacity_tonnes >= parseFloat(filters.minCapacity);
-      const matchesPrice = !filters.maxPrice || t.price_per_tonne <= parseFloat(filters.maxPrice);
+    return trips
+      .filter(t => {
+        const matchesSearch = !searchTerm || 
+          t.origin_city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          t.destination_city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (t.trucker?.full_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesOrigin = !filters.origin || t.origin_city.toLowerCase().includes(filters.origin.toLowerCase());
+        const matchesDest = !filters.destination || t.destination_city.toLowerCase().includes(filters.destination.toLowerCase());
+        const matchesCapacity = !filters.minCapacity || t.available_capacity_tonnes >= parseFloat(filters.minCapacity);
+        const matchesPrice = !filters.maxPrice || t.price_per_tonne <= parseFloat(filters.maxPrice);
 
-      return matchesSearch && matchesOrigin && matchesDest && matchesCapacity && matchesPrice;
-    });
-  }, [trips, searchTerm, filters]);
+        return matchesSearch && matchesOrigin && matchesDest && matchesCapacity && matchesPrice;
+      })
+      .map(t => ({
+        ...t,
+        _matchScore: myShipment ? calculateMatchScore(
+          myShipment.origin_city,
+          myShipment.destination_city,
+          t.origin_city,
+          t.destination_city,
+          myShipment.weight_tonnes,
+          t.available_capacity_tonnes
+        ) : 0
+      }))
+      .sort((a, b) => b._matchScore - a._matchScore);
+  }, [trips, searchTerm, filters, myShipment]);
 
   if (!userProfile) {
     return (
@@ -294,21 +307,9 @@ const TripList = () => {
                         >
                           {trip.status.toUpperCase()}
                         </Badge>
-                        {myShipment && (() => {
-                          const score = calculateMatchScore(
-                            myShipment.origin_city,
-                            myShipment.destination_city,
-                            trip.origin_city,
-                            trip.destination_city,
-                            myShipment.weight_tonnes,
-                            trip.available_capacity_tonnes
-                          );
-                          const { label, color } = getMatchLabel(score);
-                          return score > 0 ? (
-                            <Badge className={`${color} text-xs font-semibold ml-1`}>
-                              {label}
-                            </Badge>
-                          ) : null;
+                        {trip._matchScore > 0 && (() => {
+                          const { label, color } = getMatchLabel(trip._matchScore);
+                          return <Badge className={`${color} text-xs font-semibold ml-1`}>{label}</Badge>;
                         })()}
                       </div>
 
