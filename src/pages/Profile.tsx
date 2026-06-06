@@ -178,7 +178,7 @@ const Profile = () => {
       
       const { error } = await supabase
         .from('profiles')
-        .update({ role: newRole })
+        .update({ user_type: newRole })
         .eq('id', userProfile?.id);
 
       if (error) throw error;

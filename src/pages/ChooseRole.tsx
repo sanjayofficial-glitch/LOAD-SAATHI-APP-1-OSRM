@@ -54,7 +54,7 @@ const ChooseRole = () => {
         .upsert({
           id: crypto.randomUUID(),
           clerk_user_id: user.id,
-          role,
+          user_type: role,
           full_name: user.fullName || '',
           phone: user.primaryPhoneNumber?.phoneNumber || '',
           rating: 0,
