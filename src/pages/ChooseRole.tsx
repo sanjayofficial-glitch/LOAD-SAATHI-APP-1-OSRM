@@ -49,20 +49,31 @@ const ChooseRole = () => {
 
       const supabase = createClerkSupabaseClient(supabaseToken);
 
-      const { error: upsertError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: crypto.randomUUID(),
-          clerk_user_id: user.id,
-          user_type: role,
-          full_name: user.fullName || '',
-          phone: user.primaryPhoneNumber?.phoneNumber || '',
-          rating: 0,
-          total_trips: 0,
-          created_at: user.createdAt ? new Date(user.createdAt).toISOString() : new Date().toISOString()
-        }, { onConflict: 'clerk_user_id' });
+      const profile = {
+        clerk_user_id: user.id,
+        user_type: role,
+        full_name: user.fullName || '',
+        phone: user.primaryPhoneNumber?.phoneNumber || '',
+        rating: 0,
+        total_trips: 0,
+      };
 
-      if (upsertError) throw upsertError;
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('clerk_user_id', user.id)
+        .maybeSingle();
+
+      const genId = () => { try { return crypto.randomUUID(); } catch { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); } };
+
+      let result;
+      if (existing) {
+        result = await supabase.from('profiles').update(profile).eq('id', existing.id);
+      } else {
+        result = await supabase.from('profiles').insert({ id: genId(), ...profile, created_at: new Date().toISOString() });
+      }
+
+      if (result.error) throw result.error;
 
       // Crucial: Refresh the profile in our context so the app knows the new role immediately
       await refreshProfile();
