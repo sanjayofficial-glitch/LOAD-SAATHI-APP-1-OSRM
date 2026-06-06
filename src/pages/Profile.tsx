@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAuth as useClerkAuth } from '@clerk/clerk-react';
+import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,10 +36,11 @@ const ALLOWED_ADMIN_ID = "user_3Cn2O5bwNC0wsSEfGDnTky9rn2S";
 const Profile = () => {
   const { userProfile, refreshProfile } = useAuth();
   const { getToken } = useClerkAuth();
+  const { user: clerkUser } = useUser();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState(userProfile?.full_name || '');
   const [phone, setPhone] = useState(userProfile?.phone || '');
-  const [companyName, setCompanyName] = useState(userProfile?.company_name || '');
+  const [companyName, setCompanyName] = useState('');
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [switching, setSwitching] = useState(false);
@@ -52,7 +53,7 @@ const Profile = () => {
     if (userProfile) {
       setFullName(userProfile.full_name || '');
       setPhone(userProfile.phone || '');
-      setCompanyName(userProfile.company_name || '');
+      setCompanyName('');
       fetchStats();
       if (userProfile.user_type === 'trucker') {
         fetchReviews();
@@ -99,9 +100,9 @@ const Profile = () => {
       
       const supabase = createClerkSupabaseClient(supabaseToken);
       
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('reviews')
-        .select('*, shipper:users(full_name)')
+        .select('*, shipper:profiles(full_name)')
         .eq('trucker_id', userProfile.id)
         .order('created_at', { ascending: false });
       
@@ -127,11 +128,10 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ 
           full_name: fullName, 
-          phone, 
-          company_name: companyName 
+          phone
         })
         .eq('id', userProfile?.id);
 
@@ -157,8 +157,8 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('users')
-        .update({ is_verified: true })
+        .from('profiles')
+        .update({ contact_visible: true })
         .eq('id', userProfile?.id);
 
       if (error) throw error;
@@ -181,8 +181,8 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('users')
-        .update({ user_type: newRole })
+        .from('profiles')
+        .update({ role: newRole })
         .eq('id', userProfile?.id);
 
       if (error) throw error;
@@ -215,7 +215,7 @@ const Profile = () => {
               <Badge variant="secondary" className="bg-orange-50 text-orange-700 border-orange-100 capitalize">
                 {userProfile?.user_type}
               </Badge>
-              {userProfile?.is_verified && (
+              {userProfile?.contact_visible && (
                 <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
                   <CheckCircle2 className="h-3 w-3 mr-1" /> Verified
                 </Badge>
@@ -224,7 +224,7 @@ const Profile = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          {!userProfile?.is_verified && (
+          {!userProfile?.contact_visible && (
             <Button 
               variant="outline" 
               onClick={handleVerify}
@@ -296,7 +296,7 @@ const Profile = () => {
                     <Mail className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-xs text-gray-500">Email Address</p>
-                      <p className="text-sm font-medium">{userProfile?.email}</p>
+                      <p className="text-sm font-medium">{clerkUser?.primaryEmailAddress?.emailAddress || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg">
@@ -310,7 +310,7 @@ const Profile = () => {
                     <Building className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-xs text-gray-500">Company</p>
-                      <p className="text-sm font-medium">{userProfile?.company_name || 'Individual'}</p>
+                      <p className="text-sm font-medium">{companyName || 'Individual'}</p>
                     </div>
                   </div>
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg">
@@ -498,7 +498,7 @@ const Profile = () => {
                   </Button>
                   
                   {/* Only show Admin switch option to the authorized developer ID */}
-                  {userProfile?.id === ALLOWED_ADMIN_ID && (
+                  {userProfile?.clerk_user_id === ALLOWED_ADMIN_ID && (
                     <Button 
                       variant={userProfile?.user_type === 'admin' ? 'default' : 'outline'}
                       onClick={() => handleSwitchRole('admin')}

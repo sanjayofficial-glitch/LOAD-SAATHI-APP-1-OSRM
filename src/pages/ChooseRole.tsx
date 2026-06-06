@@ -51,14 +51,13 @@ const ChooseRole = () => {
 
       // Use upsert to handle both new and existing users
       const { error: upsertError } = await supabase
-        .from('users')
+        .from('profiles')
         .upsert({
-          id: user.id,
-          user_type: role,
-          email: user.primaryEmailAddress?.emailAddress || '',
+          id: crypto.randomUUID(),
+          clerk_user_id: user.id,
+          role,
           full_name: user.fullName || '',
           phone: user.primaryPhoneNumber?.phoneNumber || '',
-          is_verified: false,
           rating: 0,
           total_trips: 0,
           created_at: user.createdAt ? new Date(user.createdAt).toISOString() : new Date().toISOString()

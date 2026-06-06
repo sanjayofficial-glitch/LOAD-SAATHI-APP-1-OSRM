@@ -1,14 +1,17 @@
 export interface User {
   id: string;
-  email: string;
+  clerk_user_id: string;
   user_type: 'trucker' | 'shipper' | 'admin';
   full_name: string;
-  phone: string;
-  company_name?: string;
-  is_verified: boolean;
+  phone?: string;
+  photo_url?: string;
+  city?: string;
   rating: number;
   total_trips: number;
+  contact_visible?: boolean;
+  push_subscription?: Record<string, unknown>;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface Trip {
