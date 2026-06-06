@@ -51,6 +51,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const loadUserProfile = async () => {
       if (!clerkLoaded || !user) {
         setUserProfile(null);
@@ -59,7 +61,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       try {
-        const supabaseToken = await clerk.session?.getToken({ template: 'supabase' });
+        const tokenPromise = clerk.session?.getToken({ template: 'supabase' });
+        const supabaseToken = await Promise.race([
+          tokenPromise,
+          new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('Supabase token request timed out')), 10000)
+          )
+        ]);
+
         if (!supabaseToken) {
           setUserProfile(null);
           setLoading(false);
@@ -71,7 +80,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .from('users')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .single()
+          .abortSignal(abortController.signal);
 
         if (error) {
           console.error('[AuthContext] Error fetching user profile:', error);
@@ -88,6 +98,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     loadUserProfile();
+
+    return () => abortController.abort();
   }, [clerkLoaded, user, clerk]);
 
   const signOut = async () => {

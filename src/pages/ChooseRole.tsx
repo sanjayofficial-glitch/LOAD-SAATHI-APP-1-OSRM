@@ -9,10 +9,21 @@ import { useAuth } from '@/contexts/AuthContext';
 const ChooseRole = () => {
   const { user, isLoaded } = useUser();
   const { session } = useSession();
-  const { refreshProfile, userProfile } = useAuth();
+  const { refreshProfile, userProfile, loading: profileLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stalled, setStalled] = useState(false);
+
+  // If Clerk takes too long, show a fallback instead of infinite spinner
+  useEffect(() => {
+    if (isLoaded && user) {
+      setStalled(false);
+      return;
+    }
+    const timer = setTimeout(() => setStalled(true), 8000);
+    return () => clearTimeout(timer);
+  }, [isLoaded, user]);
 
   // Redirect if user already has a role
   useEffect(() => {
