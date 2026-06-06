@@ -12,22 +12,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
-  Search, 
-  Calendar, 
-  Package, 
-  ArrowRight, 
-  Loader2, 
-  Send,
-  IndianRupee,
-  Filter,
-  X,
-  Eye,
-  Sparkles,
-  AlertCircle,
-  User,
-  MapPin,
-  Truck
-} from 'lucide-react';
+   Search, 
+   Calendar, 
+   Package, 
+   ArrowRight, 
+   Loader2, 
+   IndianRupee,
+   Sparkles,
+   User
+ } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -47,6 +40,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { notifyShipperOfTruckerOffer } from '@/utils/notifications';
+import type { Shipment, Trip } from '@/types';
 
 const INDIAN_STATES = [
   "Any", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
@@ -57,10 +51,10 @@ const BrowseShipments = () => {
   const { getToken } = useClerkAuth();
   const navigate = useNavigate();
   
-  const [shipments, setShipments] = useState<any[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [myActiveTrip, setMyActiveTrip] = useState<any | null>(null);
+  const [myActiveTrip, setMyActiveTrip] = useState<Trip | null>(null);
   const [aiSearchQuery, setAiSearchQuery] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
@@ -73,7 +67,7 @@ const BrowseShipments = () => {
     departureDate: ''
   });
 
-  const [selectedShipment, setSelectedShipment] = useState<any>(null);
+  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
   const [proposedPrice, setProposedPrice] = useState('');
   const [message, setMessage] = useState('');
@@ -109,7 +103,7 @@ const BrowseShipments = () => {
         
       if (error) throw error;
       if (data) setShipments(data);
-    } catch (err: any) {
+    } catch (err) {
       console.error('[BrowseShipments] Error:', err);
       showError('Failed to load shipments');
     } finally {
@@ -161,14 +155,14 @@ const BrowseShipments = () => {
       if (parsedFilters.weight) setFilters(f => ({ ...f, minWeight: parsedFilters.weight!.toString() }));
       if (parsedFilters.date) setFilters(f => ({ ...f, departureDate: parsedFilters.date! }));
       showSuccess('AI parsed your search!');
-    } catch (err: any) {
+    } catch (err) {
       showError('AI search failed');
     } finally {
       setAiLoading(false);
     }
   };
 
-  const openOfferDialog = (shipment: any) => {
+  const openOfferDialog = (shipment: Shipment) => {
     setSelectedShipment(shipment);
     setProposedPrice(shipment.budget_per_tonne.toString());
     setIsOfferDialogOpen(true);
@@ -212,8 +206,8 @@ const BrowseShipments = () => {
       showSuccess('Offer sent to shipper!');
       setIsOfferDialogOpen(false);
       navigate('/trucker/my-trips?tab=sent');
-    } catch (err: any) {
-      showError(err.message || 'Failed to send offer');
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Failed to send offer');
     } finally {
       setSendingOffer(false);
     }

@@ -1,4 +1,5 @@
-declare const Sentry: any;
-declare namespace Sentry {
-  function init(options: any): void;
-}
+declare const Sentry: {
+  init(options: Record<string, unknown>): void;
+  captureException(error: unknown): void;
+  captureMessage(message: string): void;
+};

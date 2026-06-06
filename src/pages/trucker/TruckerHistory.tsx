@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,11 +16,9 @@ import {
   TrendingUp, 
   Calendar, 
   MapPin, 
-  Filter,
   Eye,
   Package,
   CheckCircle,
-  Search,
   Loader2,
   IndianRupee,
   AlertCircle,
@@ -95,7 +93,7 @@ const TruckerHistory = () => {
 
       // Process trips
       if (tripsData) {
-        tripsData.forEach((t: any) => {
+        tripsData.forEach((t) => {
           items.push({
             id: `trip-${t.id}`,
             relatedId: t.id,
@@ -113,8 +111,8 @@ const TruckerHistory = () => {
 
       // Process offers
       if (offersData) {
-        offersData.forEach((o: any) => {
-          const ship = o.shipments;
+        offersData.forEach((o) => {
+          const ship = Array.isArray(o.shipments) ? o.shipments[0] : o.shipments;
           items.push({
             id: `offer-${o.id}`,
             relatedId: o.shipment_id || '',

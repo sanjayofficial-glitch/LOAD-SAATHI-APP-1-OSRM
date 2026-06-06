@@ -6,6 +6,9 @@ export interface Message {
   created_at: string;
   is_read: boolean;
   request_id?: string;
+  shipment_request_id?: string;
+  sender?: { id: string; full_name: string };
+  recipient?: { id: string; full_name: string };
 }
 
 export interface ChatParticipant {

@@ -32,6 +32,7 @@ import {
   notifyShipperOfRequestDeclined,
   notifyShipperOfTripCompletion,
 } from '@/utils/notifications';
+import type { Trip, Request } from '@/types';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const cfg: Record<string, string> = {
@@ -56,8 +57,8 @@ const TruckerTripDetail = () => {
   const { getAuthenticatedClient } = useSupabase();
   const navigate = useNavigate();
 
-  const [trip, setTrip] = useState<any>(null);
-  const [bookingRequests, setBookingRequests] = useState<any[]>([]);
+  const [trip, setTrip] = useState<Trip | null>(null);
+  const [bookingRequests, setBookingRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -87,7 +88,7 @@ const TruckerTripDetail = () => {
         .order('created_at', { ascending: false });
 
       if (!requestsError) setBookingRequests(requests || []);
-    } catch (err: any) {
+    } catch (err) {
       showError('Failed to load trip details');
     } finally {
       setLoading(false);
@@ -125,14 +126,14 @@ const TruckerTripDetail = () => {
 
       showSuccess('Trip marked as completed! Shippers have been notified.');
       fetchData();
-    } catch (err: any) {
+    } catch (err) {
       showError('Failed to complete trip');
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleBookingAction = async (request: any, status: 'accepted' | 'declined') => {
+  const handleBookingAction = async (request: Request, status: 'accepted' | 'declined') => {
     setActionLoading(request.id);
     try {
       const supabase = await getAuthenticatedClient();
@@ -148,8 +149,8 @@ const TruckerTripDetail = () => {
           shipperId: request.shipper_id,
           truckerName: userProfile?.full_name || 'The trucker',
           truckerPhone: userProfile?.phone || 'N/A',
-          originCity: trip?.origin_city,
-          destinationCity: trip?.destination_city,
+          originCity: trip?.origin_city || '',
+          destinationCity: trip?.destination_city || '',
           requestId: request.id,
           getToken: () => getToken({ template: 'supabase' }),
         });
@@ -158,14 +159,14 @@ const TruckerTripDetail = () => {
         await notifyShipperOfRequestDeclined({
           shipperId: request.shipper_id,
           truckerName: userProfile?.full_name || 'The trucker',
-          originCity: trip?.origin_city,
-          destinationCity: trip?.destination_city,
+          originCity: trip?.origin_city || '',
+          destinationCity: trip?.destination_city || '',
           getToken: () => getToken({ template: 'supabase' }),
         });
         showSuccess('Request declined. Shipper has been notified.');
       }
       fetchData();
-    } catch (err: any) {
+    } catch (err) {
       showError(`Failed to ${status} request`);
     } finally {
       setActionLoading(null);

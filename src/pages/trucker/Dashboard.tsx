@@ -75,9 +75,11 @@ const TruckerDashboard = () => {
         .eq('trucker_id', userProfile.id)
         .eq('status', 'accepted');
 
+      type BookingEarning = { weight_tonnes: number; trip: { price_per_tonne: number } | null };
+      type OfferEarning = { proposed_price_per_tonne: number; shipment: { weight_tonnes: number } | null };
       const totalEarnings = (
-        (bookingEarnings?.reduce((sum, r: any) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0) || 0) +
-        (offerEarnings?.reduce((sum, o: any) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.weight_tonnes || 0)), 0) || 0)
+        ((bookingEarnings ?? []) as unknown as BookingEarning[]).reduce((sum, r) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0) +
+        ((offerEarnings ?? []) as unknown as OfferEarning[]).reduce((sum, o) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.weight_tonnes || 0)), 0)
       );
 
       setStats({
@@ -86,7 +88,7 @@ const TruckerDashboard = () => {
         completedTrips: completedCount || 0,
         totalEarnings
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error('[TruckerDashboard] Error:', err);
       showError('Failed to load dashboard statistics');
     } finally {

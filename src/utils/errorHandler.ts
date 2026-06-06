@@ -20,8 +20,8 @@ export function isNetworkError(error: unknown): boolean {
   }
 
   if (typeof error === 'object' && error !== null) {
-    const err = error as any;
-    if (err.code === 'PGRST301' || err.code === 'PGRST302' || err.code?.startsWith('NETWORK_')) {
+    const err = error as Record<string, unknown>;
+    if (err.code === 'PGRST301' || err.code === 'PGRST302' || (typeof err.code === 'string' && err.code.startsWith('NETWORK_'))) {
       return true;
     }
   }
@@ -37,7 +37,7 @@ export function getNetworkErrorMessage(): string {
   return 'Unable to connect. Please check your internet connection and try again.';
 }
 
-export const handleError = (error: Error, context?: Record<string, any>) => {
+export const handleError = (error: Error, context?: Record<string, unknown>) => {
   logger.error(`[ErrorHandler] ${error.message}`, { ...context, stack: error.stack });
 
   if (isNetworkError(error)) {

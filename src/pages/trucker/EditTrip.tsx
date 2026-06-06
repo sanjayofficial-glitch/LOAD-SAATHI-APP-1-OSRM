@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';  
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';  
 import { showSuccess, showError } from '@/utils/toast';  
-import { Truck, MapPin, Calendar, IndianRupee, Loader2, ArrowLeft } from 'lucide-react';  
+import { Truck, Calendar, IndianRupee, Loader2, ArrowLeft } from 'lucide-react';  
 import LocationSelector from '@/components/LocationSelector';  
 import locationData from '@/data/locations.json';  const EditTrip = () => {  
   const { tripId } = useParams();  const { userProfile } = useAuth();
@@ -62,7 +62,7 @@ import locationData from '@/data/locations.json';  const EditTrip = () => {
     };  
 
     if (userProfile && tripId) fetchTrip();  
-  }, [tripId, userProfile, navigate]);  
+  }, [tripId, userProfile, navigate, getToken]);  
 
   const handleLocationChange = (field: 'origin_city' | 'destination_city', value: { state: string; district: string; city: string }) => {  
     setFormData(prev => ({  

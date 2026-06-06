@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
@@ -23,12 +23,10 @@ import {
   Inbox,
   Package,
   CheckCircle,
-  XCircle,
   MessageSquare,
   Phone,
   Check,
-  X,
-  Flag
+  X
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -46,6 +44,7 @@ import {
   notifyShipperOfRequestAccepted,
   notifyShipperOfRequestDeclined,
 } from '@/utils/notifications';
+import type { Trip, ShipmentRequest, Request } from '@/types';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const cfg: Record<string, string> = {
@@ -71,9 +70,9 @@ const TruckerHub = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'trips';
 
-  const [trips, setTrips] = useState<any[]>([]);
-  const [sentOffers, setSentOffers] = useState<any[]>([]);
-  const [incomingRequests, setIncomingRequests] = useState<any[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [sentOffers, setSentOffers] = useState<ShipmentRequest[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -112,7 +111,7 @@ const TruckerHub = () => {
       setTrips(tripsData || []);
       setSentOffers(sent || []);
       setIncomingRequests(incoming || []);
-    } catch (err: any) {
+    } catch (err) {
       showError('Failed to fetch data');
     } finally {
       setLoading(false);
@@ -128,7 +127,7 @@ const TruckerHub = () => {
       if (error) throw error;
       showSuccess('Trip deleted successfully');
       fetchData();
-    } catch (err: any) {
+    } catch (err) {
       showError('Failed to delete trip');
     }
   };
@@ -145,14 +144,14 @@ const TruckerHub = () => {
       if (error) throw error;
       showSuccess('Trip marked as completed!');
       fetchData();
-    } catch (err: any) {
+    } catch (err) {
       showError('Failed to complete trip');
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleBookingAction = async (request: any, status: 'accepted' | 'declined') => {
+  const handleBookingAction = async (request: Request, status: 'accepted' | 'declined') => {
     setActionLoading(request.id);
     try {
       const supabase = await getAuthenticatedClient();
@@ -173,8 +172,8 @@ const TruckerHub = () => {
           shipperId: request.shipper_id,
           truckerName: userProfile?.full_name || 'The trucker',
           truckerPhone: userProfile?.phone || 'N/A',
-          originCity: request.trip?.origin_city,
-          destinationCity: request.trip?.destination_city,
+          originCity: request.trip?.origin_city || '',
+          destinationCity: request.trip?.destination_city || '',
           requestId: request.id,
           getToken: () => getToken({ template: 'supabase' }),
         });
@@ -183,8 +182,8 @@ const TruckerHub = () => {
         await notifyShipperOfRequestDeclined({
           shipperId: request.shipper_id,
           truckerName: userProfile?.full_name || 'The trucker',
-          originCity: request.trip?.origin_city,
-          destinationCity: request.trip?.destination_city,
+          originCity: request.trip?.origin_city || '',
+          destinationCity: request.trip?.destination_city || '',
           getToken: () => getToken({ template: 'supabase' }),
         });
         showSuccess('Request declined.');
@@ -192,7 +191,7 @@ const TruckerHub = () => {
       
       // Refresh all data to ensure consistency
       await fetchData();
-    } catch (err: any) {
+    } catch (err) {
       console.error('[handleBookingAction] Error:', err);
       showError(`Failed to ${status} request. Please check your permissions.`);
     } finally {
@@ -358,17 +357,17 @@ const TruckerHub = () => {
                       <div className="flex-1 space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center text-lg font-bold text-gray-900">
-                            {offer.shipment.origin_city} <ArrowRight className="h-4 w-4 text-gray-400 mx-2" /> {offer.shipment.destination_city}
+                            {offer.shipment?.origin_city} <ArrowRight className="h-4 w-4 text-gray-400 mx-2" /> {offer.shipment?.destination_city}
                           </div>
                           <StatusBadge status={offer.status} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-                          <div className="flex items-center"><Calendar className="h-4 w-4 mr-2 text-orange-500" />Ready: {new Date(offer.shipment.departure_date).toLocaleDateString()}</div>
+                          <div className="flex items-center"><Calendar className="h-4 w-4 mr-2 text-orange-500" />Ready: {offer.shipment ? new Date(offer.shipment.departure_date).toLocaleDateString() : ''}</div>
                           <div className="flex items-center font-bold text-green-700"><IndianRupee className="h-4 w-4 mr-1" />Offer: {offer.proposed_price_per_tonne?.toLocaleString()} /t</div>
                         </div>
                         <div className="bg-gray-50 p-3 rounded-lg">
                           <p className="text-xs text-gray-500 uppercase font-bold">Shipper</p>
-                          <p className="text-sm font-semibold">{offer.shipment.shipper?.full_name}</p>
+                          <p className="text-sm font-semibold">{offer.shipment?.shipper?.full_name}</p>
                         </div>
                       </div>
                       <div className="flex flex-col gap-2 min-w-[160px] justify-center">
@@ -377,7 +376,7 @@ const TruckerHub = () => {
                             <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => navigate(`/chat/${offer.id}`)}>
                               <MessageSquare className="h-4 w-4 mr-2" />Chat
                             </Button>
-                            {offer.shipment.shipper?.phone && (
+                            {offer.shipment?.shipper?.phone && (
                               <a href={`tel:${offer.shipment.shipper.phone}`} className="block">
                                 <Button variant="outline" className="w-full"><Phone className="h-4 w-4 mr-2" />Call</Button>
                               </a>
@@ -409,12 +408,12 @@ const TruckerHub = () => {
                       <div className="flex-1 space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center text-lg font-bold text-gray-900">
-                            {request.trip.origin_city} <ArrowRight className="h-4 w-4 text-gray-400 mx-2" /> {request.trip.destination_city}
+                            {request.trip?.origin_city} <ArrowRight className="h-4 w-4 text-gray-400 mx-2" /> {request.trip?.destination_city}
                           </div>
                           <StatusBadge status={request.status} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-                          <div className="flex items-center"><Calendar className="h-4 w-4 mr-2 text-orange-500" />Trip: {new Date(request.trip.departure_date).toLocaleDateString()}</div>
+                          <div className="flex items-center"><Calendar className="h-4 w-4 mr-2 text-orange-500" />Trip: {request.trip ? new Date(request.trip.departure_date).toLocaleDateString() : ''}</div>
                           <div className="flex items-center"><Package className="h-4 w-4 mr-2 text-blue-500" />{request.weight_tonnes}t — {request.goods_description}</div>
                         </div>
                         <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">

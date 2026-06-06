@@ -1,7 +1,9 @@
+import type { GeoJSON } from 'geojson';
+
 export interface RouteResult {
   distance_km: number;
   duration_min: number;
-  geometry?: any;
+  geometry?: GeoJSON.Geometry;
 }
 
 export async function getRoute(

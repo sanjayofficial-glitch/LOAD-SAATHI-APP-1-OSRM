@@ -108,8 +108,8 @@ const PostTrip = () => {
 
       showSuccess('Trip posted successfully!');
       navigate('/trucker/dashboard');
-    } catch (err: any) {
-      showError(err.message || 'An unexpected error occurred.');
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }

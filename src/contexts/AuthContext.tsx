@@ -7,15 +7,15 @@ import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { User } from '@/types';
 
 interface AuthContextType {
-  user: any;
-  session: any;
+  user: { id: string; fullName: string | null; primaryEmailAddress?: { emailAddress: string } | null; createdAt?: Date | null; primaryPhoneNumber?: { phoneNumber: string } | null } | null | undefined;
+  session: { getToken(options?: { template?: string }): Promise<string | null> } | null | undefined;
   userProfile: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   signUp: (email: string, password: string, role: 'shipper' | 'trucker') => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: any }>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
   isLoaded: boolean;
 }
 
@@ -114,9 +114,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         identifier: email,
       });
       return { error: null };
-    } catch (err: any) {
+    } catch (err) {
       console.error('[AuthContext] resetPassword error:', err);
-      return { error: err };
+      return { error: err instanceof Error ? err : new Error(String(err)) };
     }
   };
 
