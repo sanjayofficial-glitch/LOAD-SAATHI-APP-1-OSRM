@@ -51,8 +51,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const abortController = new AbortController();
-
     const loadUserProfile = async () => {
       if (!clerkLoaded || !user) {
         setUserProfile(null);
@@ -76,12 +74,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         const supabaseClient = createClerkSupabaseClient(supabaseToken);
-        const { data, error } = await supabaseClient
+        const queryPromise = supabaseClient
           .from('users')
           .select('*')
           .eq('id', user.id)
-          .single()
-          .abortSignal(abortController.signal);
+          .single();
+
+        const { data, error } = await Promise.race([
+          queryPromise,
+          new Promise<any>((_, reject) =>
+            setTimeout(() => reject(new Error('Profile query timed out')), 10000)
+          )
+        ]);
 
         if (error) {
           console.error('[AuthContext] Error fetching user profile:', error);
@@ -98,8 +102,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     loadUserProfile();
-
-    return () => abortController.abort();
   }, [clerkLoaded, user, clerk]);
 
   const signOut = async () => {

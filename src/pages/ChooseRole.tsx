@@ -85,12 +85,24 @@ const ChooseRole = () => {
     }
   };
 
-  if (!isLoaded || !user) {
+  // Wait for profile to load before showing buttons (prevents flash-redirect)
+  if (!isLoaded || !user || (profileLoading && !userProfile)) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-orange-600 mx-auto mb-2" />
           <p className="text-sm text-gray-500">Verifying account...</p>
+          {stalled && (
+            <div className="mt-4 animate-in fade-in">
+              <p className="text-xs text-gray-400 mb-3">This is taking longer than expected.</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-sm text-orange-600 hover:text-orange-700 underline underline-offset-2"
+              >
+                Refresh the page
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
