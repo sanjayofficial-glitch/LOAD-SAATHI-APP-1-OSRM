@@ -27,9 +27,9 @@ const AuthSync = () => {
         const supabaseClient = createClerkSupabaseClient(supabaseToken);
 
         const { data, error } = await supabaseClient
-          .from("profiles")
-          .select("role:user_type")
-          .eq("clerk_user_id", user.id)
+          .from("users")
+          .select("user_type")
+          .eq("id", user.id)
           .single();
 
         if (error) {
@@ -38,12 +38,11 @@ const AuthSync = () => {
           return;
         }
 
-        const role = (data as unknown as { user_type: string })?.user_type;
-        if (role === "shipper") {
+        if (data?.user_type === "shipper") {
           navigate("/shipper/dashboard");
-        } else if (role === "trucker") {
+        } else if (data?.user_type === "trucker") {
           navigate("/trucker/dashboard");
-        } else if (role === "admin") {
+        } else if (data?.user_type === "admin") {
           navigate("/admin/monitoring");
         } else {
           navigate("/choose-role");

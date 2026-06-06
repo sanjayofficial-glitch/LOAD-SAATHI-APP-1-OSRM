@@ -153,12 +153,6 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can see own profile" ON public.users
 FOR SELECT TO authenticated USING (auth.uid()::text = id);
 
-CREATE POLICY "Users can insert own profile" ON public.users
-FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = id);
-
-CREATE POLICY "Users can update own profile" ON public.users
-FOR UPDATE TO authenticated USING (auth.uid()::text = id);
-
 -- Trips policies
 CREATE POLICY "Anyone can see active trips" ON public.trips
 FOR SELECT TO authenticated USING (true);

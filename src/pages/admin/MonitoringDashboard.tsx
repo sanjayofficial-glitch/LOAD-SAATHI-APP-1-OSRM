@@ -64,12 +64,11 @@ const MonitoringDashboard = () => {
 
       // Fetch active users
       let qs = performance.now();
-      const { data: rawUserData } = await supabaseClient
-        .from('profiles')
-        .select('id, clerk_user_id, full_name, phone, photo_url, city, role:user_type, contact_visible, push_subscription, created_at, updated_at')
+      const { data: userData } = await supabaseClient
+        .from('users')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
-      const userData = (rawUserData as unknown as User[]) || [];
       queryTimes.push(performance.now() - qs);
       
       if (userData) setUsers(userData);
