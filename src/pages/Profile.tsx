@@ -20,7 +20,6 @@ import {
   Shield, 
   Truck, 
   Package, 
-  Mail, 
   Calendar,
   Lock,
   Loader2,
@@ -39,7 +38,6 @@ const Profile = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState(userProfile?.full_name || '');
   const [phone, setPhone] = useState(userProfile?.phone || '');
-  const [companyName, setCompanyName] = useState(userProfile?.company_name || '');
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [switching, setSwitching] = useState(false);
@@ -52,7 +50,6 @@ const Profile = () => {
     if (userProfile) {
       setFullName(userProfile.full_name || '');
       setPhone(userProfile.phone || '');
-      setCompanyName(userProfile.company_name || '');
       fetchStats();
       if (userProfile.user_type === 'trucker') {
         fetchReviews();
@@ -101,7 +98,7 @@ const Profile = () => {
       
       const { data, error } = await supabase
         .from('reviews')
-        .select('*, shipper:users(full_name)')
+        .select('*, shipper:profiles(full_name)')
         .eq('trucker_id', userProfile.id)
         .order('created_at', { ascending: false });
       
@@ -127,11 +124,10 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ 
           full_name: fullName, 
-          phone, 
-          company_name: companyName 
+          phone
         })
         .eq('id', userProfile?.id);
 
@@ -157,8 +153,8 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('users')
-        .update({ is_verified: true })
+        .from('profiles')
+        .update({ contact_visible: true })
         .eq('id', userProfile?.id);
 
       if (error) throw error;
@@ -181,8 +177,8 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('users')
-        .update({ user_type: newRole })
+        .from('profiles')
+        .update({ role: newRole })
         .eq('id', userProfile?.id);
 
       if (error) throw error;
@@ -215,7 +211,7 @@ const Profile = () => {
               <Badge variant="secondary" className="bg-orange-50 text-orange-700 border-orange-100 capitalize">
                 {userProfile?.user_type}
               </Badge>
-              {userProfile?.is_verified && (
+              {userProfile?.contact_visible && (
                 <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
                   <CheckCircle2 className="h-3 w-3 mr-1" /> Verified
                 </Badge>
@@ -224,7 +220,7 @@ const Profile = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          {!userProfile?.is_verified && (
+          {!userProfile?.contact_visible && (
             <Button 
               variant="outline" 
               onClick={handleVerify}
@@ -293,13 +289,6 @@ const Profile = () => {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                    <Mail className="h-5 w-5 text-gray-400 mr-3" />
-                    <div>
-                      <p className="text-xs text-gray-500">Email Address</p>
-                      <p className="text-sm font-medium">{userProfile?.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
                     <Phone className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-xs text-gray-500">Phone Number</p>
@@ -309,8 +298,8 @@ const Profile = () => {
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg">
                     <Building className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
-                      <p className="text-xs text-gray-500">Company</p>
-                      <p className="text-sm font-medium">{userProfile?.company_name || 'Individual'}</p>
+                      <p className="text-xs text-gray-500">City</p>
+                      <p className="text-sm font-medium">{userProfile?.city || 'Not provided'}</p>
                     </div>
                   </div>
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg">
@@ -410,19 +399,6 @@ const Profile = () => {
                     />
                   </div>
                 </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="company">Company Name (Optional)</Label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input 
-                      id="company"
-                      className="pl-10"
-                      value={companyName} 
-                      onChange={(e) => setCompanyName(e.target.value)} 
-                      placeholder="Enter your company name"
-                    />
-                  </div>
-                </div>
               </div>
               <Button 
                 onClick={handleUpdate} 
@@ -498,7 +474,7 @@ const Profile = () => {
                   </Button>
                   
                   {/* Only show Admin switch option to the authorized developer ID */}
-                  {userProfile?.id === ALLOWED_ADMIN_ID && (
+                  {userProfile?.clerk_user_id === ALLOWED_ADMIN_ID && (
                     <Button 
                       variant={userProfile?.user_type === 'admin' ? 'default' : 'outline'}
                       onClick={() => handleSwitchRole('admin')}

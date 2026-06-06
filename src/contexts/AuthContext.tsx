@@ -37,13 +37,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       const supabaseClient = createClerkSupabaseClient(supabaseToken);
       const { data, error } = await supabaseClient
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
+        .from('profiles')
+        .select('id, clerk_user_id, role:user_type, full_name, phone, photo_url, city, rating, total_trips, contact_visible, push_subscription, created_at, updated_at')
+        .eq('clerk_user_id', user.id)
         .single();
 
       if (!error && data) {
-        setUserProfile(data as User);
+        setUserProfile(data as unknown as User);
       }
     } catch (err) {
       console.error('[AuthContext] Error refreshing profile:', err);
@@ -75,9 +75,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const supabaseClient = createClerkSupabaseClient(supabaseToken);
         const queryPromise = supabaseClient
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
+          .from('profiles')
+          .select('id, clerk_user_id, role:user_type, full_name, phone, photo_url, city, rating, total_trips, contact_visible, push_subscription, created_at, updated_at')
+          .eq('clerk_user_id', user.id)
           .single();
 
         const { data, error } = await Promise.race([
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.error('[AuthContext] Error fetching user profile:', error);
           setUserProfile(null);
         } else if (data) {
-          setUserProfile(data as User);
+          setUserProfile(data as unknown as User);
         }
       } catch (err) {
         console.error('[AuthContext] Error:', err);
