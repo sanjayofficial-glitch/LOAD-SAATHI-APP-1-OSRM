@@ -106,7 +106,7 @@ const MyShipments = () => {
         .select(`
           *,
           shipment:shipments!inner(*),
-          trucker:users!shipment_requests_trucker_id_fkey(*)
+          trucker:profiles!shipment_requests_trucker_id_fkey(*)
         `)
         .eq('shipper_id', userProfile.id)
         .order('created_at', { ascending: false });

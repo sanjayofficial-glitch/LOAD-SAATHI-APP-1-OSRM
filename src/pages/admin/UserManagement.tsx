@@ -214,17 +214,17 @@ const UserManagement = () => {
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <Switch
-                        checked={user.is_verified}
+                        checked={user.contact_visible}
                         disabled={verifying[user.id]}
-                        onCheckedChange={() => toggleVerification(user)}
+                        onCheckedChange={() => toggleContactVisible(user)}
                       />
                       <span className="text-xs text-gray-400 w-16">
                         {verifying[user.id] ? (
                           <Loader2 className="h-3 w-3 animate-spin inline" />
-                        ) : user.is_verified ? (
-                          'Verified'
+                        ) : user.contact_visible ? (
+                          'Visible'
                         ) : (
-                          'Unverified'
+                          'Hidden'
                         )}
                       </span>
                     </div>

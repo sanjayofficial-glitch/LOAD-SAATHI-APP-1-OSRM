@@ -44,8 +44,8 @@ const Chat = () => {
         const supabaseClient = createClerkSupabaseClient(supabaseToken);
 
         const [reqRes, sReqRes] = await Promise.all([
-          supabaseClient.from('requests').select('*, trip:trips(*, trucker:users!trips_trucker_id_fkey(*)), shipper:users!requests_shipper_id_fkey(*)').eq('id', requestId).maybeSingle(),
-          supabaseClient.from('shipment_requests').select('*, shipment:shipments(*, shipper:users!shipments_shipper_id_fkey(*)), trucker:users!shipment_requests_trucker_id_fkey(*)').eq('id', requestId).maybeSingle()
+          supabaseClient.from('requests').select('*, trip:trips(*, trucker:profiles!trips_trucker_id_fkey(*)), shipper:profiles!requests_shipper_id_fkey(*)').eq('id', requestId).maybeSingle(),
+          supabaseClient.from('shipment_requests').select('*, shipment:shipments(*, shipper:profiles!shipments_shipper_id_fkey(*)), trucker:profiles!shipment_requests_trucker_id_fkey(*)').eq('id', requestId).maybeSingle()
         ]);
 
         let otherUser = null;

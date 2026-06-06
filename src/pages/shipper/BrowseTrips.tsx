@@ -74,7 +74,7 @@ const TripList = () => {
         .from('trips')
         .select(`
           *, 
-          trucker:users!trips_trucker_id_fkey(
+          trucker:profiles!trips_trucker_id_fkey(
             full_name,
             rating,
             total_trips

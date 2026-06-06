@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Package, MapPin, Calendar, IndianRupee, ArrowLeft, Loader2,
-  Edit, Send, Star, Building2, Truck, IndianRupee as RupeeIcon,
+  Edit, Send, Star, Truck, IndianRupee as RupeeIcon,
   CheckCircle, MessageSquare
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
@@ -54,7 +54,7 @@ const ShipmentDetail = () => {
 
       const { data: shipmentData, error: shipmentError } = await supabase
         .from('shipments')
-        .select('*, shipper:users!shipments_shipper_id_fkey(*)')
+        .select('*, shipper:profiles!shipments_shipper_id_fkey(*)')
         .eq('id', id)
         .single();
 
@@ -73,7 +73,7 @@ const ShipmentDetail = () => {
         if (shipmentData.status === 'matched' || shipmentData.status === 'completed') {
           const { data: acceptedReq } = await supabase
             .from('shipment_requests')
-            .select('*, trucker:users!shipment_requests_trucker_id_fkey(*)')
+            .select('*, trucker:profiles!shipment_requests_trucker_id_fkey(*)')
             .eq('shipment_id', id)
             .eq('status', 'accepted')
             .maybeSingle();
@@ -290,9 +290,9 @@ const ShipmentDetail = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">{shipment.shipper?.full_name}</p>
-                    {shipment.shipper?.company_name && (
+                    {shipment.shipper?.city && (
                       <p className="text-xs text-gray-500 flex items-center gap-1">
-                        <Building2 className="h-3 w-3" /> {shipment.shipper.company_name}
+                        {shipment.shipper.city}
                       </p>
                     )}
                   </div>
