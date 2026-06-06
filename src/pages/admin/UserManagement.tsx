@@ -35,12 +35,12 @@ const UserManagement = () => {
     try {
       const supabase = await getAuthenticatedClient();
       const { data, error } = await supabase
-        .from('users')
-        .select('*')
+        .from('profiles')
+        .select('id, clerk_user_id, role as user_type, full_name, phone, photo_url, city, rating, total_trips, contact_visible, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setUsers(data || []);
+      setUsers(data as unknown as User[] || []);
     } catch (err) {
       console.error('Error fetching users:', err);
       toast.error('Failed to load users');
@@ -49,25 +49,25 @@ const UserManagement = () => {
     }
   };
 
-  const toggleVerification = async (user: User) => {
+  const toggleContactVisible = async (user: User) => {
     setVerifying(prev => ({ ...prev, [user.id]: true }));
     try {
       const supabase = await getAuthenticatedClient();
       const { error } = await supabase
-        .from('users')
-        .update({ is_verified: !user.is_verified })
+        .from('profiles')
+        .update({ contact_visible: !user.contact_visible })
         .eq('id', user.id);
 
       if (error) throw error;
 
       setUsers(prev =>
         prev.map(u =>
-          u.id === user.id ? { ...u, is_verified: !u.is_verified } : u
+          u.id === user.id ? { ...u, contact_visible: !u.contact_visible } : u
         )
       );
-      toast.success(`${user.full_name} ${user.is_verified ? 'unverified' : 'verified'}`);
+      toast.success(`${user.full_name} ${user.contact_visible ? 'hidden' : 'visible'}`);
     } catch (err) {
-      console.error('Error toggling verification:', err);
+      console.error('Error toggling contact visibility:', err);
       toast.error('Failed to update user');
     } finally {
       setVerifying(prev => ({ ...prev, [user.id]: false }));
@@ -77,9 +77,8 @@ const UserManagement = () => {
   const filteredUsers = users.filter(user => {
     const matchesSearch =
       user.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-      user.email?.toLowerCase().includes(search.toLowerCase()) ||
-      user.company_name?.toLowerCase().includes(search.toLowerCase()) ||
-      user.phone?.includes(search);
+      user.phone?.includes(search) ||
+      user.city?.toLowerCase().includes(search.toLowerCase());
 
     const matchesRole = roleFilter === 'all' || user.user_type === roleFilter;
 
@@ -159,10 +158,10 @@ const UserManagement = () => {
             <TableRow>
               <TableHead>User</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Company</TableHead>
+              <TableHead>City</TableHead>
               <TableHead className="text-center">Rating</TableHead>
               <TableHead className="text-center">Trips</TableHead>
-              <TableHead className="text-center">Verified</TableHead>
+              <TableHead className="text-center">Contact Visible</TableHead>
               <TableHead className="text-center">Joined</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
@@ -186,13 +185,12 @@ const UserManagement = () => {
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>{getRoleBadge(user.user_type)}</TableCell>
                   <TableCell>
-                    <span className="text-sm text-gray-600">{user.company_name || '-'}</span>
+                    <span className="text-sm text-gray-600">{user.city || '-'}</span>
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-1">
@@ -204,7 +202,7 @@ const UserManagement = () => {
                     {user.total_trips || 0}
                   </TableCell>
                   <TableCell className="text-center">
-                    {user.is_verified ? (
+                    {user.contact_visible ? (
                       <UserCheck className="h-4 w-4 text-green-500 mx-auto" />
                     ) : (
                       <UserX className="h-4 w-4 text-gray-300 mx-auto" />
