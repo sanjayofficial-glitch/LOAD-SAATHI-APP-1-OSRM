@@ -1,6 +1,6 @@
 -- ================================================================
 -- LOADSAATHI — Complete Supabase Database Setup
--- Clerk Authentication (text-based user IDs)
+-- Clerk Authentication (profiles table with UUID PK + text clerk_user_id)
 -- ================================================================
 -- Run this entire script in your Supabase SQL Editor at:
 --   https://supabase.com/dashboard/project/<YOUR-PROJECT>/sql/new
@@ -12,23 +12,45 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ================================================================
--- SECTION 2: TABLES
+-- SECTION 2: DROP EXISTING (clean slate)
+-- ================================================================
+DROP TABLE IF EXISTS public.notifications CASCADE;
+DROP TABLE IF EXISTS public.messages CASCADE;
+DROP TABLE IF EXISTS public.reviews CASCADE;
+DROP TABLE IF EXISTS public.shipment_requests CASCADE;
+DROP TABLE IF EXISTS public.requests CASCADE;
+DROP TABLE IF EXISTS public.shipments CASCADE;
+DROP TABLE IF EXISTS public.trips CASCADE;
+DROP TABLE IF EXISTS public.profiles CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
+
+-- ================================================================
+-- SECTION 3: TABLES
 -- ================================================================
 
--- Users table (text IDs for Clerk compatibility)
-CREATE TABLE IF NOT EXISTS public.users (
-  id text NOT NULL,
-  email text NOT NULL,
-  user_type text NOT NULL CHECK (user_type = ANY (ARRAY['trucker'::text, 'shipper'::text])),
+-- Profiles table (replaces users)
+-- id = UUID primary key (internal)
+-- clerk_user_id = Clerk's text ID (used in auth.uid()::text comparisons)
+-- All FK references in other tables point to clerk_user_id
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  clerk_user_id text,
+  user_type text NOT NULL DEFAULT 'trucker'::text CHECK (user_type = ANY (ARRAY['trucker'::text, 'shipper'::text, 'admin'::text])),
   full_name text,
   phone text,
-  company_name text,
-  is_verified boolean DEFAULT false,
+  photo_url text,
+  city text,
   rating numeric DEFAULT 0 CHECK (rating >= 0::numeric AND rating <= 5::numeric),
   total_trips integer DEFAULT 0 CHECK (total_trips >= 0),
+  contact_visible boolean DEFAULT false,
+  push_subscription jsonb,
   created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT users_pkey PRIMARY KEY (id)
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT profiles_pkey PRIMARY KEY (id)
 );
+
+-- Unique index on clerk_user_id for FK references
+CREATE UNIQUE INDEX IF NOT EXISTS idx_profiles_clerk_user_id ON public.profiles(clerk_user_id);
 
 -- Trips table
 CREATE TABLE IF NOT EXISTS public.trips (
@@ -53,7 +75,7 @@ CREATE TABLE IF NOT EXISTS public.trips (
   estimated_distance_km numeric,
   estimated_duration_min integer,
   CONSTRAINT trips_pkey PRIMARY KEY (id),
-  CONSTRAINT trips_trucker_id_fkey FOREIGN KEY (trucker_id) REFERENCES public.users(id)
+  CONSTRAINT trips_trucker_id_fkey FOREIGN KEY (trucker_id) REFERENCES public.profiles(clerk_user_id)
 );
 
 -- Shipments table
@@ -77,7 +99,7 @@ CREATE TABLE IF NOT EXISTS public.shipments (
   estimated_distance_km numeric,
   estimated_duration_min integer,
   CONSTRAINT shipments_pkey PRIMARY KEY (id),
-  CONSTRAINT shipments_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.users(id)
+  CONSTRAINT shipments_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.profiles(clerk_user_id)
 );
 
 -- Requests table (shipper requests to join a trucker's trip)
@@ -95,8 +117,8 @@ CREATE TABLE IF NOT EXISTS public.requests (
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT requests_pkey PRIMARY KEY (id),
   CONSTRAINT requests_trip_id_fkey FOREIGN KEY (trip_id) REFERENCES public.trips(id),
-  CONSTRAINT requests_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.users(id),
-  CONSTRAINT requests_receiver_id_fkey FOREIGN KEY (receiver_id) REFERENCES public.users(id),
+  CONSTRAINT requests_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.profiles(clerk_user_id),
+  CONSTRAINT requests_receiver_id_fkey FOREIGN KEY (receiver_id) REFERENCES public.profiles(clerk_user_id),
   CONSTRAINT requests_shipment_id_fkey FOREIGN KEY (shipment_id) REFERENCES public.shipments(id)
 );
 
@@ -113,8 +135,8 @@ CREATE TABLE IF NOT EXISTS public.shipment_requests (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT shipment_requests_pkey PRIMARY KEY (id),
   CONSTRAINT shipment_requests_shipment_id_fkey FOREIGN KEY (shipment_id) REFERENCES public.shipments(id),
-  CONSTRAINT shipment_requests_trucker_id_fkey FOREIGN KEY (trucker_id) REFERENCES public.users(id),
-  CONSTRAINT shipment_requests_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.users(id)
+  CONSTRAINT shipment_requests_trucker_id_fkey FOREIGN KEY (trucker_id) REFERENCES public.profiles(clerk_user_id),
+  CONSTRAINT shipment_requests_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.profiles(clerk_user_id)
 );
 
 -- Reviews table
@@ -127,9 +149,9 @@ CREATE TABLE IF NOT EXISTS public.reviews (
   comment text,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT reviews_pkey PRIMARY KEY (id),
-  CONSTRAINT reviews_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.users(id),
+  CONSTRAINT reviews_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.profiles(clerk_user_id),
   CONSTRAINT reviews_trip_id_fkey FOREIGN KEY (trip_id) REFERENCES public.trips(id),
-  CONSTRAINT reviews_trucker_id_fkey FOREIGN KEY (trucker_id) REFERENCES public.users(id)
+  CONSTRAINT reviews_trucker_id_fkey FOREIGN KEY (trucker_id) REFERENCES public.profiles(clerk_user_id)
 );
 
 -- Messages table
@@ -143,8 +165,8 @@ CREATE TABLE IF NOT EXISTS public.messages (
   created_at timestamp with time zone DEFAULT now(),
   shipment_request_id uuid,
   CONSTRAINT messages_pkey PRIMARY KEY (id),
-  CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.users(id),
-  CONSTRAINT messages_recipient_id_fkey FOREIGN KEY (recipient_id) REFERENCES public.users(id),
+  CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.profiles(clerk_user_id),
+  CONSTRAINT messages_recipient_id_fkey FOREIGN KEY (recipient_id) REFERENCES public.profiles(clerk_user_id),
   CONSTRAINT messages_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.requests(id),
   CONSTRAINT messages_shipment_request_id_fkey FOREIGN KEY (shipment_request_id) REFERENCES public.shipment_requests(id)
 );
@@ -162,19 +184,18 @@ CREATE TABLE IF NOT EXISTS public.notifications (
   title text,
   action_url text,
   CONSTRAINT notifications_pkey PRIMARY KEY (id),
-  CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(clerk_user_id),
   CONSTRAINT notifications_related_trip_id_fkey FOREIGN KEY (related_trip_id) REFERENCES public.trips(id),
   CONSTRAINT notifications_related_shipment_request_id_fkey FOREIGN KEY (related_shipment_request_id) REFERENCES public.shipment_requests(id)
 );
 
 -- ================================================================
--- SECTION 3: ROW LEVEL SECURITY (RLS)
--- IMPORTANT: Uses auth.uid()::text for Clerk compatibility
--- Clerk returns text-based user IDs, NOT UUIDs
+-- SECTION 4: ROW LEVEL SECURITY (RLS)
+-- Clerk returns text user IDs — auth.uid()::text matches clerk_user_id
 -- ================================================================
 
 -- Enable RLS on all tables
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trips ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shipments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.requests ENABLE ROW LEVEL SECURITY;
@@ -183,13 +204,13 @@ ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
--- Drop all existing policies first (safe for fresh setup too)
+-- Drop all existing policies first
 DO $$
 DECLARE
     pol record;
     tbl text;
 BEGIN
-    FOR tbl IN SELECT unnest(ARRAY['users','trips','shipments','requests','shipment_requests','reviews','messages','notifications'])
+    FOR tbl IN SELECT unnest(ARRAY['profiles','trips','shipments','requests','shipment_requests','reviews','messages','notifications'])
     LOOP
         FOR pol IN SELECT policyname FROM pg_policies WHERE schemaname = 'public' AND tablename = tbl
         LOOP
@@ -198,15 +219,19 @@ BEGIN
     END LOOP;
 END $$;
 
--- ===================== USERS =====================
-CREATE POLICY "Users can see own profile" ON public.users
-  FOR SELECT TO authenticated USING (auth.uid()::text = id);
+-- ===================== PROFILES =====================
+CREATE POLICY "Users can see own profile" ON public.profiles
+  FOR SELECT TO authenticated USING (auth.uid()::text = clerk_user_id);
 
-CREATE POLICY "Users can insert own profile" ON public.users
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = id);
+CREATE POLICY "Users can insert own profile" ON public.profiles
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = clerk_user_id);
 
-CREATE POLICY "Users can update own profile" ON public.users
-  FOR UPDATE TO authenticated USING (auth.uid()::text = id);
+CREATE POLICY "Users can update own profile" ON public.profiles
+  FOR UPDATE TO authenticated USING (auth.uid()::text = clerk_user_id);
+
+-- Profiles must be readable by other authenticated users for joins
+CREATE POLICY "Authenticated users can read all profiles" ON public.profiles
+  FOR SELECT TO authenticated USING (true);
 
 -- ===================== TRIPS =====================
 CREATE POLICY "Anyone can see active trips" ON public.trips
@@ -295,7 +320,7 @@ CREATE POLICY "System can create notifications" ON public.notifications
   FOR INSERT TO authenticated WITH CHECK (true);
 
 -- ================================================================
--- SECTION 4: INDEXES (for performance)
+-- SECTION 5: INDEXES
 -- ================================================================
 
 CREATE INDEX IF NOT EXISTS idx_trips_status ON public.trips(status);
@@ -313,7 +338,7 @@ CREATE INDEX IF NOT EXISTS idx_messages_recipient_id ON public.messages(recipien
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id);
 
 -- ================================================================
--- DONE! Your database is ready.
+-- DONE!
 -- Next steps:
 -- 1. In Clerk Dashboard, create a JWT Template named "supabase"
 --    with the Supabase JWT secret as the signing key
