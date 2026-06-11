@@ -16,7 +16,6 @@ import {
   TrendingUp, 
   Calendar, 
   MapPin, 
-  Filter,
   Eye,
   CheckCircle,
   Search,

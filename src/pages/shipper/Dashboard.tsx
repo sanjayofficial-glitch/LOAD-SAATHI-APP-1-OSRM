@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
@@ -9,7 +9,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+
 import { 
   Package, 
   Search, 
@@ -40,7 +40,6 @@ const ShipperDashboard = () => {
   const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
   const { isOnline } = useNetworkStatus();
-  const navigate = useNavigate();
   const [stats, setStats] = useState({ 
     activeShipments: 0, 
     pendingRequests: 0, 

@@ -21,6 +21,7 @@ import {
   MapPin, 
   IndianRupee, 
   ArrowRight, 
+  Filter,
   Loader2,
   Package
 } from 'lucide-react';

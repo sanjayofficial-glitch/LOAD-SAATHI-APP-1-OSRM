@@ -12,7 +12,6 @@ interface TripStatusButtonProps {
 }
 
 export const TripStatusButton: React.FC<TripStatusButtonProps> = ({
-  tripId,
   isCompleted,
   onComplete
 }) => {

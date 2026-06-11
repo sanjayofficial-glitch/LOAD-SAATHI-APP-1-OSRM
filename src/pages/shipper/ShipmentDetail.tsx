@@ -46,7 +46,7 @@ const ShipmentDetail = () => {
   const [reviewOpen, setReviewOpen] = useState(false);
 
   const fetchData = async () => {
-    if (!id) return;
+    if (!id || !userProfile) return;
     try {
       const supabaseToken = await getToken({ template: 'supabase' });
       if (!supabaseToken) throw new Error('No Supabase token');

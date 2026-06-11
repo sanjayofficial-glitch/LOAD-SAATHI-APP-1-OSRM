@@ -15,7 +15,6 @@ import {
   ArrowRight, 
   Loader2, 
   IndianRupee, 
-  Truck, 
   Star, 
   Plus, 
   Inbox, 
