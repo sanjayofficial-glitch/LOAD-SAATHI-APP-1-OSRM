@@ -23,6 +23,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import ReviewDialog from '@/components/ReviewDialog';
+import type { Shipment, User } from '@/types';
 
 const ShipmentDetail = () => {
   const { id } = useParams();
@@ -30,11 +31,11 @@ const ShipmentDetail = () => {
   const { getToken } = useClerkAuth();
   const navigate = useNavigate();
 
-  const [shipment, setShipment] = useState<any>(null);
+  const [shipment, setShipment] = useState<Shipment | null>(null);
   const [loading, setLoading] = useState(true);
   const [offerCount, setOfferCount] = useState(0);
   const [hasReview, setHasReview] = useState(false);
-  const [acceptedTrucker, setAcceptedTrucker] = useState<any | null>(null);
+  const [acceptedTrucker, setAcceptedTrucker] = useState<User | null>(null);
 
   // Offer dialog state (for truckers)
   const [offerOpen, setOfferOpen] = useState(false);

@@ -93,7 +93,7 @@ const ShipperDashboard = () => {
 
       const { data: upcoming } = await supabase
         .from('shipments')
-        .select('*')
+        .select('id, origin_city, destination_city, goods_description, weight_tonnes, departure_date, status')
         .eq('shipper_id', userProfile.id)
         .eq('status', 'pending')
         .order('departure_date', { ascending: true })

@@ -48,8 +48,8 @@ const Moderation = () => {
       const supabase = await getAuthenticatedClient();
 
       const [tripsRes, shipmentsRes] = await Promise.all([
-        supabase.from('trips').select('*').order('created_at', { ascending: false }),
-        supabase.from('shipments').select('*').order('created_at', { ascending: false }),
+        supabase.from('trips').select('id, origin_city, destination_city, available_capacity_tonnes, price_per_tonne, departure_date, status, trucker_id, created_at').order('created_at', { ascending: false }),
+        supabase.from('shipments').select('id, origin_city, destination_city, goods_description, weight_tonnes, budget_per_tonne, departure_date, status, shipper_id, created_at').order('created_at', { ascending: false }),
       ]);
 
       if (tripsRes.error) throw tripsRes.error;

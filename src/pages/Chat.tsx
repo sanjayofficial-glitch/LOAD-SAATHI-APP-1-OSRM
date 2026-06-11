@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
@@ -68,8 +68,8 @@ const Chat = () => {
         });
 
         setLoading(false);
-      } catch (err: any) {
-        showError(err.message || 'Failed to load chat');
+      } catch (err: unknown) {
+        showError(err instanceof Error ? err.message : 'Failed to load chat');
         navigate(-1);
       }
     };
@@ -80,7 +80,7 @@ const Chat = () => {
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!recipient || !requestId || !newMessage.trim() || sending) return;
     if (!isOnline) {
@@ -92,12 +92,12 @@ const Chat = () => {
       const sentMsg = await sendMessage({ recipientId: recipient.id, content: newMessage, requestId, getToken: () => getToken({ template: 'supabase' }), userId: userProfile!.id });
       setMessages(prev => [...prev, sentMsg]);
       setNewMessage('');
-    } catch (err) {
+    } catch {
       showError('Failed to send message');
     } finally {
       setSending(false);
     }
-  };
+  }, [recipient, requestId, newMessage, sending, isOnline, getToken, userProfile]);
 
   if (loading) return <div className="flex items-center justify-center min-h-[60dvh]"><Loader2 className="h-10 w-10 animate-spin text-orange-600" /></div>;
 

@@ -51,7 +51,7 @@ const TripList = () => {
       const supabase = createClerkSupabaseClient(token);
       const { data } = await supabase
         .from('shipments')
-        .select('*')
+        .select('id, origin_city, destination_city, weight_tonnes, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, budget_per_tonne, departure_date, status')
         .eq('shipper_id', userProfile.id)
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
@@ -74,7 +74,7 @@ const TripList = () => {
       let query = supabase
         .from('trips')
         .select(`
-          *, 
+          id, origin_city, destination_city, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, available_capacity_tonnes, price_per_tonne, departure_date, created_at, trucker_id,
           trucker:users!trips_trucker_id_fkey(
             full_name,
             rating,

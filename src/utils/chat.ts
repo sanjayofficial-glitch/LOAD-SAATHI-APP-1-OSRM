@@ -1,23 +1,7 @@
-import { toast } from "sonner";
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Message } from '@/types/chat';
 import { supabase } from '@/lib/supabaseClient';
-
-export const showSuccess = (message: string) => {
-  toast.success(message);
-};
-
-export const showError = (message: string) => {
-  toast.error(message);
-};
-
-export const showLoading = (message: string) => {
-  return toast.loading(message);
-};
-
-export const dismissToast = (toastId?: string | number) => {
-  toast.dismiss(toastId);
-};
+export { showSuccess, showError, showLoading, dismissToast } from '@/utils/toast';
 
 /**
  * Send a new message in a chat conversation.
@@ -52,7 +36,7 @@ export const sendMessage = async (payload: {
         request_id: requestId,
         is_read: false,
       })
-      .select()
+      .select('id, sender_id, recipient_id, content, created_at, is_read, request_id')
       .single();
 
     if (error) {
@@ -77,7 +61,7 @@ export const fetchMessages = async (requestId: string, getToken: () => Promise<s
 
     const { data, error } = await supabaseClient
       .from('messages')
-      .select('*')
+      .select('id, sender_id, recipient_id, content, created_at, is_read, request_id')
       .eq('request_id', requestId)
       .order('created_at', { ascending: true });
 

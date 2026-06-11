@@ -84,7 +84,7 @@ const TruckerHub = () => {
       // 1. My Posted Trips
       const { data: tripsData } = await supabase
         .from('trips')
-        .select('*')
+        .select('id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne, status, created_at, trucker_id')
         .eq('trucker_id', userProfile.id)
         .order('created_at', { ascending: false });
 
@@ -92,8 +92,8 @@ const TruckerHub = () => {
       const { data: sent } = await supabase
         .from('shipment_requests')
         .select(`
-          *,
-          shipment:shipments!inner(*)
+          id, created_at, status, proposed_price_per_tonne, message, shipment_id, trucker_id,
+          shipment:shipments!inner(id, origin_city, destination_city, departure_date, weight_tonnes, status, shipper_id, shipper:users!shipments_shipper_id_fkey(full_name, phone))
         `)
         .eq('trucker_id', userProfile.id)
         .order('created_at', { ascending: false });
@@ -102,8 +102,8 @@ const TruckerHub = () => {
       const { data: incoming } = await supabase
         .from('requests')
         .select(`
-          *,
-          trip:trips!requests_trip_id_fkey(*)
+          id, created_at, status, weight_tonnes, goods_description, shipper_id, trip_id,
+          trip:trips!requests_trip_id_fkey(id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne)
         `)
         .eq('receiver_id', userProfile.id)
         .order('created_at', { ascending: false });

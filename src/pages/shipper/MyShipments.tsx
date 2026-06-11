@@ -42,6 +42,7 @@ import {
   notifyTruckerOfOfferAccepted,
   notifyTruckerOfOfferDeclined,
 } from '@/utils/notifications';
+import type { Shipment, Request, ShipmentRequest } from '@/types';
 
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -68,9 +69,9 @@ const MyShipments = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'loads';
 
-  const [shipments, setShipments] = useState<any[]>([]);
-  const [sentRequests, setSentRequests] = useState<any[]>([]);
-  const [incomingOffers, setIncomingOffers] = useState<any[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [sentRequests, setSentRequests] = useState<Request[]>([]);
+  const [incomingOffers, setIncomingOffers] = useState<ShipmentRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -81,15 +82,15 @@ const MyShipments = () => {
 
       const { data: shipmentsData } = await supabase
         .from('shipments')
-        .select('*')
+        .select('id, origin_city, destination_city, goods_description, weight_tonnes, budget_per_tonne, departure_date, status, created_at')
         .eq('shipper_id', userProfile.id)
         .order('created_at', { ascending: false });
 
       const { data: sent } = await supabase
         .from('requests')
         .select(`
-          *,
-          trip:trips!inner(*)
+          id, created_at, status, weight_tonnes, goods_description, trip_id,
+          trip:trips!inner(id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne, trucker_id)
         `)
         .eq('shipper_id', userProfile.id)
         .order('created_at', { ascending: false });
@@ -97,9 +98,9 @@ const MyShipments = () => {
       const { data: incoming } = await supabase
         .from('shipment_requests')
         .select(`
-          *,
-          shipment:shipments!inner(*),
-          trucker:users!shipment_requests_trucker_id_fkey(*)
+          id, created_at, status, proposed_price_per_tonne, message, trucker_id, shipment_id,
+          shipment:shipments!inner(id, origin_city, destination_city, goods_description, weight_tonnes, budget_per_tonne, departure_date),
+          trucker:users!shipment_requests_trucker_id_fkey(full_name, phone, rating)
         `)
         .eq('shipper_id', userProfile.id)
         .order('created_at', { ascending: false });
@@ -129,7 +130,7 @@ const MyShipments = () => {
     }
   };
 
-  const handleOfferAction = async (offer: any, status: 'accepted' | 'declined') => {
+  const handleOfferAction = async (offer: ShipmentRequest, status: 'accepted' | 'declined') => {
     setActionLoading(offer.id);
     try {
       const supabase = await getAuthenticatedClient();

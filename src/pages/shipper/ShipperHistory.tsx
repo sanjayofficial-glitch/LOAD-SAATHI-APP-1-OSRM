@@ -60,7 +60,7 @@ const ShipperHistory = () => {
       // Fetch shipments (loads posted by the shipper)
       const { data: shipmentsData, error: shipmentsError } = await supabase
         .from('shipments')
-        .select('*')
+        .select('id, origin_city, destination_city, goods_description, weight_tonnes, budget_per_tonne, departure_date, status, created_at')
         .eq('shipper_id', userProfile.id)
         .order('created_at', { ascending: false });
 

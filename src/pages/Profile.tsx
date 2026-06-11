@@ -29,6 +29,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import Star from '@/components/Star';
+import type { Review } from '@/types';
 
 const ALLOWED_ADMIN_ID = "user_3Cn2O5bwNC0wsSEfGDnTky9rn2S";
 
@@ -43,7 +44,7 @@ const Profile = () => {
   const [switching, setSwitching] = useState(false);
   const [stats, setStats] = useState({ count: 0, rating: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
 
   useEffect(() => {

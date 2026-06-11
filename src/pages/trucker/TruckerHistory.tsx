@@ -38,6 +38,15 @@ interface ActivityItem {
   relatedId: string;
 }
 
+const statCards: { label: string; key: keyof typeof defaultStats; icon: LucideIcon; color: string; bg: string }[] = [
+  { label: 'Total', key: 'total', icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { label: 'Completed', key: 'completed', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
+  { label: 'Pending', key: 'pending', icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+  { label: 'This Month', key: 'thisMonth', icon: Calendar, color: 'text-purple-600', bg: 'bg-purple-50' }
+];
+
+const defaultStats = { total: 0, completed: 0, pending: 0, thisMonth: 0 };
+
 const TruckerHistory = () => {
   const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
@@ -57,16 +66,14 @@ const TruckerHistory = () => {
       
       const supabase = createClerkSupabaseClient(supabaseToken);
 
-      // Fetch trips posted by the trucker
       const { data: tripsData, error: tripsError } = await supabase
         .from('trips')
-        .select('*')
+        .select('id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne, status, created_at')
         .eq('trucker_id', userProfile.id)
         .order('created_at', { ascending: false });
 
       if (tripsError) console.error('[History] Trips error:', tripsError);
 
-      // Fetch offers sent to shippers (shipment_requests)
       const { data: offersData, error: offersError } = await supabase
         .from('shipment_requests')
         .select(`
@@ -91,7 +98,6 @@ const TruckerHistory = () => {
 
       const items: ActivityItem[] = [];
 
-      // Process trips
       if (tripsData) {
         tripsData.forEach((t) => {
           items.push({
@@ -109,7 +115,6 @@ const TruckerHistory = () => {
         });
       }
 
-      // Process offers
       if (offersData) {
         offersData.forEach((o) => {
           const ship = Array.isArray(o.shipments) ? o.shipments[0] : o.shipments;
@@ -128,7 +133,6 @@ const TruckerHistory = () => {
         });
       }
 
-      // Sort by date descending
       return items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     },
     enabled: !!userProfile?.id,
@@ -213,22 +217,20 @@ const TruckerHistory = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: 'Total', val: stats.total, icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Completed', val: stats.completed, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Pending', val: stats.pending, icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-          { label: 'This Month', val: stats.thisMonth, icon: Calendar, color: 'text-purple-600', bg: 'bg-purple-50' }
-        ].map((stat, i) => (
+        {statCards.map((card, i) => {
+          const val = stats[card.key];
+          return (
           <Card key={i} className="border-gray-100">
             <CardContent className="p-4 flex items-center gap-4">
-              <div className={`${stat.bg} p-3 rounded-xl`}><stat.icon className={`h-5 w-5 ${stat.color}`} /></div>
+              <div className={`${card.bg} p-3 rounded-xl`}><card.icon className={`h-5 w-5 ${card.color}`} /></div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{stat.label}</p>
-                <p className="text-2xl font-black text-gray-900">{stat.val}</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.label}</p>
+                <p className="text-2xl font-black text-gray-900">{val}</p>
               </div>
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       <Card className="mb-8 border-gray-100">

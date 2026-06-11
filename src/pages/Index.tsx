@@ -20,7 +20,7 @@ const Index = () => {
       try {
         const { data, error } = await supabase
           .from('trips')
-          .select('*')
+          .select('id, origin_city, destination_city, departure_date, price_per_tonne, status, created_at')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(3);

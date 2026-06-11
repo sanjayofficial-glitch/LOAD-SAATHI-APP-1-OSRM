@@ -84,7 +84,7 @@ const BrowseShipments = () => {
       const supabase = createClerkSupabaseClient(token);
       const { data } = await supabase
         .from('trips')
-        .select('*')
+        .select('id, origin_city, destination_city, available_capacity_tonnes, price_per_tonne, origin_lat, origin_lng, destination_lat, destination_lng, departure_date, status')
         .eq('trucker_id', userProfile.id)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
@@ -105,7 +105,7 @@ const BrowseShipments = () => {
       const supabase = createClerkSupabaseClient(token);
       const { data, error } = await supabase
         .from('shipments')
-        .select('*, shipper:users(*)')
+        .select('id, origin_city, destination_city, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, goods_description, weight_tonnes, budget_per_tonne, departure_date, status, created_at, shipper_id, shipper:users(full_name, rating, phone, total_trips)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
       if (error) throw error;
