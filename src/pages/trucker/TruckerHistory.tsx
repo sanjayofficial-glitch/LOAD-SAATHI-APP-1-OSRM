@@ -22,7 +22,8 @@ import {
   Loader2,
   IndianRupee,
   AlertCircle,
-  Inbox
+  Inbox,
+  LucideIcon
 } from 'lucide-react';
 
 interface ActivityItem {
@@ -68,7 +69,7 @@ const TruckerHistory = () => {
 
       const { data: tripsData, error: tripsError } = await supabase
         .from('trips')
-        .select('id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne, status, created_at')
+        .select('id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne, status, created_at, vehicle_type, vehicle_number')
         .eq('trucker_id', userProfile.id)
         .order('created_at', { ascending: false });
 

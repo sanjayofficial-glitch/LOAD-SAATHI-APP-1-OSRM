@@ -74,7 +74,7 @@ const TripList = () => {
       let query = supabase
         .from('trips')
         .select(`
-          id, origin_city, destination_city, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, available_capacity_tonnes, price_per_tonne, departure_date, created_at, trucker_id,
+          id, origin_city, destination_city, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, available_capacity_tonnes, price_per_tonne, departure_date, created_at, trucker_id, status, estimated_distance_km, estimated_duration_min,
           trucker:users!trips_trucker_id_fkey(
             full_name,
             rating,
@@ -100,7 +100,11 @@ const TripList = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      const mapped = (data || []).map((t: Record<string, unknown>) => ({
+        ...t,
+        trucker: Array.isArray(t.trucker) ? (t.trucker as Record<string, unknown>[])[0] : t.trucker
+      }));
+      return mapped as Trip[];
     },
     enabled: !!userProfile?.id,
     staleTime: 15_000,

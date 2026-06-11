@@ -84,7 +84,7 @@ const TruckerHub = () => {
       // 1. My Posted Trips
       const { data: tripsData } = await supabase
         .from('trips')
-        .select('id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne, status, created_at, trucker_id')
+        .select('id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne, status, created_at, trucker_id, vehicle_type, vehicle_number')
         .eq('trucker_id', userProfile.id)
         .order('created_at', { ascending: false });
 
@@ -92,7 +92,7 @@ const TruckerHub = () => {
       const { data: sent } = await supabase
         .from('shipment_requests')
         .select(`
-          id, created_at, status, proposed_price_per_tonne, message, shipment_id, trucker_id,
+          id, created_at, status, proposed_price_per_tonne, message, shipment_id, trucker_id, shipper_id,
           shipment:shipments!inner(id, origin_city, destination_city, departure_date, weight_tonnes, status, shipper_id, shipper:users!shipments_shipper_id_fkey(full_name, phone))
         `)
         .eq('trucker_id', userProfile.id)
@@ -102,14 +102,24 @@ const TruckerHub = () => {
       const { data: incoming } = await supabase
         .from('requests')
         .select(`
-          id, created_at, status, weight_tonnes, goods_description, shipper_id, trip_id,
+          id, created_at, status, weight_tonnes, goods_description, shipper_id, trip_id, pickup_address, delivery_address,
           trip:trips!requests_trip_id_fkey(id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne)
         `)
         .eq('receiver_id', userProfile.id)
         .order('created_at', { ascending: false });
 
+      const mappedSent = (sent || []).map((o: Record<string, unknown>) => ({
+        ...o,
+        shipment: o.shipment ? {
+          ...(o.shipment as Record<string, unknown>),
+          shipper: Array.isArray((o.shipment as Record<string, unknown>).shipper)
+            ? ((o.shipment as Record<string, unknown>).shipper as Record<string, unknown>[])[0]
+            : (o.shipment as Record<string, unknown>).shipper
+        } : o.shipment
+      })) as ShipmentRequest[];
+
       setTrips(tripsData || []);
-      setSentOffers(sent || []);
+      setSentOffers(mappedSent);
       setIncomingRequests(incoming || []);
     } catch (err) {
       showError('Failed to fetch data');

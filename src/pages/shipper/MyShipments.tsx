@@ -82,14 +82,14 @@ const MyShipments = () => {
 
       const { data: shipmentsData } = await supabase
         .from('shipments')
-        .select('id, origin_city, destination_city, goods_description, weight_tonnes, budget_per_tonne, departure_date, status, created_at')
+        .select('id, origin_city, destination_city, goods_description, weight_tonnes, budget_per_tonne, departure_date, status, created_at, shipper_id, pickup_address, delivery_address')
         .eq('shipper_id', userProfile.id)
         .order('created_at', { ascending: false });
 
       const { data: sent } = await supabase
         .from('requests')
         .select(`
-          id, created_at, status, weight_tonnes, goods_description, trip_id,
+          id, created_at, status, weight_tonnes, goods_description, trip_id, shipper_id, pickup_address, delivery_address,
           trip:trips!inner(id, origin_city, destination_city, departure_date, available_capacity_tonnes, price_per_tonne, trucker_id)
         `)
         .eq('shipper_id', userProfile.id)
@@ -98,16 +98,29 @@ const MyShipments = () => {
       const { data: incoming } = await supabase
         .from('shipment_requests')
         .select(`
-          id, created_at, status, proposed_price_per_tonne, message, trucker_id, shipment_id,
+          id, created_at, status, proposed_price_per_tonne, message, trucker_id, shipment_id, shipper_id,
           shipment:shipments!inner(id, origin_city, destination_city, goods_description, weight_tonnes, budget_per_tonne, departure_date),
           trucker:users!shipment_requests_trucker_id_fkey(full_name, phone, rating)
         `)
         .eq('shipper_id', userProfile.id)
         .order('created_at', { ascending: false });
 
-      setShipments(shipmentsData || []);
-      setSentRequests(sent || []);
-      setIncomingOffers(incoming || []);
+      const mappedShipments = (shipmentsData || []).map((s: Record<string, unknown>) => ({
+        ...s
+      })) as Shipment[];
+
+      const mappedSent = (sent || []).map((r: Record<string, unknown>) => ({
+        ...r
+      })) as Request[];
+
+      const mappedIncoming = (incoming || []).map((o: Record<string, unknown>) => ({
+        ...o,
+        trucker: Array.isArray(o.trucker) ? (o.trucker as Record<string, unknown>[])[0] : o.trucker
+      })) as ShipmentRequest[];
+
+      setShipments(mappedShipments);
+      setSentRequests(mappedSent);
+      setIncomingOffers(mappedIncoming);
     } catch (err: any) {
       console.error('[MyShipments] Fetch error:', err);
       showError('Failed to fetch data');

@@ -7,6 +7,7 @@ export interface User {
   total_trips: number;
   is_verified?: boolean;
   created_at: string;
+  city?: string;
 }
 
 export interface Trip {
