@@ -2,7 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users table (keep as text for Clerk compatibility)
-CREATE TABLE public.users (
+CREATE TABLE IF NOT EXISTS public.users (
   id text NOT NULL,
   email text NOT NULL,
   user_type text NOT NULL CHECK (user_type = ANY (ARRAY['trucker'::text, 'shipper'::text])),
@@ -17,7 +17,7 @@ CREATE TABLE public.users (
 );
 
 -- Trips table
-CREATE TABLE public.trips (
+CREATE TABLE IF NOT EXISTS public.trips (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   trucker_id text NOT NULL,  -- References users.id (text)
   origin_city text NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE public.trips (
 );
 
 -- Shipments table
-CREATE TABLE public.shipments (
+CREATE TABLE IF NOT EXISTS public.shipments (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   shipper_id text NOT NULL,  -- References users.id (text)
   origin_city text NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE public.shipments (
 );
 
 -- Requests table (shipper requests to join a trucker's trip)
-CREATE TABLE public.requests (
+CREATE TABLE IF NOT EXISTS public.requests (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   trip_id uuid NOT NULL,
   shipper_id text NOT NULL,  -- References users.id (text)
@@ -75,7 +75,7 @@ CREATE TABLE public.requests (
 );
 
 -- Shipment requests table (trucker offers to shippers)
-CREATE TABLE public.shipment_requests (
+CREATE TABLE IF NOT EXISTS public.shipment_requests (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   shipment_id uuid NOT NULL,
   trucker_id text NOT NULL,  -- References users.id (text)
@@ -92,7 +92,7 @@ CREATE TABLE public.shipment_requests (
 );
 
 -- Reviews table
-CREATE TABLE public.reviews (
+CREATE TABLE IF NOT EXISTS public.reviews (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   trip_id uuid NOT NULL,
   trucker_id text NOT NULL,  -- References users.id (text)
@@ -107,7 +107,7 @@ CREATE TABLE public.reviews (
 );
 
 -- Messages table
-CREATE TABLE public.messages (
+CREATE TABLE IF NOT EXISTS public.messages (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   sender_id text NOT NULL,  -- References users.id (text)
   recipient_id text NOT NULL,  -- References users.id (text)
@@ -124,7 +124,7 @@ CREATE TABLE public.messages (
 );
 
 -- Notifications table
-CREATE TABLE public.notifications (
+CREATE TABLE IF NOT EXISTS public.notifications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id text NOT NULL,  -- References users.id (text)
   message text NOT NULL,
@@ -151,45 +151,57 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
 -- ===================== USERS =====================
 -- Allow users to create their own profile (role selection)
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.users;
 CREATE POLICY "Users can insert own profile" ON public.users
   FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = id);
 
 -- Allow users to update their own profile
+DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
 CREATE POLICY "Users can update own profile" ON public.users
   FOR UPDATE TO authenticated USING (auth.uid()::text = id);
 
 -- Allow all authenticated users to read all users (needed for JOINs to show names)
+DROP POLICY IF EXISTS "Authenticated users can read all users" ON public.users;
 CREATE POLICY "Authenticated users can read all users" ON public.users
   FOR SELECT TO authenticated USING (true);
 
 -- ===================== TRIPS =====================
+DROP POLICY IF EXISTS "Anyone can see active trips" ON public.trips;
 CREATE POLICY "Anyone can see active trips" ON public.trips
   FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Truckers can create trips" ON public.trips;
 CREATE POLICY "Truckers can create trips" ON public.trips
   FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = trucker_id);
 
+DROP POLICY IF EXISTS "Truckers can update own trips" ON public.trips;
 CREATE POLICY "Truckers can update own trips" ON public.trips
   FOR UPDATE TO authenticated USING (auth.uid()::text = trucker_id);
 
+DROP POLICY IF EXISTS "Truckers can delete own trips" ON public.trips;
 CREATE POLICY "Truckers can delete own trips" ON public.trips
   FOR DELETE TO authenticated USING (auth.uid()::text = trucker_id);
 
 -- ===================== SHIPMENTS =====================
 -- Allow viewing pending shipments OR own shipments (so shipper can see matched/completed)
+DROP POLICY IF EXISTS "Anyone can see pending or own shipments" ON public.shipments;
 CREATE POLICY "Anyone can see pending or own shipments" ON public.shipments
   FOR SELECT TO authenticated USING (status = 'pending' OR auth.uid()::text = shipper_id);
 
+DROP POLICY IF EXISTS "Shippers can create shipments" ON public.shipments;
 CREATE POLICY "Shippers can create shipments" ON public.shipments
   FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
 
+DROP POLICY IF EXISTS "Shippers can update own shipments" ON public.shipments;
 CREATE POLICY "Shippers can update own shipments" ON public.shipments
   FOR UPDATE TO authenticated USING (auth.uid()::text = shipper_id);
 
+DROP POLICY IF EXISTS "Shippers can delete own shipments" ON public.shipments;
 CREATE POLICY "Shippers can delete own shipments" ON public.shipments
   FOR DELETE TO authenticated USING (auth.uid()::text = shipper_id);
 
 -- ===================== REQUESTS =====================
+DROP POLICY IF EXISTS "Users can see relevant requests" ON public.requests;
 CREATE POLICY "Users can see relevant requests" ON public.requests
   FOR SELECT TO authenticated USING (
     auth.uid()::text = shipper_id OR
@@ -197,16 +209,20 @@ CREATE POLICY "Users can see relevant requests" ON public.requests
     trip_id IN (SELECT id FROM trips WHERE trucker_id = auth.uid()::text)
   );
 
+DROP POLICY IF EXISTS "Shippers can create requests" ON public.requests;
 CREATE POLICY "Shippers can create requests" ON public.requests
   FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
 
+DROP POLICY IF EXISTS "Shippers can update own requests" ON public.requests;
 CREATE POLICY "Shippers can update own requests" ON public.requests
   FOR UPDATE TO authenticated USING (auth.uid()::text = shipper_id);
 
+DROP POLICY IF EXISTS "Truckers can update received requests" ON public.requests;
 CREATE POLICY "Truckers can update received requests" ON public.requests
   FOR UPDATE TO authenticated USING (auth.uid()::text = receiver_id);
 
 -- ===================== SHIPMENT REQUESTS =====================
+DROP POLICY IF EXISTS "Users can see relevant shipment requests" ON public.shipment_requests;
 CREATE POLICY "Users can see relevant shipment requests" ON public.shipment_requests
   FOR SELECT TO authenticated USING (
     auth.uid()::text = shipper_id OR
@@ -214,37 +230,46 @@ CREATE POLICY "Users can see relevant shipment requests" ON public.shipment_requ
     shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.uid()::text)
   );
 
+DROP POLICY IF EXISTS "Truckers can create shipment requests" ON public.shipment_requests;
 CREATE POLICY "Truckers can create shipment requests" ON public.shipment_requests
   FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = trucker_id);
 
+DROP POLICY IF EXISTS "Truckers can update own shipment requests" ON public.shipment_requests;
 CREATE POLICY "Truckers can update own shipment requests" ON public.shipment_requests
   FOR UPDATE TO authenticated USING (auth.uid()::text = trucker_id);
 
+DROP POLICY IF EXISTS "Shippers can update received shipment requests" ON public.shipment_requests;
 CREATE POLICY "Shippers can update received shipment requests" ON public.shipment_requests
   FOR UPDATE TO authenticated USING (
     shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.uid()::text)
   );
 
 -- ===================== REVIEWS =====================
+DROP POLICY IF EXISTS "Anyone can see reviews" ON public.reviews;
 CREATE POLICY "Anyone can see reviews" ON public.reviews
   FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Shippers can create reviews" ON public.reviews;
 CREATE POLICY "Shippers can create reviews" ON public.reviews
   FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
 
 -- ===================== MESSAGES =====================
+DROP POLICY IF EXISTS "Users can see their messages" ON public.messages;
 CREATE POLICY "Users can see their messages" ON public.messages
   FOR SELECT TO authenticated USING (
     auth.uid()::text = sender_id OR
     auth.uid()::text = recipient_id
   );
 
+DROP POLICY IF EXISTS "Users can send messages" ON public.messages;
 CREATE POLICY "Users can send messages" ON public.messages
   FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = sender_id);
 
 -- ===================== NOTIFICATIONS =====================
+DROP POLICY IF EXISTS "Users can see their notifications" ON public.notifications;
 CREATE POLICY "Users can see their notifications" ON public.notifications
   FOR SELECT TO authenticated USING (auth.uid()::text = user_id);
 
+DROP POLICY IF EXISTS "Users can create own notifications" ON public.notifications;
 CREATE POLICY "Users can create own notifications" ON public.notifications
   FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = user_id);
