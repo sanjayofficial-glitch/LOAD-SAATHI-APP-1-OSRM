@@ -1,11 +1,21 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Drop existing tables in reverse dependency order (CASCADE handles FKs)
+DROP TABLE IF EXISTS public.notifications CASCADE;
+DROP TABLE IF EXISTS public.messages CASCADE;
+DROP TABLE IF EXISTS public.reviews CASCADE;
+DROP TABLE IF EXISTS public.shipment_requests CASCADE;
+DROP TABLE IF EXISTS public.requests CASCADE;
+DROP TABLE IF EXISTS public.shipments CASCADE;
+DROP TABLE IF EXISTS public.trips CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
+
 -- Users table (keep as text for Clerk compatibility)
-CREATE TABLE IF NOT EXISTS public.users (
+CREATE TABLE public.users (
   id text NOT NULL,
   email text NOT NULL,
-  user_type text NOT NULL CHECK (user_type = ANY (ARRAY['trucker'::text, 'shipper'::text])),
+  user_type text NOT NULL CHECK (user_type = ANY (ARRAY['trucker'::text, 'shipper'::text, 'admin'::text])),
   full_name text,
   phone text,
   company_name text,
@@ -17,7 +27,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 );
 
 -- Trips table
-CREATE TABLE IF NOT EXISTS public.trips (
+CREATE TABLE public.trips (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   trucker_id text NOT NULL,  -- References users.id (text)
   origin_city text NOT NULL,
@@ -37,7 +47,7 @@ CREATE TABLE IF NOT EXISTS public.trips (
 );
 
 -- Shipments table
-CREATE TABLE IF NOT EXISTS public.shipments (
+CREATE TABLE public.shipments (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   shipper_id text NOT NULL,  -- References users.id (text)
   origin_city text NOT NULL,
@@ -55,7 +65,7 @@ CREATE TABLE IF NOT EXISTS public.shipments (
 );
 
 -- Requests table (shipper requests to join a trucker's trip)
-CREATE TABLE IF NOT EXISTS public.requests (
+CREATE TABLE public.requests (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   trip_id uuid NOT NULL,
   shipper_id text NOT NULL,  -- References users.id (text)
@@ -75,7 +85,7 @@ CREATE TABLE IF NOT EXISTS public.requests (
 );
 
 -- Shipment requests table (trucker offers to shippers)
-CREATE TABLE IF NOT EXISTS public.shipment_requests (
+CREATE TABLE public.shipment_requests (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   shipment_id uuid NOT NULL,
   trucker_id text NOT NULL,  -- References users.id (text)
@@ -92,7 +102,7 @@ CREATE TABLE IF NOT EXISTS public.shipment_requests (
 );
 
 -- Reviews table
-CREATE TABLE IF NOT EXISTS public.reviews (
+CREATE TABLE public.reviews (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   trip_id uuid NOT NULL,
   trucker_id text NOT NULL,  -- References users.id (text)
@@ -107,7 +117,7 @@ CREATE TABLE IF NOT EXISTS public.reviews (
 );
 
 -- Messages table
-CREATE TABLE IF NOT EXISTS public.messages (
+CREATE TABLE public.messages (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   sender_id text NOT NULL,  -- References users.id (text)
   recipient_id text NOT NULL,  -- References users.id (text)
@@ -124,7 +134,7 @@ CREATE TABLE IF NOT EXISTS public.messages (
 );
 
 -- Notifications table
-CREATE TABLE IF NOT EXISTS public.notifications (
+CREATE TABLE public.notifications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id text NOT NULL,  -- References users.id (text)
   message text NOT NULL,
