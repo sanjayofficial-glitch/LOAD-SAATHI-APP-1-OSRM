@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { showSuccess, showError } from '@/utils/toast';
 import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
+import { formatDuration } from '@/utils/format';
 import { parseNaturalLanguageSearch } from '@/lib/gemini';
 import {
   Dialog,
@@ -369,9 +370,7 @@ const BrowseShipments = () => {
                               <div>
                                 <p className="text-gray-500 text-xs">Duration</p>
                                 <p className="font-medium">
-                                  {shipment.estimated_duration_min >= 60
-                                    ? `~${Math.floor(shipment.estimated_duration_min / 60)}h${shipment.estimated_duration_min % 60 ? ` ${shipment.estimated_duration_min % 60}m` : ''}`
-                                    : `~${shipment.estimated_duration_min}m`}
+                                  {formatDuration(shipment.estimated_duration_min)}
                                 </p>
                               </div>
                             </div>

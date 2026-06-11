@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
+import { formatDuration } from '@/utils/format';
 
 const TripList = () => {
   const { userProfile } = useAuth();
@@ -343,9 +344,7 @@ const TripList = () => {
                           <div className="flex items-center">
                             <Clock className="h-4 w-4 mr-2 text-blue-500" />
                             <span className="text-sm text-gray-600">
-                              {trip.estimated_duration_min >= 60
-                                ? `~${Math.floor(trip.estimated_duration_min / 60)}h${trip.estimated_duration_min % 60 ? ` ${trip.estimated_duration_min % 60}m` : ''}`
-                                : `~${trip.estimated_duration_min}m`}
+                              {formatDuration(trip.estimated_duration_min)}
                             </span>
                           </div>
                         )}
