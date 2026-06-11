@@ -102,15 +102,14 @@ const RouteMap = ({
       setOrigin(originCoords);
       setDestination(destCoords);
 
-      // Only fetch OSRM route if we had to geocode (no pre-stored coords)
-      // OSRM is expensive — never call it just for display, only at creation time
-      if (!hasPreStoredCoords) {
-        const routeResult = await getRoute(
-          originCoords.lon, originCoords.lat,
-          destCoords.lon, destCoords.lat
-        );
-        if (!cancelled) setRoute(routeResult);
-      }
+      // Always fetch the OSRM route for accurate geometry display.
+      // If we have pre-stored distance/duration, use those for the
+      // info bar; otherwise use the freshly computed values.
+      const routeResult = await getRoute(
+        originCoords.lon, originCoords.lat,
+        destCoords.lon, destCoords.lat
+      );
+      if (!cancelled) setRoute(routeResult);
 
       if (!cancelled) setLoading(false);
     };

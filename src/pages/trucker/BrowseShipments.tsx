@@ -19,7 +19,8 @@ import {
    Loader2, 
    IndianRupee,
    Sparkles,
-   User
+   User,
+   MapPin
  } from 'lucide-react';
 import { 
   Select,
@@ -139,7 +140,11 @@ const BrowseShipments = () => {
           myActiveTrip.origin_city,
           myActiveTrip.destination_city,
           s.weight_tonnes,
-          myActiveTrip.available_capacity_tonnes
+          myActiveTrip.available_capacity_tonnes,
+          s.origin_state,
+          s.destination_state,
+          myActiveTrip.origin_state,
+          myActiveTrip.destination_state
         ) : 0
       }))
       .sort((a, b) => b._matchScore - a._matchScore);
@@ -326,7 +331,7 @@ const BrowseShipments = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-2 text-orange-600" />
                             <div>
@@ -348,6 +353,15 @@ const BrowseShipments = () => {
                               <p className="font-medium">{shipment.shipper?.full_name || 'Verified Shipper'}</p>
                             </div>
                           </div>
+                          {shipment.estimated_distance_km && (
+                            <div className="flex items-center">
+                              <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                              <div>
+                                <p className="text-gray-500 text-xs">Distance</p>
+                                <p className="font-medium">{shipment.estimated_distance_km.toLocaleString()} km</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
 

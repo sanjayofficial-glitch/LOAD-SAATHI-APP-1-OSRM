@@ -144,7 +144,11 @@ const TripList = () => {
           t.origin_city,
           t.destination_city,
           myShipment.weight_tonnes,
-          t.available_capacity_tonnes
+          t.available_capacity_tonnes,
+          myShipment.origin_state,
+          myShipment.destination_state,
+          t.origin_state,
+          t.destination_state
         ) : 0
       }))
       .sort((a, b) => b._matchScore - a._matchScore);
@@ -311,9 +315,7 @@ const TripList = () => {
                           const { label, color } = getMatchLabel(trip._matchScore);
                           return <Badge className={`${color} text-xs font-semibold ml-1`}>{label}</Badge>;
                         })()}
-                      </div>
-
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                      </div>                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 mr-2 text-orange-600" />
                           <span>{new Date(trip.departure_date).toLocaleDateString('en-IN', { 
@@ -330,14 +332,18 @@ const TripList = () => {
                           <IndianRupee className="h-4 w-4 mr-1 text-green-600" />
                           <span className="font-semibold">₹{trip.price_per_tonne.toLocaleString()} /t</span>
                         </div>
-                        <div className="flex items-center md:col-span-3">
+                        {trip.estimated_distance_km && (
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                            <span className="text-sm text-gray-600">{trip.estimated_distance_km.toLocaleString()} km</span>
+                          </div>
+                        )}
+                        <div className="flex items-center md:col-span-4">
                           <Truck className="h-4 w-4 mr-2 text-gray-400" />
                           <span className="text-sm text-gray-600">
                             {trip.trucker?.full_name || 'Verified Trucker'}
                           </span>
-                        </div>
-                        <div className="flex items-center md:col-span-3">
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 ml-2">
                             {trip.trucker?.rating ? `⭐ ${trip.trucker.rating.toFixed(1)} Rating` : 'No ratings yet'}
                           </span>
                         </div>

@@ -155,7 +155,17 @@ const TripDetail = () => {
       </Button>
       
       <div className="mb-8">
-        <RouteMap originCity={trip.origin_city} destinationCity={trip.destination_city} height="280px" />
+        <RouteMap
+          originCity={trip.origin_city}
+          destinationCity={trip.destination_city}
+          originLat={trip.origin_lat}
+          originLng={trip.origin_lng}
+          destLat={trip.destination_lat}
+          destLng={trip.destination_lng}
+          distanceKm={trip.estimated_distance_km}
+          durationMin={trip.estimated_duration_min}
+          height="280px"
+        />
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">

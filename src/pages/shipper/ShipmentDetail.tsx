@@ -193,7 +193,17 @@ const ShipmentDetail = () => {
 
       {/* Route Map */}
       <div className="mb-8 rounded-2xl overflow-hidden">
-        <RouteMap originCity={shipment.origin_city} destinationCity={shipment.destination_city} height="260px" />
+        <RouteMap
+          originCity={shipment.origin_city}
+          destinationCity={shipment.destination_city}
+          originLat={shipment.origin_lat}
+          originLng={shipment.origin_lng}
+          destLat={shipment.destination_lat}
+          destLng={shipment.destination_lng}
+          distanceKm={shipment.estimated_distance_km}
+          durationMin={shipment.estimated_duration_min}
+          height="260px"
+        />
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">

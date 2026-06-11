@@ -10,7 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { showSuccess, showError } from '@/utils/toast';  
 import { Truck, Calendar, IndianRupee, Loader2, ArrowLeft } from 'lucide-react';  
 import LocationSelector from '@/components/LocationSelector';  
-import locationData from '@/data/locations.json';  const EditTrip = () => {  
+import locationData from '@/data/locations.json';  
+import { geocodeCity } from '@/utils/geocode';  
+import { getRoute } from '@/utils/osrm';  const EditTrip = () => {  
   const { tripId } = useParams();  const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
   const navigate = useNavigate();  
@@ -106,6 +108,29 @@ import locationData from '@/data/locations.json';  const EditTrip = () => {
       if (error) {  
         showError(error.message);  
       } else {  
+        // Update coordinates and route info asynchronously
+        try {
+          const [originCoords, destCoords] = await Promise.all([
+            geocodeCity(formData.origin_city),
+            geocodeCity(formData.destination_city)
+          ]);
+          if (originCoords && destCoords) {
+            const route = await getRoute(
+              originCoords.lon, originCoords.lat,
+              destCoords.lon, destCoords.lat
+            );
+            await supabase.from('trips').update({
+              origin_lat: originCoords.lat,
+              origin_lng: originCoords.lon,
+              destination_lat: destCoords.lat,
+              destination_lng: destCoords.lon,
+              estimated_distance_km: route?.distance_km ?? null,
+              estimated_duration_min: route?.duration_min ?? null,
+            }).eq('id', tripId);
+          }
+        } catch {
+          // Silently ignore — coordinates are optional enhancement
+        }
         showSuccess('Trip updated successfully!');  
         navigate('/trucker/my-trips');  
       }  

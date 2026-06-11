@@ -226,7 +226,17 @@ const TruckerTripDetail = () => {
       </div>
 
       <div className="mb-8 rounded-2xl overflow-hidden">
-        <RouteMap originCity={trip.origin_city} destinationCity={trip.destination_city} height="240px" />
+        <RouteMap
+          originCity={trip.origin_city}
+          destinationCity={trip.destination_city}
+          originLat={trip.origin_lat}
+          originLng={trip.origin_lng}
+          destLat={trip.destination_lat}
+          destLng={trip.destination_lng}
+          distanceKm={trip.estimated_distance_km}
+          durationMin={trip.estimated_duration_min}
+          height="240px"
+        />
       </div>
 
       <Card className="mb-8 border-orange-100 shadow-sm">

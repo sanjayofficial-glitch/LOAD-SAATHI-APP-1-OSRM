@@ -1,11 +1,15 @@
-import type { GeoJSON } from 'geojson';
+import type { Geometry } from 'geojson';
 
 export interface RouteResult {
   distance_km: number;
   duration_min: number;
-  geometry?: GeoJSON.Geometry;
+  geometry?: Geometry;
 }
 
+/**
+ * Fetch a driving route from the public OSRM API.
+ * Returns distance (km), duration (min), and GeoJSON geometry.
+ */
 export async function getRoute(
   originLng: number, originLat: number,
   destLng: number, destLat: number
@@ -28,3 +32,4 @@ export async function getRoute(
     return null;
   }
 }
+

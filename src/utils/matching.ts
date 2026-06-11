@@ -4,7 +4,11 @@ export function calculateMatchScore(
   tripOriginCity: string,
   tripDestCity: string,
   shipmentWeightTonnes: number,
-  tripCapacityTonnes: number
+  tripCapacityTonnes: number,
+  shipmentOriginState?: string,
+  shipmentDestState?: string,
+  tripOriginState?: string,
+  tripDestState?: string
 ): number {
   const n = (s: string) => s.toLowerCase().trim();
   const so = n(shipmentOriginCity);
@@ -12,11 +16,26 @@ export function calculateMatchScore(
   const to = n(tripOriginCity);
   const td = n(tripDestCity);
 
-  const originScore = (so.includes(to) || to.includes(so)) ? 40 : 0;
-  const destScore   = (sd.includes(td) || td.includes(sd)) ? 40 : 0;
+  // City-level matching (exact or substring)
+  const originScore = (so === to || so.includes(to) || to.includes(so)) ? 40 : 0;
+  const destScore   = (sd === td || sd.includes(td) || td.includes(sd)) ? 40 : 0;
   const capScore    = shipmentWeightTonnes <= tripCapacityTonnes ? 20 : 0;
 
-  return originScore + destScore + capScore;
+  let score = originScore + destScore + capScore;
+
+  // Bonus: if cities don't match exactly but states do, give partial credit
+  if (originScore === 0 && shipmentOriginState && tripOriginState) {
+    if (n(shipmentOriginState) === n(tripOriginState)) {
+      score += 20; // Same state, different city
+    }
+  }
+  if (destScore === 0 && shipmentDestState && tripDestState) {
+    if (n(shipmentDestState) === n(tripDestState)) {
+      score += 20; // Same state, different city
+    }
+  }
+
+  return Math.min(score, 100);
 }
 
 export function getMatchLabel(score: number): {
