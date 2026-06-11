@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
@@ -32,10 +33,7 @@ const TripList = () => {
   const { getToken } = useClerkAuth();
   const navigate = useNavigate();
   
-  const [trips, setTrips] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [myShipment, setMyShipment] = useState<any | null>(null);
   const [filters, setFilters] = useState({
     origin: '',
     destination: '',
@@ -43,35 +41,37 @@ const TripList = () => {
     maxPrice: ''
   });
 
-  // Fetch trips with proper error handling
-  const fetchTrips = useCallback(async () => {
-    if (!userProfile?.id) return;
-    
-    setLoading(true);
-    try {
+  // Fetch current shipper's pending shipment for match scoring
+  const { data: myShipment } = useQuery({
+    queryKey: ['myShipment', userProfile?.id],
+    queryFn: async () => {
+      if (!userProfile?.id || userProfile.user_type !== 'shipper') return null;
       const token = await getToken({ template: 'supabase' });
-      if (!token) {
-        showError('Authentication required');
-        return;
-      }
+      if (!token) return null;
+      const supabase = createClerkSupabaseClient(token);
+      const { data } = await supabase
+        .from('shipments')
+        .select('*')
+        .eq('shipper_id', userProfile.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data || null;
+    },
+    enabled: !!userProfile?.id && userProfile.user_type === 'shipper',
+    staleTime: 30_000,
+  });
 
-      const supabaseClient = createClerkSupabaseClient(token);
+  // Fetch active trips with React Query caching
+  const { data: trips = [], isLoading } = useQuery({
+    queryKey: ['activeTrips', filters.origin, filters.destination, filters.minCapacity, filters.maxPrice],
+    queryFn: async () => {
+      const token = await getToken({ template: 'supabase' });
+      if (!token) throw new Error('Authentication required');
+      const supabase = createClerkSupabaseClient(token);
 
-      // Fetch shipper's first active shipment for match scoring
-      if (userProfile.user_type === 'shipper') {
-        const { data: shipmentData } = await supabaseClient
-          .from('shipments')
-          .select('*')
-          .eq('shipper_id', userProfile.id)
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        setMyShipment(shipmentData || null);
-      }
-
-      // Build query with proper filtering
-      let query = supabaseClient
+      let query = supabase
         .from('trips')
         .select(`
           *, 
@@ -82,9 +82,9 @@ const TripList = () => {
           )
         `)
         .eq('status', 'active')
-        .order('departure_date', { ascending: true });
+        .order('departure_date', { ascending: true })
+        .limit(50);
 
-      // Apply filters
       if (filters.origin) {
         query = query.ilike('origin_city', `%${filters.origin}%`);
       }
@@ -97,30 +97,14 @@ const TripList = () => {
       if (filters.maxPrice) {
         query = query.lte('price_per_tonne', parseFloat(filters.maxPrice));
       }
-      if (searchTerm) {
-        query = query.or(`origin_city.ilike.%${searchTerm}%,destination_city.ilike.%${searchTerm}%,trucker.full_name.ilike.%${searchTerm}%`);
-      }
 
       const { data, error } = await query;
-
-      if (error) {
-        console.error('Trips fetch error:', error);
-        showError('Failed to load available trucks');
-        return;
-      }
-
-      setTrips(data || []);
-    } catch (err: any) {
-      console.error('Trips error:', err);
-      showError(err.message || 'Failed to load trips');
-    } finally {
-      setLoading(false);
-    }
-  }, [getToken, filters, searchTerm, userProfile?.id]);
-
-  useEffect(() => {
-    fetchTrips();
-  }, [fetchTrips]);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!userProfile?.id,
+    staleTime: 15_000,
+  });
 
   const filteredTrips = useMemo(() => {
     return trips
@@ -130,30 +114,38 @@ const TripList = () => {
           t.destination_city.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (t.trucker?.full_name || '').toLowerCase().includes(searchTerm.toLowerCase());
         
-        const matchesOrigin = !filters.origin || t.origin_city.toLowerCase().includes(filters.origin.toLowerCase());
-        const matchesDest = !filters.destination || t.destination_city.toLowerCase().includes(filters.destination.toLowerCase());
-        const matchesCapacity = !filters.minCapacity || t.available_capacity_tonnes >= parseFloat(filters.minCapacity);
-        const matchesPrice = !filters.maxPrice || t.price_per_tonne <= parseFloat(filters.maxPrice);
-
-        return matchesSearch && matchesOrigin && matchesDest && matchesCapacity && matchesPrice;
+        return matchesSearch;
       })
       .map(t => ({
         ...t,
-        _matchScore: myShipment ? calculateMatchScore(
-          myShipment.origin_city,
-          myShipment.destination_city,
-          t.origin_city,
-          t.destination_city,
-          myShipment.weight_tonnes,
-          t.available_capacity_tonnes,
-          myShipment.origin_state,
-          myShipment.destination_state,
-          t.origin_state,
-          t.destination_state
-        ) : 0
+        _matchScore: myShipment ? calculateMatchScore({
+          shipmentOriginCity: myShipment.origin_city,
+          shipmentDestCity: myShipment.destination_city,
+          tripOriginCity: t.origin_city,
+          tripDestCity: t.destination_city,
+          shipmentWeightTonnes: myShipment.weight_tonnes,
+          tripCapacityTonnes: t.available_capacity_tonnes,
+          shipmentOriginState: myShipment.origin_state,
+          shipmentDestState: myShipment.destination_state,
+          tripOriginState: t.origin_state,
+          tripDestState: t.destination_state,
+          shipmentOriginLat: myShipment.origin_lat,
+          shipmentOriginLng: myShipment.origin_lng,
+          tripOriginLat: t.origin_lat,
+          tripOriginLng: t.origin_lng,
+          shipmentDestLat: myShipment.destination_lat,
+          shipmentDestLng: myShipment.destination_lng,
+          tripDestLat: t.destination_lat,
+          tripDestLng: t.destination_lng,
+          shipmentBudgetPerTonne: myShipment.budget_per_tonne,
+          tripPricePerTonne: t.price_per_tonne,
+          shipmentDate: myShipment.departure_date,
+          tripDate: t.departure_date,
+          truckerRating: t.trucker?.rating,
+        }) : 0
       }))
       .sort((a, b) => b._matchScore - a._matchScore);
-  }, [trips, searchTerm, filters, myShipment]);
+  }, [trips, searchTerm, myShipment]);
 
   if (!userProfile) {
     return (
@@ -164,7 +156,7 @@ const TripList = () => {
     );
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-4 py-8">
         {[1, 2, 3].map((i) => (
@@ -210,11 +202,10 @@ const TripList = () => {
               <Button 
                 variant="outline" 
                 className="border-orange-200 text-orange-700 hover:bg-orange-50"
-                onClick={fetchTrips}
-                disabled={loading}
+                disabled
               >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Filter className="h-4 w-4 mr-2" />}
-                Apply Filters
+                <Filter className="h-4 w-4 mr-2" />
+                Filters Applied
               </Button>
             </div>
           </div>

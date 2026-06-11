@@ -4,7 +4,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Loader2 } from 'lucide-react';
 
-// Massive coordinate cache for instant loading of common locations
 const coordCache: Record<string, [number, number]> = {
   'mumbai': [19.0760, 72.8777],
   'delhi': [28.6139, 77.2090],
@@ -63,11 +62,9 @@ const coordCache: Record<string, [number, number]> = {
   'panaji': [15.4909, 73.8278],
 };
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 const applyJitter = (coord: [number, number], index: number): [number, number] => {
-  const jitter = 0.02; 
-  const angle = (index * 137.5) % 360; 
+  const jitter = 0.02;
+  const angle = (index * 137.5) % 360;
   const rad = (angle * Math.PI) / 180;
   return [coord[0] + Math.sin(rad) * jitter, coord[1] + Math.cos(rad) * jitter];
 };
@@ -75,7 +72,6 @@ const applyJitter = (coord: [number, number], index: number): [number, number] =
 async function getCityCoords(city: string): Promise<[number, number] | null> {
   const normalized = city.toLowerCase().trim();
   if (coordCache[normalized]) return coordCache[normalized];
-
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city + ', India')}&format=json&limit=1`,
@@ -87,10 +83,22 @@ async function getCityCoords(city: string): Promise<[number, number] | null> {
       coordCache[normalized] = coords;
       return coords;
     }
-  } catch (err) {
-    console.error(`Geocode error: ${city}`, err);
+  } catch {
+    // ignore
   }
   return null;
+}
+
+async function resolveCoords(
+  item: any,
+  cityField: string,
+  latField: string,
+  lngField: string
+): Promise<[number, number] | null> {
+  if (item[latField] != null && item[lngField] != null) {
+    return [Number(item[latField]), Number(item[lngField])];
+  }
+  return getCityCoords(item[cityField]);
 }
 
 const truckIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/1048/1048313.png', iconSize: [24, 24], iconAnchor: [12, 12] });
@@ -99,20 +107,13 @@ const flagIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3
 
 function MapResizer() {
   const map = useMap();
-  const containerRef = useRef<HTMLElement | null>(null);
-
   useEffect(() => {
-    containerRef.current = map.getContainer();
-    if (!containerRef.current) return;
-
-    const observer = new ResizeObserver(() => {
-      map.invalidateSize();
-    });
-
-    observer.observe(containerRef.current);
+    const container = map.getContainer();
+    if (!container) return;
+    const observer = new ResizeObserver(() => map.invalidateSize());
+    observer.observe(container);
     return () => observer.disconnect();
   }, [map]);
-
   return null;
 }
 
@@ -122,55 +123,53 @@ const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
   const [resolvedTrips, setResolvedTrips] = useState<any[]>([]);
   const [resolvedShipments, setResolvedShipments] = useState<any[]>([]);
   const [resolving, setResolving] = useState(false);
-  const dataRef = useRef({ trips, shipments });
 
   useEffect(() => {
-    dataRef.current = { trips, shipments };
-    
     let isMounted = true;
-    const processSequentially = async () => {
+    const resolveAll = async () => {
       setResolving(true);
-      const { trips: tList, shipments: sList } = dataRef.current;
-      
-      const tripsResult: any[] = [];
-      const shipmentsResult: any[] = [];
+      const activeTrips = trips.filter(t => t.status !== 'cancelled');
+      const activeShipments = shipments.filter(s => s.status !== 'cancelled');
 
-      for (let i = 0; i < tList.length; i++) {
-        if (!isMounted) break;
-        const trip = tList[i];
-        if (trip.status === 'cancelled') continue;
-        
-        const origin = await getCityCoords(trip.origin_city);
-        if (!coordCache[trip.origin_city.toLowerCase()]) await sleep(500);
-        const dest = await getCityCoords(trip.destination_city);
-        if (!coordCache[trip.destination_city.toLowerCase()]) await sleep(500);
-
-        if (origin && dest) {
-          tripsResult.push({ ...trip, origin: applyJitter(origin, i), destination: applyJitter(dest, i + 10) });
-          if (isMounted) setResolvedTrips([...tripsResult]);
+      // Resolve all coords in parallel batches of 5 to respect Nominatim rate limits
+      const batchResolve = async (items: any[], isTrip: boolean) => {
+        const results: any[] = [];
+        for (let i = 0; i < items.length; i += 5) {
+          const batch = items.slice(i, i + 5);
+          const batchResults = await Promise.all(
+            batch.map(async (item, idx) => {
+              const origin = await resolveCoords(item, 'origin_city', 'origin_lat', 'origin_lng');
+              const dest = await resolveCoords(item, 'destination_city', 'destination_lat', 'destination_lng');
+              if (origin && dest) {
+                const globalIdx = i + idx;
+                return {
+                  ...item,
+                  origin: applyJitter(origin, isTrip ? globalIdx : globalIdx + 50),
+                  destination: applyJitter(dest, isTrip ? globalIdx + 10 : globalIdx + 60),
+                };
+              }
+              return null;
+            })
+          );
+          results.push(...batchResults.filter(Boolean));
+          // 200ms delay between batches to avoid rate limiting
+          if (i + 5 < items.length) await new Promise(r => setTimeout(r, 200));
         }
+        return results;
+      };
+
+      const [tripResults, shipmentResults] = await Promise.all([
+        batchResolve(activeTrips, true),
+        batchResolve(activeShipments, false),
+      ]);
+
+      if (isMounted) {
+        setResolvedTrips(tripResults);
+        setResolvedShipments(shipmentResults);
+        setResolving(false);
       }
-
-      for (let i = 0; i < sList.length; i++) {
-        if (!isMounted) break;
-        const ship = sList[i];
-        if (ship.status === 'cancelled') continue;
-
-        const origin = await getCityCoords(ship.origin_city);
-        if (!coordCache[ship.origin_city.toLowerCase()]) await sleep(500);
-        const dest = await getCityCoords(ship.destination_city);
-        if (!coordCache[ship.destination_city.toLowerCase()]) await sleep(500);
-
-        if (origin && dest) {
-          shipmentsResult.push({ ...ship, origin: applyJitter(origin, i + 50), destination: applyJitter(dest, i + 60) });
-          if (isMounted) setResolvedShipments([...shipmentsResult]);
-        }
-      }
-
-      if (isMounted) setResolving(false);
     };
-
-    processSequentially();
+    resolveAll();
     return () => { isMounted = false; };
   }, [trips, shipments]);
 
@@ -179,7 +178,7 @@ const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
       <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: '100%', width: '100%', background: '#020617' }} scrollWheelZoom={false}>
         <MapResizer />
         <TileLayer attribution='&copy; OSM' url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-        
+
         {resolvedTrips.map(t => (
           <React.Fragment key={`t-${t.id}`}>
             <Marker position={t.origin} icon={truckIcon}><Popup>{t.trucker?.full_name}: {t.origin_city}</Popup></Marker>
@@ -201,7 +200,7 @@ const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
         <div className="absolute bottom-4 right-4 z-[1000] bg-slate-950/90 border border-slate-800 px-4 py-2 rounded-full flex items-center gap-3 shadow-2xl">
           <Loader2 className="h-4 w-4 text-orange-500 animate-spin" />
           <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
-            Mapping Global Logistics ({resolvedTrips.length + resolvedShipments.length} found)
+            Mapping Logistics ({resolvedTrips.length + resolvedShipments.length} loaded)
           </span>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSupabase } from '@/hooks/useSupabase';
 import { 
   ResizableHandle, 
@@ -55,12 +55,15 @@ const MonitoringDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const supabaseRef = useRef<any>(null);
+  const channelRef = useRef<any>(null);
 
   const fetchData = useCallback(async () => {
     try {
       setError(null);
       const queryTimes: number[] = [];
       const supabaseClient = await getAuthenticatedClient();
+      supabaseRef.current = supabaseClient;
 
       // Fetch active users
       let qs = performance.now();
@@ -170,9 +173,26 @@ const MonitoringDashboard = () => {
   }, [getAuthenticatedClient]);
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 15000);
-    return () => clearInterval(interval);
+    fetchData().then(() => {
+      const client = supabaseRef.current;
+      if (!client || channelRef.current) return;
+      channelRef.current = client.channel('admin-monitoring')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'trips' }, () => fetchData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => fetchData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => fetchData())
+        .subscribe();
+    });
+
+    const interval = setInterval(fetchData, 30000);
+
+    return () => {
+      clearInterval(interval);
+      if (channelRef.current) {
+        const client = supabaseRef.current;
+        if (client) client.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
   }, [fetchData]);
 
   return (

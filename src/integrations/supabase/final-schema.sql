@@ -42,6 +42,12 @@ CREATE TABLE public.trips (
   updated_at timestamp with time zone DEFAULT now(),
   origin_state text,
   destination_state text,
+  origin_lat numeric,
+  origin_lng numeric,
+  destination_lat numeric,
+  destination_lng numeric,
+  estimated_distance_km numeric,
+  estimated_duration_min integer,
   CONSTRAINT trips_pkey PRIMARY KEY (id),
   CONSTRAINT trips_trucker_id_fkey FOREIGN KEY (trucker_id) REFERENCES public.users(id)
 );
@@ -62,6 +68,12 @@ CREATE TABLE public.shipments (
   budget_per_tonne numeric NOT NULL CHECK (budget_per_tonne > 0::numeric),
   status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'matched'::text, 'completed'::text, 'cancelled'::text])),
   created_at timestamp with time zone DEFAULT now(),
+  origin_lat numeric,
+  origin_lng numeric,
+  destination_lat numeric,
+  destination_lng numeric,
+  estimated_distance_km numeric,
+  estimated_duration_min integer,
   CONSTRAINT shipments_pkey PRIMARY KEY (id),
   CONSTRAINT shipments_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.users(id)
 );
@@ -150,6 +162,44 @@ CREATE TABLE public.notifications (
   CONSTRAINT notifications_related_trip_id_fkey FOREIGN KEY (related_trip_id) REFERENCES public.trips(id),
   CONSTRAINT notifications_related_shipment_request_id_fkey FOREIGN KEY (related_shipment_request_id) REFERENCES public.shipment_requests(id)
 );
+
+-- Performance indexes for common query patterns
+CREATE INDEX IF NOT EXISTS idx_trips_status ON public.trips(status);
+CREATE INDEX IF NOT EXISTS idx_trips_trucker_id ON public.trips(trucker_id);
+CREATE INDEX IF NOT EXISTS idx_trips_origin_city ON public.trips(origin_city);
+CREATE INDEX IF NOT EXISTS idx_trips_destination_city ON public.trips(destination_city);
+CREATE INDEX IF NOT EXISTS idx_trips_status_origin_dest ON public.trips(status, origin_city, destination_city);
+CREATE INDEX IF NOT EXISTS idx_trips_departure_date ON public.trips(departure_date);
+
+CREATE INDEX IF NOT EXISTS idx_shipments_status ON public.shipments(status);
+CREATE INDEX IF NOT EXISTS idx_shipments_shipper_id ON public.shipments(shipper_id);
+CREATE INDEX IF NOT EXISTS idx_shipments_origin_city ON public.shipments(origin_city);
+CREATE INDEX IF NOT EXISTS idx_shipments_destination_city ON public.shipments(destination_city);
+CREATE INDEX IF NOT EXISTS idx_shipments_status_origin_dest ON public.shipments(status, origin_city, destination_city);
+CREATE INDEX IF NOT EXISTS idx_shipments_departure_date ON public.shipments(departure_date);
+
+CREATE INDEX IF NOT EXISTS idx_requests_status ON public.requests(status);
+CREATE INDEX IF NOT EXISTS idx_requests_trip_id ON public.requests(trip_id);
+CREATE INDEX IF NOT EXISTS idx_requests_shipper_id ON public.requests(shipper_id);
+
+CREATE INDEX IF NOT EXISTS idx_shipment_requests_status ON public.shipment_requests(status);
+CREATE INDEX IF NOT EXISTS idx_shipment_requests_shipment_id ON public.shipment_requests(shipment_id);
+CREATE INDEX IF NOT EXISTS idx_shipment_requests_trucker_id ON public.shipment_requests(trucker_id);
+CREATE INDEX IF NOT EXISTS idx_shipment_requests_shipper_id ON public.shipment_requests(shipper_id);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON public.notifications(is_read);
+
+CREATE INDEX IF NOT EXISTS idx_messages_sender_id ON public.messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_messages_recipient_id ON public.messages(recipient_id);
+
+-- Enable Realtime for live updates
+ALTER PUBLICATION supabase_realtime ADD TABLE public.trips;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.shipments;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.requests;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.shipment_requests;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
 
 -- Enable RLS on all tables
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;

@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
+import { geocodeCity } from "@/utils/geocode";
+import { getRoute } from "@/utils/osrm";
 
 const EditShipment = () => {
   const { getToken } = useClerkAuth();
@@ -20,7 +22,11 @@ const EditShipment = () => {
   const [formData, setFormData] = useState({
     goods_description: "",
     weight_tonnes: "",
-    budget_per_tonne: ""
+    budget_per_tonne: "",
+    origin_city: "",
+    origin_state: "",
+    destination_city: "",
+    destination_state: "",
   });
 
   const { data: shipment, isLoading } = useQuery({
@@ -46,10 +52,39 @@ const EditShipment = () => {
       setFormData({
         goods_description: shipment.goods_description || "",
         weight_tonnes: shipment.weight_tonnes?.toString() || "",
-        budget_per_tonne: shipment.budget_per_tonne?.toString() || ""
+        budget_per_tonne: shipment.budget_per_tonne?.toString() || "",
+        origin_city: shipment.origin_city || "",
+        origin_state: shipment.origin_state || "",
+        destination_city: shipment.destination_city || "",
+        destination_state: shipment.destination_state || "",
       });
     }
   }, [shipment]);
+
+  const saveCoords = async (supabase: any, id: string) => {
+    try {
+      const [originCoords, destCoords] = await Promise.all([
+        geocodeCity(formData.origin_city),
+        geocodeCity(formData.destination_city),
+      ]);
+      if (originCoords && destCoords) {
+        const route = await getRoute(
+          originCoords.lon, originCoords.lat,
+          destCoords.lon, destCoords.lat
+        );
+        await supabase.from('shipments').update({
+          origin_lat: originCoords.lat,
+          origin_lng: originCoords.lon,
+          destination_lat: destCoords.lat,
+          destination_lng: destCoords.lon,
+          estimated_distance_km: route?.distance_km ?? null,
+          estimated_duration_min: route?.duration_min ?? null,
+        }).eq('id', id);
+      }
+    } catch {
+      // Silently ignore — coordinates are optional
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: async (updatedData: any) => {
@@ -59,9 +94,14 @@ const EditShipment = () => {
       const { error } = await supabase
         .from('shipments')
         .update(updatedData)
-        .eq('id', shipmentId);
-      
+        .eq('id', shipmentId)
+        .select('id')
+        .single();
+
       if (error) throw error;
+
+      // Persist coordinates after save
+      await saveCoords(supabase, shipmentId);
     },
     onSuccess: () => {
       showSuccess("Shipment updated successfully");
@@ -78,7 +118,11 @@ const EditShipment = () => {
     mutation.mutate({
       goods_description: formData.goods_description,
       weight_tonnes: parseFloat(formData.weight_tonnes),
-      budget_per_tonne: parseFloat(formData.budget_per_tonne)
+      budget_per_tonne: parseFloat(formData.budget_per_tonne),
+      origin_city: formData.origin_city,
+      origin_state: formData.origin_state,
+      destination_city: formData.destination_city,
+      destination_state: formData.destination_state,
     });
   };
 
