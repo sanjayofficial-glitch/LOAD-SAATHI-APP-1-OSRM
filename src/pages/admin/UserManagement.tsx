@@ -35,12 +35,12 @@ const UserManagement = () => {
     try {
       const supabase = await getAuthenticatedClient();
       const { data, error } = await supabase
-        .from('profiles')
-        .select('id, clerk_user_id, role as user_type, full_name, phone, photo_url, city, rating, total_trips, contact_visible, created_at, updated_at')
+        .from('users')
+        .select('id, id as clerk_user_id, user_type, full_name, phone, rating, total_trips, is_verified as contact_visible, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setUsers(data as unknown as User[] || []);
+      setUsers((data || []).map(u => ({ ...(u as any), photo_url: null, city: null, updated_at: null })) as unknown as User[]);
     } catch (err) {
       console.error('Error fetching users:', err);
       toast.error('Failed to load users');
@@ -54,8 +54,8 @@ const UserManagement = () => {
     try {
       const supabase = await getAuthenticatedClient();
       const { error } = await supabase
-        .from('profiles')
-        .update({ contact_visible: !user.contact_visible })
+        .from('users')
+        .update({ is_verified: !user.contact_visible })
         .eq('id', user.id);
 
       if (error) throw error;

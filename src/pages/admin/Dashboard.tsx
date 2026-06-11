@@ -14,7 +14,7 @@ const AdminDashboard = () => {
       try {
         setError(null);
         const supabaseClient = await getAuthenticatedClient();
-        const { count: users } = await supabaseClient.from('profiles').select('*', { count: 'exact', head: true });
+        const { count: users } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
         const { count: trips } = await supabaseClient.from('trips').select('*', { count: 'exact', head: true });
         const { count: requests } = await supabaseClient.from('requests').select('*', { count: 'exact', head: true });
         setStats({ users: users || 0, trips: trips || 0, requests: requests || 0 });

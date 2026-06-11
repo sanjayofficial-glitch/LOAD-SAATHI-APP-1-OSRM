@@ -98,7 +98,7 @@ const Profile = () => {
       
       const { data } = await supabase
         .from('reviews')
-        .select('*, shipper:profiles(full_name)')
+        .select('*, shipper:users(full_name)')
         .eq('trucker_id', userProfile.id)
         .order('created_at', { ascending: false });
       
@@ -124,7 +124,7 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('profiles')
+        .from('users')
         .update({ 
           full_name: fullName, 
           phone
@@ -153,8 +153,8 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('profiles')
-        .update({ contact_visible: true })
+        .from('users')
+        .update({ is_verified: true })
         .eq('id', userProfile?.id);
 
       if (error) throw error;
@@ -177,7 +177,7 @@ const Profile = () => {
       const supabase = createClerkSupabaseClient(supabaseToken);
       
       const { error } = await supabase
-        .from('profiles')
+        .from('users')
         .update({ user_type: newRole })
         .eq('id', userProfile?.id);
 

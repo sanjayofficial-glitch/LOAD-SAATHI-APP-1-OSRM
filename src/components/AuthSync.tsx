@@ -27,9 +27,9 @@ const AuthSync = () => {
         const supabaseClient = createClerkSupabaseClient(supabaseToken);
 
         const { data, error } = await supabaseClient
-          .from("profiles")
-          .select("role:user_type")
-          .eq("clerk_user_id", user.id)
+          .from("users")
+          .select("user_type")
+          .eq("id", user.id)
           .single();
 
         if (error) {

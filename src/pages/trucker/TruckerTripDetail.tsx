@@ -69,7 +69,7 @@ const TruckerTripDetail = () => {
 
       const { data: tripData, error: tripError } = await supabase
         .from('trips')
-        .select('*, trucker:profiles!trips_trucker_id_fkey(*)')
+        .select('*, trucker:users!trips_trucker_id_fkey(*)')
         .eq('id', tripId)
         .eq('trucker_id', userProfile.id)
         .single();
@@ -83,7 +83,7 @@ const TruckerTripDetail = () => {
 
       const { data: requests, error: requestsError } = await supabase
         .from('requests')
-        .select('*, shipper:profiles!requests_shipper_id_fkey(*)')
+        .select('*, shipper:users!requests_shipper_id_fkey(*)')
         .eq('trip_id', tripId)
         .order('created_at', { ascending: false });
 

@@ -54,7 +54,7 @@ const ShipmentDetail = () => {
 
       const { data: shipmentData, error: shipmentError } = await supabase
         .from('shipments')
-        .select('*, shipper:profiles!shipments_shipper_id_fkey(*)')
+        .select('*, shipper:users!shipments_shipper_id_fkey(*)')
         .eq('id', id)
         .single();
 
@@ -73,7 +73,7 @@ const ShipmentDetail = () => {
         if (shipmentData.status === 'matched' || shipmentData.status === 'completed') {
           const { data: acceptedReq } = await supabase
             .from('shipment_requests')
-            .select('*, trucker:profiles!shipment_requests_trucker_id_fkey(*)')
+            .select('*, trucker:users!shipment_requests_trucker_id_fkey(*)')
             .eq('shipment_id', id)
             .eq('status', 'accepted')
             .maybeSingle();

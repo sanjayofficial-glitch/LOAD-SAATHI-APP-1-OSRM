@@ -65,19 +65,19 @@ const MonitoringDashboard = () => {
       // Fetch active users
       let qs = performance.now();
       const { data: userData } = await supabaseClient
-        .from('profiles')
-        .select('id, clerk_user_id, role as user_type, full_name, photo_url, city, rating, total_trips, created_at')
+        .from('users')
+        .select('id, id as clerk_user_id, user_type, full_name, rating, total_trips, is_verified as contact_visible, created_at')
         .order('created_at', { ascending: false })
         .limit(50);
       queryTimes.push(performance.now() - qs);
       
-      if (userData) setUsers(userData as unknown as User[]);
+      if (userData) setUsers(userData.map(u => ({ ...(u as any), photo_url: null, city: null })) as unknown as User[]);
 
       // Fetch trips with trucker info
       qs = performance.now();
       const { data: tripData } = await supabaseClient
         .from('trips')
-        .select('*, trucker:profiles!trips_trucker_id_fkey(full_name)')
+        .select('*, trucker:users!trips_trucker_id_fkey(full_name)')
         .order('created_at', { ascending: false });
       queryTimes.push(performance.now() - qs);
       
@@ -87,7 +87,7 @@ const MonitoringDashboard = () => {
       qs = performance.now();
       const { data: shipmentData } = await supabaseClient
         .from('shipments')
-        .select('*, shipper:profiles!shipments_shipper_id_fkey(full_name)')
+        .select('*, shipper:users!shipments_shipper_id_fkey(full_name)')
         .order('created_at', { ascending: false });
       queryTimes.push(performance.now() - qs);
       

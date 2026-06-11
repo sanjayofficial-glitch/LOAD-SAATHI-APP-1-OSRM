@@ -53,7 +53,7 @@ const ChatList = () => {
                 origin_city,
                 destination_city
               ),
-              shipper:profiles!requests_shipper_id_fkey(
+              shipper:users!requests_shipper_id_fkey(
                 id,
                 full_name,
                 user_type
