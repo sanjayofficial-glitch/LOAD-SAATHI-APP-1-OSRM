@@ -20,7 +20,8 @@ import {
    IndianRupee,
    Sparkles,
    User,
-   MapPin
+   MapPin,
+   Clock
  } from 'lucide-react';
 import { 
   Select,
@@ -359,6 +360,19 @@ const BrowseShipments = () => {
                               <div>
                                 <p className="text-gray-500 text-xs">Distance</p>
                                 <p className="font-medium">{shipment.estimated_distance_km.toLocaleString()} km</p>
+                              </div>
+                            </div>
+                          )}
+                          {shipment.estimated_duration_min && (
+                            <div className="flex items-center">
+                              <Clock className="h-4 w-4 mr-2 text-blue-500" />
+                              <div>
+                                <p className="text-gray-500 text-xs">Duration</p>
+                                <p className="font-medium">
+                                  {shipment.estimated_duration_min >= 60
+                                    ? `~${Math.floor(shipment.estimated_duration_min / 60)}h${shipment.estimated_duration_min % 60 ? ` ${shipment.estimated_duration_min % 60}m` : ''}`
+                                    : `~${shipment.estimated_duration_min}m`}
+                                </p>
                               </div>
                             </div>
                           )}

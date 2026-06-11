@@ -21,7 +21,8 @@ import {
   MapPin,
   Package as PackageIcon,
   AlertCircle,
-  Plus
+  Plus,
+  Clock
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
@@ -336,6 +337,16 @@ const TripList = () => {
                           <div className="flex items-center">
                             <MapPin className="h-4 w-4 mr-2 text-blue-500" />
                             <span className="text-sm text-gray-600">{trip.estimated_distance_km.toLocaleString()} km</span>
+                          </div>
+                        )}
+                        {trip.estimated_duration_min && (
+                          <div className="flex items-center">
+                            <Clock className="h-4 w-4 mr-2 text-blue-500" />
+                            <span className="text-sm text-gray-600">
+                              {trip.estimated_duration_min >= 60
+                                ? `~${Math.floor(trip.estimated_duration_min / 60)}h${trip.estimated_duration_min % 60 ? ` ${trip.estimated_duration_min % 60}m` : ''}`
+                                : `~${trip.estimated_duration_min}m`}
+                            </span>
                           </div>
                         )}
                         <div className="flex items-center md:col-span-4">
