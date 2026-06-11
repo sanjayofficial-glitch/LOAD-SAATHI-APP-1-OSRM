@@ -1,15 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_PUBLIC_KEY = import.meta.env.VITE_SUPABASE_PUBLIC_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  console.error('[Supabase] Missing environment variables for anonymous client');
+if (!SUPABASE_URL || !SUPABASE_PUBLIC_KEY) {
+  throw new Error('Missing critical Supabase environment variables. Please configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLIC_KEY in production.');
 }
 
-// This client is for anonymous/public access only
-// For authenticated requests, use createClerkSupabaseClient from @/utils/supabaseClient
-export const supabase = createClient(SUPABASE_URL || '', SUPABASE_PUBLISHABLE_KEY || '', {
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
