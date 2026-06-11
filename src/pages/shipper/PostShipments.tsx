@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { showSuccess, showError } from "@/utils/toast";
-import { Package, MapPin, Calendar, IndianRupee, Loader2, ArrowLeft, WifiOff } from "lucide-react";
+import { Package, Calendar, IndianRupee, Loader2, ArrowLeft, WifiOff } from "lucide-react";
 import LocationSelector from "@/components/LocationSelector";
 import locationData from "@/data/locations.json";
 import { geocodeCity } from "@/utils/geocode";

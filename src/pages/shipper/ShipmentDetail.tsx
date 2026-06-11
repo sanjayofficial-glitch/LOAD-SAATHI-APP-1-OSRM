@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import {
   Package, MapPin, Calendar, IndianRupee, ArrowLeft, Loader2,
   Edit, Send, Star, Truck, IndianRupee as RupeeIcon,
-  CheckCircle, MessageSquare
+  CheckCircle
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import { notifyShipperOfTruckerOffer } from '@/utils/notifications';

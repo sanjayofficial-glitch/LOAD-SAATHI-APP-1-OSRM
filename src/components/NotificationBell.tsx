@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { showError, showSuccess } from '@/utils/toast';
+import { showSuccess } from '@/utils/toast';
 import { supabase } from '@/lib/supabaseClient';
 
 interface Notification {

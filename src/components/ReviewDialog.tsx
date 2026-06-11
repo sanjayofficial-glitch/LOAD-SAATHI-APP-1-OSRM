@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { 

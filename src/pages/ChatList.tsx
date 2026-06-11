@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, User, ArrowRight, Loader2, Clock } from 'lucide-react';
+import { MessageSquare, User, ArrowRight, Loader2 } from 'lucide-react';
 import { showError } from '@/utils/toast';
 
 interface ChatConversation {

@@ -12,7 +12,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Search, 
   Calendar, 
-  Package, 
   ArrowRight, 
   Loader2, 
   IndianRupee,
@@ -24,7 +23,7 @@ import {
   Plus,
   Clock
 } from 'lucide-react';
-import { showError, showSuccess } from '@/utils/toast';
+import { showError } from '@/utils/toast';
 import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
 import { formatDuration } from '@/utils/format';
 

@@ -1,4 +1,3 @@
-import type React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { 
@@ -6,8 +5,7 @@ import {
   Globe, 
   AlertTriangle, 
   Cpu,
-  ArrowUpRight,
-  ArrowDownRight
+  ArrowUpRight
 } from 'lucide-react';
 
 interface MetricsProps {
@@ -21,7 +19,6 @@ interface MetricsProps {
 
 const SystemMetricsPanel: React.FC<MetricsProps> = ({ metrics }) => {
   const connectionHealth = Math.min(100, metrics.active_connections * 5);
-  const latencyHealth = Math.max(0, 100 - (metrics.api_response_time / 5));
 
   return (
     <div className="space-y-4">

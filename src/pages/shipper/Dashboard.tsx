@@ -18,10 +18,8 @@ import {
   PlusCircle, 
   DollarSign, 
   Calendar, 
-  MapPin,
   Truck,
   ArrowRight,
-  AlertCircle,
   WifiOff
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
@@ -10,26 +10,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Search, 
   Calendar, 
   Package, 
   ArrowRight, 
   Loader2, 
   IndianRupee, 
-  Filter, 
   Truck, 
-  CheckCircle, 
-  AlertCircle, 
   Star, 
   Plus, 
   Inbox, 
   MessageSquare, 
-  Phone, 
   Check, 
   Trash2, 
   Eye, 
   Edit, 
-  MapPin,
   Send,
   X
 } from 'lucide-react';
@@ -49,7 +43,7 @@ import {
   notifyTruckerOfOfferAccepted,
   notifyTruckerOfOfferDeclined,
 } from '@/utils/notifications';
-import { Skeleton } from '@/components/ui/skeleton';
+
 
 const StatusBadge = ({ status }: { status: string }) => {
   const cfg: Record<string, string> = {

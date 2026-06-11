@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
@@ -21,8 +21,6 @@ import {
   MapPin, 
   IndianRupee, 
   ArrowRight, 
-  Search, 
-  Filter,
   Loader2,
   Package
 } from 'lucide-react';

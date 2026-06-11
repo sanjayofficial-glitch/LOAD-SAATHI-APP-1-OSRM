@@ -96,7 +96,7 @@ const Profile = () => {
       
       const supabase = createClerkSupabaseClient(supabaseToken);
       
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('reviews')
         .select('*, shipper:profiles(full_name)')
         .eq('trucker_id', userProfile.id)

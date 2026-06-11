@@ -1,11 +1,7 @@
-import type React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  TrendingUp, 
   Package, 
   CheckCircle2, 
-  IndianRupee,
-  ArrowUpRight,
   Truck
 } from 'lucide-react';
 
