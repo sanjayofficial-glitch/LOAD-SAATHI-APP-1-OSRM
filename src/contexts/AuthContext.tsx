@@ -1,20 +1,18 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useUser, useSession, useClerk } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
-
 import { User } from '@/types';
 
 interface AuthContextType {
-  user: { id: string; fullName: string | null; primaryEmailAddress?: { emailAddress: string } | null; createdAt?: Date | null; primaryPhoneNumber?: { phoneNumber: string } | null } | null | undefined;
-  session: { getToken(options?: { template?: string }): Promise<string | null> } | null | undefined;
+  user: ReturnType<typeof useUser>['user'];
+  session: ReturnType<typeof useSession>['session'];
   userProfile: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
-  signUp: (email: string, password: string, role: 'shipper' | 'trucker') => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  setProfile: (profile: User) => void;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   isLoaded: boolean;
 }
@@ -28,100 +26,84 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refreshProfile = async () => {
-    if (!user) return;
-    
+  const fetchProfile = useCallback(async () => {
+    if (!user || !clerk.session) {
+      setUserProfile(null);
+      setLoading(false);
+      return null;
+    }
+
     try {
-      const supabaseToken = await clerk.session?.getToken({ template: 'supabase' });
-      if (!supabaseToken) return;
-      
+      const supabaseToken = await clerk.session.getToken({ template: 'supabase' });
+      if (!supabaseToken) {
+        console.warn('[AuthContext] No Supabase token returned from Clerk');
+        setUserProfile(null);
+        setLoading(false);
+        return null;
+      }
+
       const supabaseClient = createClerkSupabaseClient(supabaseToken);
       const { data, error } = await supabaseClient
         .from('users')
-        .select('id, id as clerk_user_id, user_type, full_name, phone, rating, total_trips, is_verified as contact_visible, created_at')
+        .select('id, user_type, full_name, phone, rating, total_trips, is_verified, created_at')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (!error && data) {
-        setUserProfile({ ...(data as any), photo_url: null, city: null, push_subscription: null, updated_at: null } as unknown as User);
+      if (error) {
+        console.error('[AuthContext] Error fetching profile:', error);
+        setUserProfile(null);
+        setLoading(false);
+        return null;
       }
+
+      if (data) {
+        const profile: User = {
+          id: data.id,
+          user_type: data.user_type || null,
+          full_name: data.full_name || '',
+          phone: data.phone || '',
+          rating: data.rating || 0,
+          total_trips: data.total_trips || 0,
+          is_verified: data.is_verified || false,
+          created_at: data.created_at || new Date().toISOString(),
+        };
+        setUserProfile(profile);
+        setLoading(false);
+        return profile;
+      }
+
+      setUserProfile(null);
+      setLoading(false);
+      return null;
     } catch (err) {
-      console.error('[AuthContext] Error refreshing profile:', err);
+      console.error('[AuthContext] Error:', err);
+      setUserProfile(null);
+      setLoading(false);
+      return null;
     }
-  };
+  }, [user, clerk.session]);
 
   useEffect(() => {
-    const loadUserProfile = async () => {
-      if (!clerkLoaded || !user) {
-        setUserProfile(null);
-        setLoading(false);
-        return;
-      }
+    if (!clerkLoaded) return;
+    fetchProfile();
+  }, [clerkLoaded, fetchProfile]);
 
-      try {
-        const tokenPromise = clerk.session?.getToken({ template: 'supabase' });
-        const supabaseToken = await Promise.race([
-          tokenPromise,
-          new Promise<null>((_, reject) =>
-            setTimeout(() => reject(new Error('Supabase token request timed out')), 10000)
-          )
-        ]);
+  const refreshProfile = useCallback(async () => {
+    setLoading(true);
+    await fetchProfile();
+  }, [fetchProfile]);
 
-        if (!supabaseToken) {
-          setUserProfile(null);
-          setLoading(false);
-          return;
-        }
+  const setProfile = useCallback((profile: User) => {
+    setUserProfile(profile);
+    setLoading(false);
+  }, []);
 
-        const supabaseClient = createClerkSupabaseClient(supabaseToken);
-        const queryPromise = supabaseClient
-          .from('users')
-          .select('id, id as clerk_user_id, user_type, full_name, phone, rating, total_trips, is_verified as contact_visible, created_at')
-          .eq('id', user.id)
-          .single();
-
-        const { data, error } = await Promise.race([
-          queryPromise,
-          new Promise<any>((_, reject) =>
-            setTimeout(() => reject(new Error('Profile query timed out')), 10000)
-          )
-        ]);
-
-        if (error) {
-          console.error('[AuthContext] Error fetching user profile:', error);
-          setUserProfile(null);
-        } else if (data) {
-          setUserProfile({ ...(data as any), photo_url: null, city: null, push_subscription: null, updated_at: null } as unknown as User);
-        }
-      } catch (err) {
-        console.error('[AuthContext] Error:', err);
-        setUserProfile(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUserProfile();
-  }, [clerkLoaded, user, clerk]);
-
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await clerk.signOut();
     setUserProfile(null);
-  };
+  }, [clerk]);
 
-  const signUp = async (_email: string, _password: string, _role: 'shipper' | 'trucker') => {
-    // Clerk handles sign-up via UI components, this is for API-based sign-up if needed
-    throw new Error('Use Clerk SignUp component for registration');
-  };
-
-  const signIn = async (_email: string, _password: string) => {
-    // Clerk handles sign-in via UI components, this is for API-based sign-in if needed
-    throw new Error('Use Clerk SignIn component for authentication');
-  };
-
-  const resetPassword = async (email: string) => {
-    // Use Clerk's built-in password reset flow
-    // Clerk handles password reset via its <ForgotPassword> UI component or signIn.create
+  const resetPassword = useCallback(async (email: string) => {
     try {
       await clerk.client?.signIn.create({
         strategy: 'reset_password_email_code',
@@ -132,17 +114,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('[AuthContext] resetPassword error:', err);
       return { error: err instanceof Error ? err : new Error(String(err)) };
     }
-  };
+  }, [clerk.client]);
 
   const value: AuthContextType = {
     user,
     session,
     userProfile,
-    loading,
+    loading: loading && clerkLoaded,
     signOut,
     refreshProfile,
-    signUp,
-    signIn,
+    setProfile,
     resetPassword,
     isLoaded: clerkLoaded,
   };

@@ -19,8 +19,8 @@ const AuthSync = () => {
       try {
         const supabaseToken = await session?.getToken({ template: "supabase" });
         if (!supabaseToken) {
-          console.error("[AuthSync] Failed to get Supabase token");
-          setChecking(false);
+          console.warn("[AuthSync] No Supabase token — user may not have role yet");
+          navigate("/choose-role");
           return;
         }
 
@@ -30,7 +30,7 @@ const AuthSync = () => {
           .from("users")
           .select("user_type")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("[AuthSync] Error fetching user:", error);
@@ -38,19 +38,19 @@ const AuthSync = () => {
           return;
         }
 
-        const role = (data as unknown as { user_type: string })?.user_type;
-        if (role === "shipper") {
-          navigate("/shipper/dashboard");
-        } else if (role === "trucker") {
-          navigate("/trucker/dashboard");
-        } else if (role === "admin") {
-          navigate("/admin/monitoring");
-        } else {
+        if (!data) {
           navigate("/choose-role");
+          return;
         }
+
+        const role = data.user_type;
+        if (role === "shipper") navigate("/shipper/dashboard", { replace: true });
+        else if (role === "trucker") navigate("/trucker/dashboard", { replace: true });
+        else if (role === "admin") navigate("/admin/monitoring", { replace: true });
+        else navigate("/choose-role", { replace: true });
       } catch (err) {
         console.error("[AuthSync] Error:", err);
-        navigate("/choose-role");
+        navigate("/choose-role", { replace: true });
       } finally {
         setChecking(false);
       }

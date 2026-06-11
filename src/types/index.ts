@@ -1,17 +1,12 @@
 export interface User {
   id: string;
-  clerk_user_id?: string;
   user_type: 'trucker' | 'shipper' | 'admin';
   full_name: string;
   phone?: string;
-  photo_url?: string;
-  city?: string;
   rating: number;
   total_trips: number;
-  contact_visible?: boolean;
-  push_subscription?: unknown;
+  is_verified?: boolean;
   created_at: string;
-  updated_at?: string;
 }
 
 export interface Trip {

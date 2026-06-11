@@ -5,25 +5,15 @@ import { Loader2, User, Truck, CheckCircle2 } from 'lucide-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { showSuccess, showError } from '@/utils/toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { User as UserType } from '@/types';
 
 const ChooseRole = () => {
   const { user, isLoaded } = useUser();
   const { session } = useSession();
-  const { refreshProfile, userProfile, loading: profileLoading } = useAuth();
+  const { setProfile, userProfile } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [stalled, setStalled] = useState(false);
-
-  // If Clerk takes too long, show a fallback instead of infinite spinner
-  useEffect(() => {
-    if (isLoaded && user) {
-      setStalled(false);
-      return;
-    }
-    const timer = setTimeout(() => setStalled(true), 8000);
-    return () => clearTimeout(timer);
-  }, [isLoaded, user]);
 
   // Redirect if user already has a role
   useEffect(() => {
@@ -32,7 +22,6 @@ const ChooseRole = () => {
       if (userProfile.user_type === 'shipper') targetPath = '/shipper/dashboard';
       else if (userProfile.user_type === 'trucker') targetPath = '/trucker/dashboard';
       else if (userProfile.user_type === 'admin') targetPath = '/admin/monitoring';
-      
       navigate(targetPath, { replace: true });
     }
   }, [userProfile, navigate]);
@@ -80,16 +69,24 @@ const ChooseRole = () => {
 
       if (result.error) throw result.error;
 
-      // Crucial: Refresh the profile in our context so the app knows the new role immediately
-      await refreshProfile();
+      // Set profile synchronously in context before navigating
+      // This ensures RoleProtectedRoute sees the role immediately
+      const profileData: UserType = {
+        id: user.id,
+        user_type: role,
+        full_name: user.fullName || '',
+        phone: user.primaryPhoneNumber?.phoneNumber || '',
+        rating: 0,
+        total_trips: 0,
+        is_verified: false,
+        created_at: new Date().toISOString(),
+      };
+      setProfile(profileData);
 
       showSuccess(`Welcome ${role === 'shipper' ? 'Shipper' : 'Trucker'}!`);
 
-      // Use a small delay to ensure state is updated before navigation
-      setTimeout(() => {
-        const targetPath = role === 'shipper' ? '/shipper/dashboard' : '/trucker/dashboard';
-        navigate(targetPath, { replace: true });
-      }, 100);
+      const targetPath = role === 'shipper' ? '/shipper/dashboard' : '/trucker/dashboard';
+      navigate(targetPath, { replace: true });
     } catch (err: any) {
       console.error('[ChooseRole] Error:', err);
       setError(err.message || 'Failed to set role');
@@ -99,24 +96,13 @@ const ChooseRole = () => {
     }
   };
 
-  // Wait for profile to load before showing buttons (prevents flash-redirect)
-  if (!isLoaded || !user || (profileLoading && !userProfile)) {
+  // Wait for Clerk to load
+  if (!isLoaded || !user) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-orange-600 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Verifying account...</p>
-          {stalled && (
-            <div className="mt-4 animate-in fade-in">
-              <p className="text-xs text-gray-400 mb-3">This is taking longer than expected.</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="text-sm text-orange-600 hover:text-orange-700 underline underline-offset-2"
-              >
-                Refresh the page
-              </button>
-            </div>
-          )}
+          <p className="text-sm text-gray-500">Loading...</p>
         </div>
       </div>
     );

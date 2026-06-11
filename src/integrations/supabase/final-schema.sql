@@ -149,84 +149,102 @@ ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
--- Users policies
-CREATE POLICY "Users can see own profile" ON public.users
-FOR SELECT TO authenticated USING (auth.uid()::text = id);
+-- ===================== USERS =====================
+-- Allow users to create their own profile (role selection)
+CREATE POLICY "Users can insert own profile" ON public.users
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = id);
 
--- Trips policies
+-- Allow users to update their own profile
+CREATE POLICY "Users can update own profile" ON public.users
+  FOR UPDATE TO authenticated USING (auth.uid()::text = id);
+
+-- Allow all authenticated users to read all users (needed for JOINs to show names)
+CREATE POLICY "Authenticated users can read all users" ON public.users
+  FOR SELECT TO authenticated USING (true);
+
+-- ===================== TRIPS =====================
 CREATE POLICY "Anyone can see active trips" ON public.trips
-FOR SELECT TO authenticated USING (true);
+  FOR SELECT TO authenticated USING (true);
 
 CREATE POLICY "Truckers can create trips" ON public.trips
-FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = trucker_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = trucker_id);
 
 CREATE POLICY "Truckers can update own trips" ON public.trips
-FOR UPDATE TO authenticated USING (auth.uid()::text = trucker_id);
+  FOR UPDATE TO authenticated USING (auth.uid()::text = trucker_id);
 
 CREATE POLICY "Truckers can delete own trips" ON public.trips
-FOR DELETE TO authenticated USING (auth.uid()::text = trucker_id);
+  FOR DELETE TO authenticated USING (auth.uid()::text = trucker_id);
 
--- Shipments policies
-CREATE POLICY "Anyone can see pending shipments" ON public.shipments
-FOR SELECT TO authenticated USING (status = 'pending');
+-- ===================== SHIPMENTS =====================
+-- Allow viewing pending shipments OR own shipments (so shipper can see matched/completed)
+CREATE POLICY "Anyone can see pending or own shipments" ON public.shipments
+  FOR SELECT TO authenticated USING (status = 'pending' OR auth.uid()::text = shipper_id);
 
 CREATE POLICY "Shippers can create shipments" ON public.shipments
-FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
 
 CREATE POLICY "Shippers can update own shipments" ON public.shipments
-FOR UPDATE TO authenticated USING (auth.uid()::text = shipper_id);
+  FOR UPDATE TO authenticated USING (auth.uid()::text = shipper_id);
 
 CREATE POLICY "Shippers can delete own shipments" ON public.shipments
-FOR DELETE TO authenticated USING (auth.uid()::text = shipper_id);
+  FOR DELETE TO authenticated USING (auth.uid()::text = shipper_id);
 
--- Requests policies
-CREATE POLICY "Truckers can see requests for their trips" ON public.requests
-FOR SELECT TO authenticated USING (
-  auth.uid()::text = receiver_id OR 
-  trip_id IN (SELECT id FROM trips WHERE trucker_id = auth.uid()::text)
-);
+-- ===================== REQUESTS =====================
+CREATE POLICY "Users can see relevant requests" ON public.requests
+  FOR SELECT TO authenticated USING (
+    auth.uid()::text = shipper_id OR
+    auth.uid()::text = receiver_id OR 
+    trip_id IN (SELECT id FROM trips WHERE trucker_id = auth.uid()::text)
+  );
 
 CREATE POLICY "Shippers can create requests" ON public.requests
-FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
 
 CREATE POLICY "Shippers can update own requests" ON public.requests
-FOR UPDATE TO authenticated USING (auth.uid()::text = shipper_id);
+  FOR UPDATE TO authenticated USING (auth.uid()::text = shipper_id);
 
--- Shipment requests policies
-CREATE POLICY "Shippers can see requests for their shipments" ON public.shipment_requests
-FOR SELECT TO authenticated USING (
-  auth.uid()::text = shipper_id OR 
-  shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.uid()::text)
-);
+CREATE POLICY "Truckers can update received requests" ON public.requests
+  FOR UPDATE TO authenticated USING (auth.uid()::text = receiver_id);
+
+-- ===================== SHIPMENT REQUESTS =====================
+CREATE POLICY "Users can see relevant shipment requests" ON public.shipment_requests
+  FOR SELECT TO authenticated USING (
+    auth.uid()::text = shipper_id OR
+    auth.uid()::text = trucker_id OR
+    shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.uid()::text)
+  );
 
 CREATE POLICY "Truckers can create shipment requests" ON public.shipment_requests
-FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = trucker_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = trucker_id);
 
 CREATE POLICY "Truckers can update own shipment requests" ON public.shipment_requests
-FOR UPDATE TO authenticated USING (auth.uid()::text = trucker_id);
+  FOR UPDATE TO authenticated USING (auth.uid()::text = trucker_id);
 
--- Reviews policies
+CREATE POLICY "Shippers can update received shipment requests" ON public.shipment_requests
+  FOR UPDATE TO authenticated USING (
+    shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.uid()::text)
+  );
+
+-- ===================== REVIEWS =====================
 CREATE POLICY "Anyone can see reviews" ON public.reviews
-FOR SELECT TO authenticated USING (true);
+  FOR SELECT TO authenticated USING (true);
 
 CREATE POLICY "Shippers can create reviews" ON public.reviews
-FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
 
--- Messages policies
+-- ===================== MESSAGES =====================
 CREATE POLICY "Users can see their messages" ON public.messages
-FOR SELECT TO authenticated USING (
-  auth.uid()::text = sender_id OR 
-  auth.uid()::text = recipient_id
-);
+  FOR SELECT TO authenticated USING (
+    auth.uid()::text = sender_id OR
+    auth.uid()::text = recipient_id
+  );
 
 CREATE POLICY "Users can send messages" ON public.messages
-FOR INSERT TO authenticated WITH CHECK (
-  auth.uid()::text = sender_id
-);
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = sender_id);
 
--- Notifications policies
+-- ===================== NOTIFICATIONS =====================
 CREATE POLICY "Users can see their notifications" ON public.notifications
-FOR SELECT TO authenticated USING (auth.uid()::text = user_id);
+  FOR SELECT TO authenticated USING (auth.uid()::text = user_id);
 
-CREATE POLICY "System can create notifications" ON public.notifications
-FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Users can create own notifications" ON public.notifications
+  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = user_id);

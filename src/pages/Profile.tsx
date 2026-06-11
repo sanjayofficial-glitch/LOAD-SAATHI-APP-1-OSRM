@@ -211,7 +211,7 @@ const Profile = () => {
               <Badge variant="secondary" className="bg-orange-50 text-orange-700 border-orange-100 capitalize">
                 {userProfile?.user_type}
               </Badge>
-              {userProfile?.contact_visible && (
+              {userProfile?.is_verified && (
                 <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
                   <CheckCircle2 className="h-3 w-3 mr-1" /> Verified
                 </Badge>
@@ -220,7 +220,7 @@ const Profile = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          {!userProfile?.contact_visible && (
+          {!userProfile?.is_verified && (
             <Button 
               variant="outline" 
               onClick={handleVerify}
@@ -299,7 +299,7 @@ const Profile = () => {
                     <Building className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-xs text-gray-500">City</p>
-                      <p className="text-sm font-medium">{userProfile?.city || 'Not provided'}</p>
+                      <p className="text-sm font-medium">Not provided</p>
                     </div>
                   </div>
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg">
@@ -474,7 +474,7 @@ const Profile = () => {
                   </Button>
                   
                   {/* Only show Admin switch option to the authorized developer ID */}
-                  {userProfile?.clerk_user_id === ALLOWED_ADMIN_ID && (
+                  {userProfile?.id === ALLOWED_ADMIN_ID && (
                     <Button 
                       variant={userProfile?.user_type === 'admin' ? 'default' : 'outline'}
                       onClick={() => handleSwitchRole('admin')}

@@ -66,12 +66,12 @@ const MonitoringDashboard = () => {
       let qs = performance.now();
       const { data: userData } = await supabaseClient
         .from('users')
-        .select('id, id as clerk_user_id, user_type, full_name, rating, total_trips, is_verified as contact_visible, created_at')
+        .select('id, user_type, full_name, rating, total_trips, is_verified, created_at')
         .order('created_at', { ascending: false })
         .limit(50);
       queryTimes.push(performance.now() - qs);
       
-      if (userData) setUsers(userData.map(u => ({ ...(u as any), photo_url: null, city: null })) as unknown as User[]);
+      if (userData) setUsers(userData as unknown as User[]);
 
       // Fetch trips with trucker info
       qs = performance.now();

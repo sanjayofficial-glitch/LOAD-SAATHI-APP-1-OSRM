@@ -36,11 +36,11 @@ const UserManagement = () => {
       const supabase = await getAuthenticatedClient();
       const { data, error } = await supabase
         .from('users')
-        .select('id, id as clerk_user_id, user_type, full_name, phone, rating, total_trips, is_verified as contact_visible, created_at')
+        .select('id, user_type, full_name, phone, rating, total_trips, is_verified, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setUsers((data || []).map(u => ({ ...(u as any), photo_url: null, city: null, updated_at: null })) as unknown as User[]);
+      setUsers((data || []) as unknown as User[]);
     } catch (err) {
       console.error('Error fetching users:', err);
       toast.error('Failed to load users');
@@ -49,25 +49,25 @@ const UserManagement = () => {
     }
   };
 
-  const toggleContactVisible = async (user: User) => {
+  const toggleVerification = async (user: User) => {
     setVerifying(prev => ({ ...prev, [user.id]: true }));
     try {
       const supabase = await getAuthenticatedClient();
       const { error } = await supabase
         .from('users')
-        .update({ is_verified: !user.contact_visible })
+        .update({ is_verified: !user.is_verified })
         .eq('id', user.id);
 
       if (error) throw error;
 
       setUsers(prev =>
         prev.map(u =>
-          u.id === user.id ? { ...u, contact_visible: !u.contact_visible } : u
+          u.id === user.id ? { ...u, is_verified: !u.is_verified } : u
         )
       );
-      toast.success(`${user.full_name} ${user.contact_visible ? 'hidden' : 'visible'}`);
+      toast.success(`${user.full_name} ${user.is_verified ? 'hidden' : 'visible'}`);
     } catch (err) {
-      console.error('Error toggling contact visibility:', err);
+      console.error('Error toggling verification:', err);
       toast.error('Failed to update user');
     } finally {
       setVerifying(prev => ({ ...prev, [user.id]: false }));
@@ -77,8 +77,7 @@ const UserManagement = () => {
   const filteredUsers = users.filter(user => {
     const matchesSearch =
       user.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-      user.phone?.includes(search) ||
-      user.city?.toLowerCase().includes(search.toLowerCase());
+      user.phone?.includes(search);
 
     const matchesRole = roleFilter === 'all' || user.user_type === roleFilter;
 
@@ -158,10 +157,9 @@ const UserManagement = () => {
             <TableRow>
               <TableHead>User</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>City</TableHead>
               <TableHead className="text-center">Rating</TableHead>
               <TableHead className="text-center">Trips</TableHead>
-              <TableHead className="text-center">Contact Visible</TableHead>
+              <TableHead className="text-center">Verified</TableHead>
               <TableHead className="text-center">Joined</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
@@ -169,7 +167,7 @@ const UserManagement = () => {
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-12 text-gray-500">
                   No users found matching your filters
                 </TableCell>
               </TableRow>
@@ -189,9 +187,6 @@ const UserManagement = () => {
                     </div>
                   </TableCell>
                   <TableCell>{getRoleBadge(user.user_type)}</TableCell>
-                  <TableCell>
-                    <span className="text-sm text-gray-600">{user.city || '-'}</span>
-                  </TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-1">
                       <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
@@ -202,7 +197,7 @@ const UserManagement = () => {
                     {user.total_trips || 0}
                   </TableCell>
                   <TableCell className="text-center">
-                    {user.contact_visible ? (
+                    {user.is_verified ? (
                       <UserCheck className="h-4 w-4 text-green-500 mx-auto" />
                     ) : (
                       <UserX className="h-4 w-4 text-gray-300 mx-auto" />
@@ -214,17 +209,17 @@ const UserManagement = () => {
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <Switch
-                        checked={user.contact_visible}
+                        checked={user.is_verified}
                         disabled={verifying[user.id]}
-                        onCheckedChange={() => toggleContactVisible(user)}
+                        onCheckedChange={() => toggleVerification(user)}
                       />
                       <span className="text-xs text-gray-400 w-16">
                         {verifying[user.id] ? (
                           <Loader2 className="h-3 w-3 animate-spin inline" />
-                        ) : user.contact_visible ? (
-                          'Visible'
+                        ) : user.is_verified ? (
+                          'Verified'
                         ) : (
-                          'Hidden'
+                          'Unverified'
                         )}
                       </span>
                     </div>

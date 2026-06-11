@@ -42,7 +42,7 @@ const Index = () => {
     if (!isLoaded) return;
 
     if (isSignedIn && user) {
-      navigate('/auth-sync');
+      navigate('/auth-sync', { replace: true });
     }
   }, [isLoaded, isSignedIn, user, navigate]);
 
