@@ -163,12 +163,12 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 -- Allow users to create their own profile (role selection)
 DROP POLICY IF EXISTS "Users can insert own profile" ON public.users;
 CREATE POLICY "Users can insert own profile" ON public.users
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = id);
+  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = id);
 
 -- Allow users to update their own profile
 DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
 CREATE POLICY "Users can update own profile" ON public.users
-  FOR UPDATE TO authenticated USING (auth.uid()::text = id);
+  FOR UPDATE TO authenticated USING (auth.jwt()->>'sub' = id);
 
 -- Allow all authenticated users to read all users (needed for JOINs to show names)
 DROP POLICY IF EXISTS "Authenticated users can read all users" ON public.users;
@@ -182,76 +182,76 @@ CREATE POLICY "Anyone can see active trips" ON public.trips
 
 DROP POLICY IF EXISTS "Truckers can create trips" ON public.trips;
 CREATE POLICY "Truckers can create trips" ON public.trips
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = trucker_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = trucker_id);
 
 DROP POLICY IF EXISTS "Truckers can update own trips" ON public.trips;
 CREATE POLICY "Truckers can update own trips" ON public.trips
-  FOR UPDATE TO authenticated USING (auth.uid()::text = trucker_id);
+  FOR UPDATE TO authenticated USING (auth.jwt()->>'sub' = trucker_id);
 
 DROP POLICY IF EXISTS "Truckers can delete own trips" ON public.trips;
 CREATE POLICY "Truckers can delete own trips" ON public.trips
-  FOR DELETE TO authenticated USING (auth.uid()::text = trucker_id);
+  FOR DELETE TO authenticated USING (auth.jwt()->>'sub' = trucker_id);
 
 -- ===================== SHIPMENTS =====================
 -- Allow viewing pending shipments OR own shipments (so shipper can see matched/completed)
 DROP POLICY IF EXISTS "Anyone can see pending or own shipments" ON public.shipments;
 CREATE POLICY "Anyone can see pending or own shipments" ON public.shipments
-  FOR SELECT TO authenticated USING (status = 'pending' OR auth.uid()::text = shipper_id);
+  FOR SELECT TO authenticated USING (status = 'pending' OR auth.jwt()->>'sub' = shipper_id);
 
 DROP POLICY IF EXISTS "Shippers can create shipments" ON public.shipments;
 CREATE POLICY "Shippers can create shipments" ON public.shipments
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = shipper_id);
 
 DROP POLICY IF EXISTS "Shippers can update own shipments" ON public.shipments;
 CREATE POLICY "Shippers can update own shipments" ON public.shipments
-  FOR UPDATE TO authenticated USING (auth.uid()::text = shipper_id);
+  FOR UPDATE TO authenticated USING (auth.jwt()->>'sub' = shipper_id);
 
 DROP POLICY IF EXISTS "Shippers can delete own shipments" ON public.shipments;
 CREATE POLICY "Shippers can delete own shipments" ON public.shipments
-  FOR DELETE TO authenticated USING (auth.uid()::text = shipper_id);
+  FOR DELETE TO authenticated USING (auth.jwt()->>'sub' = shipper_id);
 
 -- ===================== REQUESTS =====================
 DROP POLICY IF EXISTS "Users can see relevant requests" ON public.requests;
 CREATE POLICY "Users can see relevant requests" ON public.requests
   FOR SELECT TO authenticated USING (
-    auth.uid()::text = shipper_id OR
-    auth.uid()::text = receiver_id OR 
-    trip_id IN (SELECT id FROM trips WHERE trucker_id = auth.uid()::text)
+    auth.jwt()->>'sub' = shipper_id OR
+    auth.jwt()->>'sub' = receiver_id OR 
+    trip_id IN (SELECT id FROM trips WHERE trucker_id = auth.jwt()->>'sub')
   );
 
 DROP POLICY IF EXISTS "Shippers can create requests" ON public.requests;
 CREATE POLICY "Shippers can create requests" ON public.requests
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = shipper_id);
 
 DROP POLICY IF EXISTS "Shippers can update own requests" ON public.requests;
 CREATE POLICY "Shippers can update own requests" ON public.requests
-  FOR UPDATE TO authenticated USING (auth.uid()::text = shipper_id);
+  FOR UPDATE TO authenticated USING (auth.jwt()->>'sub' = shipper_id);
 
 DROP POLICY IF EXISTS "Truckers can update received requests" ON public.requests;
 CREATE POLICY "Truckers can update received requests" ON public.requests
-  FOR UPDATE TO authenticated USING (auth.uid()::text = receiver_id);
+  FOR UPDATE TO authenticated USING (auth.jwt()->>'sub' = receiver_id);
 
 -- ===================== SHIPMENT REQUESTS =====================
 DROP POLICY IF EXISTS "Users can see relevant shipment requests" ON public.shipment_requests;
 CREATE POLICY "Users can see relevant shipment requests" ON public.shipment_requests
   FOR SELECT TO authenticated USING (
-    auth.uid()::text = shipper_id OR
-    auth.uid()::text = trucker_id OR
-    shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.uid()::text)
+    auth.jwt()->>'sub' = shipper_id OR
+    auth.jwt()->>'sub' = trucker_id OR
+    shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.jwt()->>'sub')
   );
 
 DROP POLICY IF EXISTS "Truckers can create shipment requests" ON public.shipment_requests;
 CREATE POLICY "Truckers can create shipment requests" ON public.shipment_requests
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = trucker_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = trucker_id);
 
 DROP POLICY IF EXISTS "Truckers can update own shipment requests" ON public.shipment_requests;
 CREATE POLICY "Truckers can update own shipment requests" ON public.shipment_requests
-  FOR UPDATE TO authenticated USING (auth.uid()::text = trucker_id);
+  FOR UPDATE TO authenticated USING (auth.jwt()->>'sub' = trucker_id);
 
 DROP POLICY IF EXISTS "Shippers can update received shipment requests" ON public.shipment_requests;
 CREATE POLICY "Shippers can update received shipment requests" ON public.shipment_requests
   FOR UPDATE TO authenticated USING (
-    shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.uid()::text)
+    shipment_id IN (SELECT id FROM shipments WHERE shipper_id = auth.jwt()->>'sub')
   );
 
 -- ===================== REVIEWS =====================
@@ -261,25 +261,25 @@ CREATE POLICY "Anyone can see reviews" ON public.reviews
 
 DROP POLICY IF EXISTS "Shippers can create reviews" ON public.reviews;
 CREATE POLICY "Shippers can create reviews" ON public.reviews
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = shipper_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = shipper_id);
 
 -- ===================== MESSAGES =====================
 DROP POLICY IF EXISTS "Users can see their messages" ON public.messages;
 CREATE POLICY "Users can see their messages" ON public.messages
   FOR SELECT TO authenticated USING (
-    auth.uid()::text = sender_id OR
-    auth.uid()::text = recipient_id
+    auth.jwt()->>'sub' = sender_id OR
+    auth.jwt()->>'sub' = recipient_id
   );
 
 DROP POLICY IF EXISTS "Users can send messages" ON public.messages;
 CREATE POLICY "Users can send messages" ON public.messages
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = sender_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = sender_id);
 
 -- ===================== NOTIFICATIONS =====================
 DROP POLICY IF EXISTS "Users can see their notifications" ON public.notifications;
 CREATE POLICY "Users can see their notifications" ON public.notifications
-  FOR SELECT TO authenticated USING (auth.uid()::text = user_id);
+  FOR SELECT TO authenticated USING (auth.jwt()->>'sub' = user_id);
 
 DROP POLICY IF EXISTS "Users can create own notifications" ON public.notifications;
 CREATE POLICY "Users can create own notifications" ON public.notifications
-  FOR INSERT TO authenticated WITH CHECK (auth.uid()::text = user_id);
+  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = user_id);
