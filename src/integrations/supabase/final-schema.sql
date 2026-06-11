@@ -52,6 +52,8 @@ CREATE TABLE public.shipments (
   shipper_id text NOT NULL,  -- References users.id (text)
   origin_city text NOT NULL,
   destination_city text NOT NULL,
+  origin_state text,
+  destination_state text,
   departure_date date NOT NULL,
   goods_description text NOT NULL,
   weight_tonnes numeric NOT NULL CHECK (weight_tonnes > 0::numeric),
