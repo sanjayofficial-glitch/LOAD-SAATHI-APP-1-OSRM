@@ -27,6 +27,7 @@ import {
 import { showError } from '@/utils/toast';
 import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
 import { formatDuration } from '@/utils/format';
+import type { Trip } from '@/types';
 
 const TripList = () => {
   const { userProfile } = useAuth();

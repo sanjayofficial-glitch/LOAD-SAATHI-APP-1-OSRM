@@ -105,13 +105,13 @@ const MyShipments = () => {
         .eq('shipper_id', userProfile.id)
         .order('created_at', { ascending: false });
 
-      const mappedShipments = (shipmentsData || []).map((s: Record<string, unknown>) => ({
+      const mappedShipments = (shipmentsData || []).map(s => ({
         ...s
-      })) as Shipment[];
+      })) as unknown as Shipment[];
 
-      const mappedSent = (sent || []).map((r: Record<string, unknown>) => ({
+      const mappedSent = (sent || []).map(r => ({
         ...r
-      })) as Request[];
+      })) as unknown as Request[];
 
       const mappedIncoming = (incoming || []).map((o: Record<string, unknown>) => ({
         ...o,

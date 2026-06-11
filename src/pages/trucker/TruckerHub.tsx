@@ -118,9 +118,14 @@ const TruckerHub = () => {
         } : o.shipment
       })) as ShipmentRequest[];
 
+      const mappedIncoming = (incoming || []).map((r: Record<string, unknown>) => ({
+        ...r,
+        trip: Array.isArray(r.trip) ? (r.trip as Record<string, unknown>[])[0] : r.trip
+      })) as unknown as Request[];
+
       setTrips(tripsData || []);
       setSentOffers(mappedSent);
-      setIncomingRequests(incoming || []);
+      setIncomingRequests(mappedIncoming);
     } catch (err) {
       showError('Failed to fetch data');
     } finally {
