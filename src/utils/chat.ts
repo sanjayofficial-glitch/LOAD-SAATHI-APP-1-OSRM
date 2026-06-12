@@ -1,6 +1,6 @@
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Message } from '@/types/chat';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 export { showSuccess, showError, showLoading, dismissToast } from '@/utils/toast';
 
 /**

@@ -10,13 +10,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { showSuccess, showError } from '@/utils/toast';  
 import { Truck, Calendar, IndianRupee, Loader2, ArrowLeft } from 'lucide-react';  
 import LocationSelector from '@/components/LocationSelector';  
-import locationData from '@/data/locations.json';  
 import { geocodeCity } from '@/utils/geocode';  
-import { getRoute } from '@/utils/osrm';  const EditTrip = () => {  
+import { getRoute } from '@/utils/osrm';
+
+type LocationData = Record<string, Record<string, string[]>>;
+
+const EditTrip = () => {  
   const { tripId } = useParams();  const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
   const navigate = useNavigate();  
-  const [loading, setLoading] = useState(true);  
+  const [loading, setLoading] = useState(true);
+  const [locationData, setLocationData] = useState<LocationData | null>(null);
+
+  useEffect(() => {
+    import('@/data/locations.json').then(mod => setLocationData(mod.default.data));
+  }, []);
   const [saving, setSaving] = useState(false);  
   const [formData, setFormData] = useState({  
     origin_city: '',  
@@ -161,17 +169,17 @@ import { getRoute } from '@/utils/osrm';  const EditTrip = () => {
         <CardContent className="pt-6">  
           <form onSubmit={handleSubmit} className="space-y-6">              <div className="space-y-2">  
               <Label className="text-gray-700 font-medium">Origin Location</Label>  
-              <LocationSelector  
-                label="Origin"  
-                data={locationData.data}  
-                onChange={(value) => handleLocationChange('origin_city', value)}  
-              />  
-            </div>  
-
-            <div className="space-y-2">  
-              <Label className="text-gray-700 font-medium">Destination Location</Label>                <LocationSelector  
-                label="Destination"  
-                data={locationData.data}  
+                <LocationSelector  
+                  label="Origin"  
+                  data={locationData || {}}  
+                  onChange={(value) => handleLocationChange('origin_city', value)}  
+                />  
+              </div>  
+              
+              <div className="space-y-2">  
+                <Label className="text-gray-700 font-medium">Destination Location</Label>                <LocationSelector  
+                  label="Destination"  
+                  data={locationData || {}}  
                 onChange={(value) => handleLocationChange('destination_city', value)}                />  
             </div>              <div className="space-y-2">  
               <Label htmlFor="date">Departure Date</Label>  

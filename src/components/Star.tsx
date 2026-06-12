@@ -5,7 +5,7 @@ interface StarProps {
   className?: string;
 }
 
-const Star: React.FC<StarProps> = ({ filled = false, className = "" }) => (
+const Star: React.FC<StarProps> = React.memo(({ filled = false, className = "" }) => (
   <svg 
     className={`${className} ${filled ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} 
     width="16" 
@@ -19,6 +19,6 @@ const Star: React.FC<StarProps> = ({ filled = false, className = "" }) => (
   >
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
-);
+));
 
 export default Star;

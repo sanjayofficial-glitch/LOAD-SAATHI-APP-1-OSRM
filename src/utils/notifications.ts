@@ -1,4 +1,5 @@
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
+import { showError } from '@/utils/toast';
 
 interface NotificationPayload {
   userId: string;
@@ -25,6 +26,7 @@ export const sendNotification = async (payload: NotificationPayload): Promise<vo
     });
   } catch (err) {
     console.error('[sendNotification] Error:', err);
+    showError('Failed to send notification');
   }
 };
 

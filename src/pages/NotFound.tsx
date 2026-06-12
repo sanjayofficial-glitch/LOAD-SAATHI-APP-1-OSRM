@@ -6,15 +6,6 @@ import { Truck, ArrowLeft, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const NotFound = () => {
-  const navigate = useNavigate();
-  
-  React.useEffect(() => {
-    const timeout = setTimeout(() => {
-      navigate('/', { replace: true });
-    }, 10000);    
-    return () => clearTimeout(timeout);
-  }, [navigate]);
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
       <div className="text-center max-w-md animate-scale-in">
@@ -41,7 +32,7 @@ const NotFound = () => {
         </div>
         
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-8">
-          Redirecting to homepage in 10 seconds...
+          Use the buttons above to navigate
         </p>
       </div>
     </div>

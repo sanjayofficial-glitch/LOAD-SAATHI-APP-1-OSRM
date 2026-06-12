@@ -1,9 +1,10 @@
 "use client";
 
+import React from 'react';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff, Wifi } from 'lucide-react';
 
-export function OfflineBanner() {
+export const OfflineBanner = React.memo(function OfflineBanner() {
   const { isOnline, wasOffline } = useNetworkStatus();
 
   if (!isOnline) {
@@ -25,6 +26,6 @@ export function OfflineBanner() {
   }
 
   return null;
-}
+});
 
 export default OfflineBanner;

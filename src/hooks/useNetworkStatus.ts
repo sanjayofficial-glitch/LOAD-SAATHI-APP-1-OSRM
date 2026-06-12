@@ -22,23 +22,11 @@ export function useNetworkStatus() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    const interval = setInterval(() => {
-      const currentOnline = navigator.onLine;
-      if (currentOnline !== isOnline) {
-        setIsOnline(currentOnline);
-        if (currentOnline) {
-          setWasOffline(true);
-          setTimeout(() => setWasOffline(false), 3000);
-        }
-      }
-    }, 5000);
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      clearInterval(interval);
     };
-  }, [handleOnline, handleOffline, isOnline]);
+  }, [handleOnline, handleOffline]);
 
   return { isOnline, wasOffline };
 }

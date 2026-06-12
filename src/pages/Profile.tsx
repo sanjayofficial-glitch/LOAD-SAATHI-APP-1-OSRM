@@ -31,7 +31,7 @@ import {
 import Star from '@/components/Star';
 import type { Review } from '@/types';
 
-const ALLOWED_ADMIN_ID = "user_3Cn2O5bwNC0wsSEfGDnTky9rn2S";
+const ALLOWED_ADMIN_ID = import.meta.env.VITE_ADMIN_USER_ID || '';
 
 const Profile = () => {
   const { userProfile, refreshProfile } = useAuth();

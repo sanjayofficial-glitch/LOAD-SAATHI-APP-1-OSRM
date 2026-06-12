@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface LocationSelectorProps {
@@ -8,7 +8,7 @@ interface LocationSelectorProps {
   data: Record<string, Record<string, string[]>>;
 }
 
-const LocationSelector: React.FC<LocationSelectorProps> = ({ label, value, onChange, data }) => {
+const LocationSelector: React.FC<LocationSelectorProps> = memo(({ label, value, onChange, data }) => {
   const [selectedState, setSelectedState] = useState(value?.state || '');
   const [selectedDistrict, setSelectedDistrict] = useState(value?.district || '');
   const [selectedCity, setSelectedCity] = useState(value?.city || '');
@@ -99,6 +99,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ label, value, onCha
       )}
     </div>
   );
-};
+});
 
 export default LocationSelector;

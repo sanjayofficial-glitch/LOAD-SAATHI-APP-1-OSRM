@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowLeft, Send, Loader2, User as UserIcon, WifiOff, Phone } from 'lucide-react';
 import { showError } from '@/utils/toast';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 
 const TypingIndicator = () => (
   <div className="flex items-center gap-1 px-4 py-2">
@@ -38,7 +38,6 @@ const Chat = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [recipient, setRecipient] = useState<{ id: string; full_name: string; phone?: string } | null>(null);
-  const [isTyping] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -179,13 +178,6 @@ const Chat = () => {
                   </div>
                 );
               })}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl px-4 shadow-sm">
-                    <TypingIndicator />
-                  </div>
-                </div>
-              )}
               <div ref={messagesEndRef} />
             </div>
           </ScrollArea>

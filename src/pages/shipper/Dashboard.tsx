@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
@@ -139,7 +139,7 @@ const ShipperDashboard = () => {
     }
   };
 
-  const statCards = [
+  const statCards = useMemo(() => [
     {
       title: 'Active Loads',
       value: stats.activeShipments,
@@ -177,7 +177,7 @@ const ShipperDashboard = () => {
       iconBg: 'bg-green-100 dark:bg-green-900/30',
       isCurrency: true,
     },
-  ];
+  ], [stats]);
 
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8 animate-fade-in">
