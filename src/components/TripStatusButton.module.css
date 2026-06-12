@@ -11,6 +11,16 @@
   background-color: #f0f0f0;
 }
 
+:global(.dark) .button {
+  border-color: #4b5563;
+  background-color: #1f2937;
+  color: #e5e7eb;
+}
+
+:global(.dark) .button:hover {
+  background-color: #374151;
+}
+
 .completedIcon {
   font-size: 24px;
   color: #4CAF50;
