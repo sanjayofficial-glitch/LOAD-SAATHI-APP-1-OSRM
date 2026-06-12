@@ -20,7 +20,7 @@ import {
   Package,
   Calendar,
   Star as StarIcon,
-  WifiOff
+  WifiOff,
 } from 'lucide-react';
 import { showError } from '@/utils/toast';
 
@@ -98,99 +98,131 @@ const TruckerDashboard = () => {
 
   useEffect(() => { fetchDashboardData(); }, [fetchDashboardData]);
 
+  const statCards = [
+    {
+      title: 'Live Trips',
+      value: stats.activeTrips,
+      icon: Truck,
+      color: 'text-orange-600',
+      bg: 'bg-orange-50 dark:bg-orange-900/20',
+      border: 'border-orange-100 dark:border-orange-800',
+      iconBg: 'bg-orange-100 dark:bg-orange-900/30',
+    },
+    {
+      title: 'New Requests',
+      value: stats.pendingRequests,
+      icon: Clock,
+      color: 'text-yellow-600',
+      bg: 'bg-yellow-50 dark:bg-yellow-900/20',
+      border: 'border-yellow-100 dark:border-yellow-800',
+      iconBg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    },
+    {
+      title: 'Completed',
+      value: stats.completedTrips,
+      icon: TrendingUp,
+      color: 'text-green-600',
+      bg: 'bg-green-50 dark:bg-green-900/20',
+      border: 'border-green-100 dark:border-green-800',
+      iconBg: 'bg-green-100 dark:bg-green-900/30',
+    },
+    {
+      title: 'Total Earnings',
+      value: `₹${stats.totalEarnings.toLocaleString()}`,
+      icon: IndianRupee,
+      color: 'text-green-600',
+      bg: 'bg-green-50 dark:bg-green-900/20',
+      border: 'border-green-100 dark:border-green-800',
+      iconBg: 'bg-green-100 dark:bg-green-900/30',
+      isCurrency: true,
+    },
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-6 sm:py-8">
+    <div className="container mx-auto px-4 py-6 sm:py-8 animate-fade-in">
+      {/* Header */}
       <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">Trucker Dashboard</h1>
-          <p className="text-sm sm:text-base text-gray-500 mt-1">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1.5 rounded-lg shadow-sm">
+              <Truck className="h-4 w-4 text-white" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Trucker Dashboard</h1>
+          </div>
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
             Welcome, {userProfile?.full_name || 'Partner'}! {isOnline ? (
-              <>You have <span className="text-orange-600 font-bold">{stats.activeTrips}</span> active trips.</>
+              <>You have <span className="text-orange-600 dark:text-orange-400 font-bold">{stats.activeTrips}</span> active trips.</>
             ) : (
               <span className="text-yellow-600">You are offline. Showing cached data.</span>
             )}
           </p>
         </div>
-        <div className="bg-yellow-50 px-3 sm:px-4 py-2 rounded-2xl border border-yellow-100 flex items-center gap-2 self-start sm:self-auto">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 px-3 sm:px-4 py-2 rounded-2xl border border-yellow-100 dark:border-yellow-800 flex items-center gap-2 self-start sm:self-auto">
           <StarIcon className="h-4 w-4 text-yellow-500 fill-current" />
-          <span className="text-sm font-black text-yellow-700">{userProfile?.rating?.toFixed(1) || '0.0'} Partner Rating</span>
+          <span className="text-sm font-black text-yellow-700 dark:text-yellow-400">{userProfile?.rating?.toFixed(1) || '0.0'} Rating</span>
         </div>
       </div>
 
       {!isOnline && (
-        <div className="mb-4 sm:mb-6 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800">
+        <div className="mb-4 sm:mb-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-300 animate-fade-in">
           <WifiOff className="h-4 w-4 shrink-0" />
           <span>You are offline. Data shown may be out of date.</span>
         </div>
       )}
 
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <Card className="border-orange-100 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-            <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Live Trips</CardTitle>
-            <Truck className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            {loading ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl sm:text-3xl font-black text-gray-900">{stats.activeTrips}</div>}
-          </CardContent>
-        </Card>
-
-        <Card className="border-orange-100 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-            <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">New Requests</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            {loading ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl sm:text-3xl font-black text-gray-900">{stats.pendingRequests}</div>}
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-50 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-            <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Completed</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            {loading ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl sm:text-3xl font-black text-gray-900">{stats.completedTrips}</div>}
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-50 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-            <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Earnings</CardTitle>
-            <IndianRupee className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            {loading ? (
-              <Skeleton className="h-8 w-24" />
-            ) : (
-              <div className="text-2xl sm:text-3xl font-black text-green-600">
-                ₹{stats.totalEarnings.toLocaleString()}
+        {statCards.map((card, i) => (
+          <Card key={card.title} className={`${card.border} shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up`} style={{ animationDelay: `${i * 80}ms` }}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+              <CardTitle className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{card.title}</CardTitle>
+              <div className={`${card.iconBg} p-2 rounded-lg`}>
+                <card.icon className={`h-4 w-4 ${card.color}`} />
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              {loading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <div className={`text-2xl sm:text-3xl font-black ${card.isCurrency ? card.color : 'text-gray-900 dark:text-white'}`}>
+                  {card.value}
+                </div>
+              )}
+              {/* Mini progress bar for visual interest */}
+              {!loading && card.title !== 'Total Earnings' && (
+                <div className="mt-2 h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-700 ${card.title === 'Live Trips' ? 'bg-orange-500' : card.title === 'New Requests' ? 'bg-yellow-500' : 'bg-green-500'}`}
+                    style={{ width: `${Math.min(100, (card.title === 'Live Trips' ? stats.activeTrips : card.title === 'New Requests' ? stats.pendingRequests : stats.completedTrips) * 20)}%` }}
+                  />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
+      {/* Action Cards */}
       <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
-        <Card className="border-orange-200 shadow-md">
-          <CardHeader className="bg-orange-50/50 px-4 sm:px-6">
-            <CardTitle className="text-lg sm:text-xl font-black text-gray-900">Partner Controls</CardTitle>
+        <Card className="border-orange-200 dark:border-orange-800 shadow-md overflow-hidden animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          <div className="h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
+          <CardHeader className="bg-orange-50/50 dark:bg-orange-900/10 px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 pt-6 px-4 sm:px-6">
             <Link to="/trucker/post-trip" className="block">
-              <Button className="w-full bg-orange-600 hover:bg-orange-700 h-12 sm:h-14 text-base sm:text-lg font-bold shadow-sm" disabled={!isOnline}>
+              <Button className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 h-12 sm:h-14 text-base sm:text-lg font-bold shadow-md hover:shadow-lg transition-all" disabled={!isOnline}>
                 <PlusCircle className="mr-2 h-5 w-5" /> Post New Trip
               </Button>
             </Link>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link to="/trucker/browse-shipments">
-                <Button variant="outline" className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 h-10 sm:h-12 font-bold text-sm sm:text-base">
+                <Button variant="outline" className="w-full border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950 h-10 sm:h-12 font-bold text-sm sm:text-base">
                   <Search className="mr-2 h-4 w-4" /> Find Loads
                 </Button>
               </Link>
               <Link to="/trucker/my-trips">
-                <Button variant="outline" className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 h-10 sm:h-12 font-bold text-sm sm:text-base">
+                <Button variant="outline" className="w-full border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950 h-10 sm:h-12 font-bold text-sm sm:text-base">
                   <Truck className="mr-2 h-4 w-4" /> Manage Trips
                 </Button>
               </Link>
@@ -198,31 +230,36 @@ const TruckerDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-gray-100">
+        <Card className="border-gray-100 dark:border-gray-800 shadow-md overflow-hidden animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+          <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
           <CardHeader className="px-4 sm:px-6">
-            <CardTitle className="text-lg sm:text-xl font-black text-gray-900">Quick Links</CardTitle>
+            <CardTitle className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Quick Links</CardTitle>
           </CardHeader>
           <CardContent className="pt-2 px-4 sm:px-6">
             <div className="space-y-3">
-              <Link to="/trucker/my-trips?tab=incoming" className="flex items-center justify-between p-3 sm:p-4 hover:bg-orange-50 rounded-2xl transition-all group border border-transparent hover:border-orange-100">
+              <Link to="/trucker/my-trips?tab=incoming" className="flex items-center justify-between p-3 sm:p-4 hover:bg-orange-50 dark:hover:bg-orange-950/50 rounded-2xl transition-all group border border-transparent hover:border-orange-100 dark:hover:border-orange-800">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                  <div className="bg-orange-100 p-2 rounded-xl group-hover:bg-orange-600 transition-colors shrink-0"><Package className="h-5 w-5 text-orange-600 group-hover:text-white" /></div>
+                  <div className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-xl group-hover:bg-orange-600 dark:group-hover:bg-orange-700 transition-colors shrink-0">
+                    <Package className="h-5 w-5 text-orange-600 dark:text-orange-400 group-hover:text-white dark:group-hover:text-white transition-colors" />
+                  </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-gray-800 text-sm sm:text-base truncate">Booking Requests</p>
-                    <p className="text-xs text-gray-400 font-medium uppercase tracking-widest truncate">Incoming from shippers</p>
+                    <p className="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base truncate">Booking Requests</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-widest truncate">Incoming from shippers</p>
                   </div>
                 </div>
-                <ArrowRight className="h-5 w-5 text-gray-200 group-hover:text-orange-600 group-hover:translate-x-1 transition-all shrink-0" />
+                <ArrowRight className="h-5 w-5 text-gray-200 dark:text-gray-700 group-hover:text-orange-600 dark:group-hover:text-orange-400 group-hover:translate-x-1 transition-all shrink-0" />
               </Link>
-              <Link to="/trucker/history" className="flex items-center justify-between p-3 sm:p-4 hover:bg-orange-50 rounded-2xl transition-all group border border-transparent hover:border-orange-100">
+              <Link to="/trucker/history" className="flex items-center justify-between p-3 sm:p-4 hover:bg-orange-50 dark:hover:bg-orange-950/50 rounded-2xl transition-all group border border-transparent hover:border-orange-100 dark:hover:border-orange-800">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                  <div className="bg-blue-50 p-2 rounded-xl group-hover:bg-blue-600 transition-colors shrink-0"><Calendar className="h-5 w-5 text-blue-600 group-hover:text-white" /></div>
+                  <div className="bg-blue-50 dark:bg-blue-900/30 p-2 rounded-xl group-hover:bg-blue-600 dark:group-hover:bg-blue-700 transition-colors shrink-0">
+                    <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:text-white dark:group-hover:text-white transition-colors" />
+                  </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-gray-800 text-sm sm:text-base truncate">Work History</p>
-                    <p className="text-xs text-gray-400 font-medium uppercase tracking-widest truncate">Past trips and earnings</p>
+                    <p className="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base truncate">Work History</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-widest truncate">Past trips and earnings</p>
                   </div>
                 </div>
-                <ArrowRight className="h-5 w-5 text-gray-200 group-hover:text-orange-600 group-hover:translate-x-1 transition-all shrink-0" />
+                <ArrowRight className="h-5 w-5 text-gray-200 dark:text-gray-700 group-hover:text-orange-600 dark:group-hover:text-orange-400 group-hover:translate-x-1 transition-all shrink-0" />
               </Link>
             </div>
           </CardContent>

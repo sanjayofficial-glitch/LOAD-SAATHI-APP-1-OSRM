@@ -97,10 +97,61 @@
 /* Custom styles for LoadSaathi */
 @layer components {
   .btn-primary {
-    @apply bg-orange-600 hover:bg-orange-700 text-white font-medium transition-colors;
+    @apply bg-orange-600 hover:bg-orange-700 text-white font-medium transition-all duration-200;
   }
   
   .card-hover {
-    @apply transition-shadow hover:shadow-lg;
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5;
   }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Clerk component theming */
+.cl-card {
+  border-radius: var(--radius) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+.cl-formButtonPrimary {
+  background: hsl(25, 100%, 55%) !important;
+}
+.cl-formButtonPrimary:hover {
+  background: hsl(25, 100%, 45%) !important;
+}
+.cl-footerActionLink {
+  color: hsl(25, 100%, 55%) !important;
+}
+.cl-internal-1dauvpw {
+  display: none !important;
 }

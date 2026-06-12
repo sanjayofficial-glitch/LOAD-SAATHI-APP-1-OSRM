@@ -200,20 +200,22 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl animate-fade-in">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center border-2 border-orange-200">
-            <User className="h-8 w-8 text-orange-600" />
+          <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg shadow-orange-200/50 dark:shadow-orange-900/30">
+            <span className="text-2xl font-bold text-white">
+              {(userProfile?.full_name || 'U').charAt(0).toUpperCase()}
+            </span>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{userProfile?.full_name || 'User'}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{userProfile?.full_name || 'User'}</h1>
             <div className="flex items-center gap-2 mt-1">
-              <Badge variant="secondary" className="bg-orange-50 text-orange-700 border-orange-100 capitalize">
+              <Badge variant="secondary" className="bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-100 dark:border-orange-800 capitalize">
                 {userProfile?.user_type}
               </Badge>
               {userProfile?.is_verified && (
-                <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
+                <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800">
                   <CheckCircle2 className="h-3 w-3 mr-1" /> Verified
                 </Badge>
               )}
@@ -226,7 +228,7 @@ const Profile = () => {
               variant="outline" 
               onClick={handleVerify}
               disabled={verifying}
-              className="border-green-200 text-green-700 hover:bg-green-50"
+              className="border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950"
             >
               {verifying ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ShieldCheck className="h-4 w-4 mr-2" />}
               Verify Account
@@ -245,69 +247,72 @@ const Profile = () => {
 
         <TabsContent value="overview">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="border-orange-100 shadow-sm">
+            <Card className="border-orange-100 dark:border-orange-800 shadow-sm overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
                   {userProfile?.user_type === 'trucker' ? 'Total Trips' : 'Total Shipments'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold">
+                  <div className="text-3xl font-black text-gray-900 dark:text-white">
                     {statsLoading ? <Loader2 className="h-6 w-6 animate-spin text-orange-600" /> : stats.count}
                   </div>
                   {userProfile?.user_type === 'trucker' ? (
-                    <Truck className="h-8 w-8 text-orange-200" />
+                    <Truck className="h-8 w-8 text-orange-200 dark:text-orange-800" />
                   ) : (
-                    <Package className="h-8 w-8 text-blue-200" />
+                    <Package className="h-8 w-8 text-blue-200 dark:text-blue-800" />
                   )}
                 </div>
               </CardContent>
             </Card>
 
             {userProfile?.user_type === 'trucker' && (
-              <Card className="border-yellow-100 shadow-sm">
+              <Card className="border-yellow-100 dark:border-yellow-800 shadow-sm overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-yellow-500 to-yellow-400" />
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Average Rating</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">Average Rating</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
-                    <div className="text-3xl font-bold flex items-center">
+                    <div className="text-3xl font-black flex items-center text-gray-900 dark:text-white">
                       {userProfile.rating?.toFixed(1) || '0.0'}
                       <StarIcon className="h-5 w-5 text-yellow-500 ml-2 fill-current" />
                     </div>
-                    <StarIcon className="h-8 w-8 text-yellow-100" />
+                    <StarIcon className="h-8 w-8 text-yellow-100 dark:text-yellow-900" />
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            <Card className="md:col-span-2 border-gray-100 shadow-sm">
+            <Card className="md:col-span-2 border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
               <CardHeader>
-                <CardTitle>Account Summary</CardTitle>
-                <CardDescription>Your basic contact and account details</CardDescription>
+                <CardTitle className="text-gray-900 dark:text-white">Account Summary</CardTitle>
+                <CardDescription className="dark:text-gray-400">Your basic contact and account details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                    <Phone className="h-5 w-5 text-gray-400 mr-3" />
+                  <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <Phone className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-3 shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-500">Phone Number</p>
-                      <p className="text-sm font-medium">{userProfile?.phone || 'Not provided'}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Phone Number</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{userProfile?.phone || 'Not provided'}</p>
                     </div>
                   </div>
-                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                    <Building className="h-5 w-5 text-gray-400 mr-3" />
+                  <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <Building className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-3 shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-500">City</p>
-                      <p className="text-sm font-medium">Not provided</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">City</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Not provided</p>
                     </div>
                   </div>
-                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                    <Calendar className="h-5 w-5 text-gray-400 mr-3" />
+                  <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <Calendar className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-3 shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-500">Member Since</p>
-                      <p className="text-sm font-medium">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Member Since</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {userProfile?.created_at ? new Date(userProfile.created_at).toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
@@ -320,10 +325,10 @@ const Profile = () => {
 
         {userProfile?.user_type === 'trucker' && (
           <TabsContent value="reviews">
-            <Card className="border-orange-100 shadow-sm">
+            <Card className="border-orange-100 dark:border-orange-800 shadow-sm">
               <CardHeader>
-                <CardTitle>Customer Reviews</CardTitle>
-                <CardDescription>What shippers are saying about your service</CardDescription>
+                <CardTitle className="text-gray-900 dark:text-white">Customer Reviews</CardTitle>
+                <CardDescription className="dark:text-gray-400">What shippers are saying about your service</CardDescription>
               </CardHeader>
               <CardContent>
                 {reviewsLoading ? (
@@ -331,14 +336,14 @@ const Profile = () => {
                     <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
                   </div>
                 ) : reviews.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed">
-                    <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">No reviews yet. Complete trips to get feedback!</p>
+                  <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl border border-dashed dark:border-gray-700">
+                    <MessageSquare className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-500 dark:text-gray-400">No reviews yet. Complete trips to get feedback!</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {reviews.map((review) => (
-                      <div key={review.id} className="p-4 border rounded-lg bg-white">
+                      <div key={review.id} className="p-4 border border-gray-100 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 shadow-sm">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-2">
                             <div className="flex">
@@ -346,16 +351,16 @@ const Profile = () => {
                                 <Star key={s} filled={review.rating >= s} className="h-4 w-4" />
                               ))}
                             </div>
-                            <span className="text-sm font-bold text-gray-900">
+                            <span className="text-sm font-bold text-gray-900 dark:text-white">
                               {review.shipper?.full_name || 'Anonymous Shipper'}
                             </span>
                           </div>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
                             {new Date(review.created_at).toLocaleDateString()}
                           </span>
                         </div>
                         {review.comment && (
-                          <p className="text-sm text-gray-600 italic">"{review.comment}"</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 italic">"{review.comment}"</p>
                         )}
                       </div>
                     ))}
@@ -367,20 +372,21 @@ const Profile = () => {
         )}
 
         <TabsContent value="personal">
-          <Card className="border-orange-100 shadow-sm">
+          <Card className="border-orange-100 dark:border-orange-800 shadow-sm overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Update your profile details and contact information</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">Personal Information</CardTitle>
+              <CardDescription className="dark:text-gray-400">Update your profile details and contact information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName" className="dark:text-gray-300">Full Name</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input 
                       id="fullName"
-                      className="pl-10"
+                      className="pl-10 border-orange-100 dark:border-orange-800"
                       value={fullName} 
                       onChange={(e) => setFullName(e.target.value)} 
                       placeholder="Enter your full name"
@@ -388,12 +394,12 @@ const Profile = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone" className="dark:text-gray-300">Phone Number</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input 
                       id="phone"
-                      className="pl-10"
+                      className="pl-10 border-orange-100 dark:border-orange-800"
                       value={phone} 
                       onChange={(e) => setPhone(e.target.value)} 
                       placeholder="+91 9876543210"
@@ -403,7 +409,7 @@ const Profile = () => {
               </div>
               <Button 
                 onClick={handleUpdate} 
-                className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
+                className="w-full md:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-md"
                 disabled={loading}
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
@@ -415,43 +421,45 @@ const Profile = () => {
 
         <TabsContent value="security">
           <div className="space-y-6">
-            <Card className="border-red-100 shadow-sm">
+            <Card className="border-red-100 dark:border-red-900/50 shadow-sm overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-red-500 to-red-400" />
               <CardHeader>
-                <CardTitle className="flex items-center text-red-900">
-                  <Shield className="mr-2 h-5 w-5 text-red-600" />
+                <CardTitle className="flex items-center text-red-900 dark:text-red-300">
+                  <Shield className="mr-2 h-5 w-5 text-red-600 dark:text-red-400" />
                   Security Settings
                 </CardTitle>
-                <CardDescription>Manage your password and account security</CardDescription>
+                <CardDescription className="dark:text-gray-400">Manage your password and account security</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+                <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-100 dark:border-red-900/50">
                   <div className="flex items-start gap-3">
-                    <Lock className="h-5 w-5 text-red-600 mt-0.5" />
+                    <Lock className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
                     <div>
-                      <h4 className="text-sm font-bold text-red-900">Password Management</h4>
-                      <p className="text-sm text-red-700 mt-1">
+                      <h4 className="text-sm font-bold text-red-900 dark:text-red-300">Password Management</h4>
+                      <p className="text-sm text-red-700 dark:text-red-400 mt-1">
                         Manage your password through your Clerk account settings.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t">
-                  <h4 className="text-sm font-bold text-gray-900 mb-2">Account Safety</h4>
-                  <p className="text-sm text-gray-500">
+                <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-2">Account Safety</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Your account is protected by industry-standard encryption. Always ensure you use a strong, unique password.
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-blue-100 shadow-sm">
+            <Card className="border-blue-100 dark:border-blue-900/50 shadow-sm overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
               <CardHeader>
-                <CardTitle className="flex items-center text-blue-900">
-                  <RefreshCw className="mr-2 h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center text-blue-900 dark:text-blue-300">
+                  <RefreshCw className="mr-2 h-5 w-5 text-blue-600 dark:text-blue-400" />
                   Switch Account Type
                 </CardTitle>
-                <CardDescription>Change how you use LoadSaathi (for testing purposes)</CardDescription>
+                <CardDescription className="dark:text-gray-400">Change how you use LoadSaathi (for testing purposes)</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -459,7 +467,7 @@ const Profile = () => {
                     variant={userProfile?.user_type === 'shipper' ? 'default' : 'outline'}
                     onClick={() => handleSwitchRole('shipper')}
                     disabled={switching || userProfile?.user_type === 'shipper'}
-                    className="w-full"
+                    className={`w-full ${userProfile?.user_type === 'shipper' ? 'bg-gradient-to-r from-blue-600 to-blue-500' : ''}`}
                   >
                     {switching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Package className="h-4 w-4 mr-2" />}
                     Shipper
@@ -468,26 +476,25 @@ const Profile = () => {
                     variant={userProfile?.user_type === 'trucker' ? 'default' : 'outline'}
                     onClick={() => handleSwitchRole('trucker')}
                     disabled={switching || userProfile?.user_type === 'trucker'}
-                    className="w-full"
+                    className={`w-full ${userProfile?.user_type === 'trucker' ? 'bg-gradient-to-r from-orange-600 to-orange-500' : ''}`}
                   >
                     {switching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Truck className="h-4 w-4 mr-2" />}
                     Trucker
                   </Button>
                   
-                  {/* Only show Admin switch option to the authorized developer ID */}
                   {userProfile?.id === ALLOWED_ADMIN_ID && (
                     <Button 
                       variant={userProfile?.user_type === 'admin' ? 'default' : 'outline'}
                       onClick={() => handleSwitchRole('admin')}
                       disabled={switching || userProfile?.user_type === 'admin'}
-                      className="w-full border-purple-200 text-purple-700 hover:bg-purple-50 sm:col-span-2"
+                      className="w-full border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950 sm:col-span-2"
                     >
                       {switching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ShieldCheck className="h-4 w-4 mr-2" />}
                       Admin Mode
                     </Button>
                   )}
                 </div>
-                <p className="text-[10px] text-gray-400 italic text-center">
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 italic text-center">
                   Note: Switching roles will change your dashboard and available features.
                 </p>
               </CardContent>

@@ -9,6 +9,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Skeleton } from "./components/ui/skeleton";
 import Layout from "./components/Layout";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
+import { ThemeProvider } from "@/theme/theme";
 import { lazy, Suspense } from "react";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -60,6 +61,7 @@ function App() {
     <ErrorBoundary>
       <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
         <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
           <AuthProvider>
             <BrowserRouter>
               <Suspense fallback={<Skeleton className="h-screen w-full" />}>
@@ -185,9 +187,10 @@ function App() {
               </Suspense>
             </BrowserRouter>
           </AuthProvider>
+        </ThemeProvider>
         </QueryClientProvider>
       </ClerkProvider>
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" richColors theme={typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : 'light'} />
     </ErrorBoundary>
   );
 }

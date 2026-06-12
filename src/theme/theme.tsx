@@ -1,45 +1,42 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-interface Theme {
-  primaryColor: string;
-  secondaryColor: string;
-  accentColor: string;
-  spacing: number;
-  radius: 'sm' | 'md' | 'lg' | 'xl';
-  fontSize: 'sm' | 'md' | 'lg' | 'xl';
-  shadow: 'sm' | 'md' | 'lg' | 'xl';
+interface ThemeContextType {
+  isDark: boolean;
+  toggle: () => void;
+  setDark: (v: boolean) => void;
 }
 
-interface ThemeProviderProps {
-  children: ReactNode;
-}
+const ThemeContext = createContext<ThemeContextType>({
+  isDark: false,
+  toggle: () => {},
+  setDark: () => {},
+});
 
-const defaultTheme: Theme = {
-  primaryColor: '#FF6B6B',
-  secondaryColor: '#4ECDC4',
-  accentColor: '#45B7D1',
-  spacing: 4,
-  radius: 'md',
-  fontSize: 'md',
-  shadow: 'md'
-};
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  const [isDark, setIsDark] = useState(() => {
+    const stored = localStorage.getItem('loadsaathi-theme');
+    if (stored) return stored === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
-const ThemeContext = createContext<Theme>(defaultTheme);
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('loadsaathi-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
-export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [theme] = useState<Theme>(defaultTheme);
+  const toggle = () => setIsDark(prev => !prev);
+  const setDark = (v: boolean) => setIsDark(v);
 
   return (
-    <ThemeContext.Provider value={theme}>
+    <ThemeContext.Provider value={{ isDark, toggle, setDark }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within ThemeProvider');
-  }
-  return context;
-};
+export const useTheme = () => useContext(ThemeContext);

@@ -14,7 +14,6 @@ import {
   Search, 
   Calendar, 
   ArrowRight, 
-  Loader2, 
   IndianRupee,
   Filter,
   Truck,
@@ -24,7 +23,8 @@ import {
   Plus,
   Clock
 } from 'lucide-react';
-import { showError } from '@/utils/toast';
+
+
 import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
 import { formatDuration } from '@/utils/format';
 import type { Trip } from '@/types';
@@ -177,17 +177,20 @@ const TripList = () => {
     );
   }
 
+  const hasActiveFilters = filters.origin || filters.destination || filters.minCapacity || filters.maxPrice;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Search and Filters */}
-      <Card className="border-orange-100 shadow-sm">
-        <CardContent className="p-4">
+      <Card className="border-orange-100 dark:border-orange-800 shadow-sm overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
+        <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder="Search by city, trucker name..."
-                className="pl-10 border-orange-100"
+                className="pl-10 border-orange-100 dark:border-orange-800"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -200,59 +203,58 @@ const TripList = () => {
                   setFilters({ origin: '', destination: '', minCapacity: '', maxPrice: '' });
                   setSearchTerm('');
                 }}
-                className="border-gray-200"
+                className="border-gray-200 dark:border-gray-700"
               >
                 Clear
               </Button>
               <Button 
                 variant="outline" 
-                className="border-orange-200 text-orange-700 hover:bg-orange-50"
-                disabled
+                className={`${hasActiveFilters ? 'border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950' : 'border-gray-200 dark:border-gray-700'}`}
               >
                 <Filter className="h-4 w-4 mr-2" />
-                Filters Applied
+                Filters {hasActiveFilters ? 'Applied' : ''}
               </Button>
             </div>
           </div>
 
-          {/* Filter inputs */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold text-gray-500 uppercase">Origin</Label>
+          {/* Filter inputs collapsible */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Origin</Label>
               <Input
                 placeholder="e.g. Mumbai"
                 value={filters.origin}
                 onChange={(e) => setFilters({ ...filters, origin: e.target.value })}
-                className="border-orange-100"
+                className="border-orange-100 dark:border-orange-800"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold text-gray-500 uppercase">Destination</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Destination</Label>
               <Input
                 placeholder="e.g. Delhi"
                 value={filters.destination}
                 onChange={(e) => setFilters({ ...filters, destination: e.target.value })}
-                className="border-orange-100"
+                className="border-orange-100 dark:border-orange-800"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold text-gray-500 uppercase">Min Capacity</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Min Capacity</Label>
               <Input
                 type="number"
                 placeholder="e.g. 5"
                 value={filters.minCapacity}
                 onChange={(e) => setFilters({ ...filters, minCapacity: e.target.value })}
-                className="border-orange-100"
+                className="border-orange-100 dark:border-orange-800"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold text-gray-500 uppercase">Max Price</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Max Price</Label>
               <Input
                 type="number"
                 placeholder="e.g. 2000"
                 value={filters.maxPrice}
                 onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                className="border-orange-100"
+                className="border-orange-100 dark:border-orange-800"
               />
             </div>
           </div>
@@ -262,21 +264,23 @@ const TripList = () => {
       {/* Results */}
       <div className="grid gap-4">
         {filteredTrips.length === 0 ? (
-          <Card className="border-dashed border-2 border-gray-200">
+          <Card className="border-dashed border-2 border-gray-200 dark:border-gray-700">
             <CardContent className="py-20 text-center">
-              <Truck className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No trucks found</h3>
-              <p className="text-gray-500 mb-6">Try adjusting your search or filters</p>
+              <div className="bg-gray-50 dark:bg-gray-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Truck className="h-8 w-8 text-gray-300 dark:text-gray-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">No trucks found</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">Try adjusting your search or filters</p>
               <div className="flex gap-4 justify-center">
                 <Button 
                   variant="outline" 
                   onClick={() => setFilters({ origin: '', destination: '', minCapacity: '', maxPrice: '' })}
-                  className="border-gray-200"
+                  className="border-gray-200 dark:border-gray-700"
                 >
                   Clear All Filters
                 </Button>
                 <Link to="/trucker/post-trip">
-                  <Button className="bg-orange-600 hover:bg-orange-700">
+                  <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-md">
                     <Plus className="h-4 w-4 mr-2" />
                     Post Your Own Trip
                   </Button>
@@ -286,78 +290,78 @@ const TripList = () => {
           </Card>
         ) : (
           <div className="grid gap-4">
-            {filteredTrips.map((trip) => (
+            {filteredTrips.map((trip, i) => (
               <Card 
                 key={trip.id} 
-                className="border-orange-100 hover:shadow-md transition-shadow cursor-pointer"
+                className="border-orange-100 dark:border-orange-800 hover:shadow-md transition-all duration-300 cursor-pointer hover:-translate-y-0.5 animate-fade-in-up"
+                style={{ animationDelay: `${i * 60}ms` }}
                 onClick={() => navigate(`/trips/${trip.id}`)}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-5 sm:p-6">
                   <div className="flex flex-col md:flex-row justify-between gap-6">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="flex items-center text-xl font-bold text-gray-900">
-                          <MapPin className="h-5 w-5 text-orange-600 mr-2" />
+                      <div className="flex flex-wrap items-center gap-2 mb-4">
+                        <div className="flex items-center text-lg sm:text-xl font-black text-gray-900 dark:text-white">
+                          <MapPin className="h-5 w-5 text-orange-500 mr-1.5 shrink-0" />
                           {trip.origin_city}
-                          <ArrowRight className="h-4 w-4 mx-2 text-gray-400" />
+                          <ArrowRight className="h-4 w-4 mx-2 text-gray-300 dark:text-gray-600" />
                           {trip.destination_city}
                         </div>
                         <Badge 
                           variant={trip.status === 'active' ? 'default' : 'secondary'}
-                          className="text-xs font-semibold"
+                          className="text-[10px] font-bold uppercase tracking-wider"
                         >
-                          {trip.status.toUpperCase()}
+                          {trip.status}
                         </Badge>
                         {trip._matchScore > 0 && (() => {
                           const { label, color } = getMatchLabel(trip._matchScore);
-                          return <Badge className={`${color} text-xs font-semibold ml-1`}>{label}</Badge>;
+                          return <Badge className={`${color} text-[10px] font-bold`}>{label}</Badge>;
                         })()}
-                      </div>                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-2 text-orange-600" />
-                          <span>{new Date(trip.departure_date).toLocaleDateString('en-IN', { 
-                            day: 'numeric', 
-                            month: 'short', 
-                            year: 'numeric' 
-                          })}</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        <div className="flex items-center text-gray-600 dark:text-gray-400">
+                          <Calendar className="h-4 w-4 mr-2 text-orange-500 shrink-0" />
+                          <span className="truncate">{new Date(trip.departure_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                         </div>
-                        <div className="flex items-center">
-                          <PackageIcon className="h-4 w-4 mr-2 text-purple-600" />
-                          <span>{trip.available_capacity_tonnes}t</span>
+                        <div className="flex items-center text-gray-600 dark:text-gray-400">
+                          <PackageIcon className="h-4 w-4 mr-2 text-purple-500 shrink-0" />
+                          <span>{trip.available_capacity_tonnes}t available</span>
                         </div>
-                        <div className="flex items-center">
-                          <IndianRupee className="h-4 w-4 mr-1 text-green-600" />
-                          <span className="font-semibold">₹{trip.price_per_tonne.toLocaleString()} /t</span>
+                        <div className="flex items-center font-bold text-gray-900 dark:text-white">
+                          <IndianRupee className="h-4 w-4 mr-1 text-green-500 shrink-0" />
+                          ₹{trip.price_per_tonne.toLocaleString()} /t
                         </div>
                         {trip.estimated_distance_km && (
-                          <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-2 text-blue-500" />
-                            <span className="text-sm text-gray-600">{trip.estimated_distance_km.toLocaleString()} km</span>
+                          <div className="flex items-center text-gray-500 dark:text-gray-400">
+                            <MapPin className="h-4 w-4 mr-2 text-blue-500 shrink-0" />
+                            <span>{trip.estimated_distance_km.toLocaleString()} km</span>
                           </div>
                         )}
-                        {trip.estimated_duration_min && (
-                          <div className="flex items-center">
-                            <Clock className="h-4 w-4 mr-2 text-blue-500" />
-                            <span className="text-sm text-gray-600">
-                              {formatDuration(trip.estimated_duration_min)}
-                            </span>
+                        {trip.estimated_duration_min && !trip.estimated_distance_km && (
+                          <div className="flex items-center text-gray-500 dark:text-gray-400">
+                            <Clock className="h-4 w-4 mr-2 text-blue-500 shrink-0" />
+                            <span>{formatDuration(trip.estimated_duration_min)}</span>
                           </div>
                         )}
-                        <div className="flex items-center md:col-span-4">
-                          <Truck className="h-4 w-4 mr-2 text-gray-400" />
-                          <span className="text-sm text-gray-600">
-                            {trip.trucker?.full_name || 'Verified Trucker'}
-                          </span>
-                          <span className="text-xs text-gray-500 ml-2">
-                            {trip.trucker?.rating ? `⭐ ${trip.trucker.rating.toFixed(1)} Rating` : 'No ratings yet'}
-                          </span>
+                      </div>
+                      
+                      <div className="flex items-center mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                        <div className="bg-orange-100 dark:bg-orange-900/30 w-7 h-7 rounded-full flex items-center justify-center mr-2">
+                          <Truck className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" />
                         </div>
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          {trip.trucker?.full_name || 'Verified Trucker'}
+                        </span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
+                          {trip.trucker?.rating ? `⭐ ${trip.trucker.rating.toFixed(1)}` : 'New'}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="md:w-48 flex flex-col gap-2">
+                    <div className="md:w-44 flex flex-row md:flex-col gap-2">
                       <Button 
-                        className="w-full bg-orange-600 hover:bg-orange-700"
+                        className="flex-1 md:w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/trips/${trip.id}`);

@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const DashboardSkeleton = () => {
   return (
-    <div className="container mx-auto px-4 py-8 animate-in fade-in duration-500">
+    <div className="container mx-auto px-4 py-8 animate-fade-in">
       <div className="mb-8 flex justify-between items-end">
         <div className="space-y-2">
           <Skeleton className="h-10 w-48" />
@@ -12,25 +12,15 @@ const DashboardSkeleton = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <Skeleton key={i} className="h-24 w-full rounded-xl" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-28 w-full rounded-xl" />
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
-          <Skeleton className="h-12 w-full rounded-lg" />
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-xl" />
-            ))}
-          </div>
-        </div>
-        <div className="space-y-6">
-          <Skeleton className="h-48 w-full rounded-xl" />
-          <Skeleton className="h-48 w-full rounded-xl" />
-        </div>
+      <div className="grid sm:grid-cols-2 gap-8">
+        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-xl" />
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showSuccess, showError } from '@/utils/toast';
-import { Truck, Mail, ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2, CheckCircle, Lock } from 'lucide-react';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -41,30 +41,32 @@ const ForgotPassword = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 animate-scale-in">
           <div className="text-center">
-            <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="h-8 w-8 text-green-600" />
+            <div className="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/50 dark:to-green-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Check Your Email</h2>
-            <p className="text-gray-600 mt-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Check Your Email</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-4 leading-relaxed">
               We've sent a password reset link to <strong>{email}</strong>. 
               Please check your inbox and follow the instructions.
             </p>
-            <p className="text-sm text-gray-500 mt-4">
+            <p className="text-sm text-gray-500 dark:text-gray-500 mt-4">
               Didn't receive the email? Check your spam folder or try again.
             </p>
           </div>
-          <div className="space-y-4">
-            <Button               onClick={() => setSubmitted(false)}
+          <div className="space-y-4 mt-8">
+            <Button
+              onClick={() => setSubmitted(false)}
               variant="outline"
-              className="w-full"
+              className="w-full border-gray-200 dark:border-gray-700"
             >
-              Try a different email            </Button>
+              Try a different email
+            </Button>
             <Button 
               onClick={() => navigate('/login')}
-              className="w-full bg-orange-600 hover:bg-orange-700"
+              className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-md"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Login
@@ -76,21 +78,21 @@ const ForgotPassword = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
+      <div className="max-w-md w-full bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 animate-scale-in">
         <div className="text-center">
-          <Link to="/" className="flex items-center justify-center space-x-2 group">
-            <Truck className="h-12 w-12 text-orange-600" />
-          </Link>
-          <h2 className="text-3xl font-bold text-gray-900">Forgot Password?</h2>
-          <p className="text-gray-600 mt-2">
+          <div className="bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/50 dark:to-orange-800/50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Lock className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Forgot Password?</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
             No worries! Enter your email and we'll send you a reset link.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 mt-8">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-700 font-medium">Email Address</Label>
+            <Label htmlFor="email" className="text-gray-700 dark:text-gray-300 font-medium">Email Address</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input 
@@ -99,19 +101,19 @@ const ForgotPassword = () => {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10"
+                className="pl-10 border-orange-100 dark:border-orange-800"
                 required
                 disabled={loading}
               />
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Enter the email associated with your account
             </p>
           </div>
 
           <Button 
             type="submit"
-            className="w-full bg-orange-600 hover:bg-orange-700 h-11 font-medium"
+            className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 h-11 font-bold shadow-md"
             disabled={loading}
           >
             {loading ? (
@@ -125,10 +127,10 @@ const ForgotPassword = () => {
           </Button>
         </form>
 
-        <div className="text-center">
+        <div className="text-center mt-6">
           <Link 
             to="/login" 
-            className="text-sm text-orange-600 hover:text-orange-700 font-medium inline-flex items-center"
+            className="text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-semibold inline-flex items-center"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Login
