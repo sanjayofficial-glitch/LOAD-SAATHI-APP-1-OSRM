@@ -1,6 +1,7 @@
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Message } from '@/types/chat';
 import { supabase } from '@/integrations/supabase/client';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 export { showSuccess, showError, showLoading, dismissToast } from '@/utils/toast';
 
 /**
@@ -44,7 +45,7 @@ export const sendMessage = async (payload: {
     }
 
     return data as Message;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[sendMessage] Error:', err);
     throw err;
   }
@@ -70,7 +71,7 @@ export const fetchMessages = async (requestId: string, getToken: () => Promise<s
     }
 
     return (data || []) as Message[];
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[fetchMessages] Error:', err);
     throw err;
   }
@@ -91,7 +92,7 @@ export const markMessagesAsRead = async (requestId: string, userId: string, getT
       .eq('request_id', requestId)
       .eq('recipient_id', userId)
       .eq('is_read', false);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[markMessagesAsRead] Error:', err);
   }
 };
@@ -102,7 +103,7 @@ export const markMessagesAsRead = async (requestId: string, userId: string, getT
 export const subscribeToMessages = (
   requestId: string,
   onNewMessage: (message: Message) => void
-): any => {
+): RealtimeChannel => {
   const channel = supabase
     .channel(`chat:${requestId}`)
     .on(
