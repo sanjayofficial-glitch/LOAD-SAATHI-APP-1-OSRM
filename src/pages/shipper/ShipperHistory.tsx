@@ -316,10 +316,10 @@ const ShipperHistory = () => {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="text-xl font-black text-gray-900 leading-none">{activity.title}</h3>
-                            <span className="text-[10px] font-black uppercase text-gray-300 tracking-tighter">#{activity.id.split('-')[1]?.slice(0, 6) ?? ''}</span>
+                            <h3 className="text-xl font-black text-gray-900 dark:text-gray-100 leading-none">{activity.title}</h3>
+                            <span className="text-[10px] font-black uppercase text-gray-300 dark:text-gray-600 tracking-tighter">#{activity.id.split('-')[1]?.slice(0, 6) ?? ''}</span>
                           </div>
-                          <p className="text-xs font-bold text-gray-400 mt-1 flex items-center gap-1">
+                          <p className="text-xs font-bold text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1">
                             <Calendar className="h-3 w-3" /> {formatDate(activity.date)}
                           </p>
                         </div>
@@ -327,26 +327,26 @@ const ShipperHistory = () => {
                       <div className="flex items-center gap-2">{getStatusBadge(activity.status)}</div>
                     </div>
                     
-                    <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50 mb-6">
-                      <p className="text-sm text-gray-600 font-medium">{activity.description}</p>
+                    <div className="bg-gray-50/50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100/50 dark:border-gray-700/50 mb-6">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">{activity.description}</p>
                     </div>
                     
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                       <div className="space-y-1">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Entity</p>
-                        <p className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                          <MapPin className="h-3 w-3 text-red-400" /> {activity.counterparty}
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Entity</p>
+                        <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <MapPin className="h-3 w-3 text-red-400 dark:text-red-500" /> {activity.counterparty}
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Weight</p>
-                        <p className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                          <Package className="h-3 w-3 text-blue-400" /> {activity.weight}t
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Weight</p>
+                        <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <Package className="h-3 w-3 text-blue-400 dark:text-blue-500" /> {activity.weight}t
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Rate</p>
-                        <p className="text-sm font-bold text-green-600 flex items-center gap-1">
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Rate</p>
+                        <p className="text-sm font-bold text-green-600 dark:text-green-400 flex items-center gap-1">
                           <IndianRupee className="h-3 w-3" /> {activity.amount.toLocaleString('en-IN')} /t
                         </p>
                       </div>
