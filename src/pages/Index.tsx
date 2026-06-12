@@ -130,20 +130,8 @@ const Index = () => {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [activeTab, setActiveTab] = useState('shipper');
-  const [isDark, setIsDark] = useState(() =>
-    document.documentElement.classList.contains('dark')
-  );
   const globeRef = useRef<HTMLDivElement>(null);
   const globeInited = useRef(false);
-
-  // Observe theme changes for globe
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     if (!isLoaded) return;
