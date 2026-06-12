@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAuth as useClerkAuth } from '@clerk/clerk-react';
+import { useAuth as useClerkAuth } from '@clerk/clerk-react'; // Clerk's useAuth for getToken
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -103,12 +103,140 @@
   .card-hover {
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5;
   }
+
+  /* Glass morphism panels */
+  .glass-panel {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border));
+  }
+  .dark .glass-panel {
+    background: hsl(var(--card) / 0.6);
+  }
+
+  .glass-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+  }
+  .dark .glass-card {
+    background: hsl(var(--card));
+  }
+
+  /* Animated floating */
+  .animate-float {
+    animation: floatAnim 6s ease-in-out infinite;
+  }
+
+  /* Route line animation for hero SVG */
+  .route-line {
+    stroke-dasharray: 10, 10;
+    animation: dashAnim 30s linear infinite;
+  }
+
+  /* Tab content transitions */
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: flex;
+    animation: tabFadeIn 0.4s ease;
+  }
+
+  /* Pulse ring effect */
+  .animate-pulse-ring {
+    animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+
+  /* Text gradient */
+  .text-gradient-orange-blue {
+    background: linear-gradient(135deg, #f97316 0%, #93c5fd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Grid pattern background */
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Nav link underline animation */
+  .nav-link {
+    position: relative;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #f97316;
+    transition: width 0.3s;
+  }
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    width: 100%;
+  }
+
+  /* Scroll-triggered fade-in */
+  .fade-section {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .fade-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Globe pulse dot */
+  .globe-pulse {
+    animation: globePulse 3s ease-in-out infinite;
+  }
+
+  /* Globe canvas */
+  #globe-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Animations */
+@keyframes floatAnim {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes dashAnim {
+  to { stroke-dashoffset: -1000; }
+}
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.5); }
+  100% { box-shadow: 0 0 0 15px rgba(255, 107, 0, 0); }
+}
+@keyframes globePulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
 }
 
 /* Smooth page transitions */

@@ -10,116 +10,6 @@ import ThemeToggle from '@/components/ThemeToggle';
 import IndexSkeleton from '@/components/IndexSkeleton';
 import { useTheme } from '@/theme/theme';
 
-const styles = `
-  .glass-panel {
-    background: hsl(var(--card) / 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid hsl(var(--border));
-  }
-  .dark .glass-panel {
-    background: hsl(var(--card) / 0.6);
-  }
-  .glass-card {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-  }
-  .dark .glass-card {
-    background: hsl(var(--card));
-  }
-  .animate-float {
-    animation: floatAnim 6s ease-in-out infinite;
-  }
-  .route-line {
-    stroke-dasharray: 10, 10;
-    animation: dashAnim 30s linear infinite;
-  }
-  .tab-content {
-    display: none;
-  }
-  .tab-content.active {
-    display: flex;
-    animation: tabFadeIn 0.4s ease;
-  }
-  @keyframes floatAnim {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-  }
-  @keyframes dashAnim {
-    to { stroke-dashoffset: -1000; }
-  }
-  @keyframes tabFadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes pulseRing {
-    0% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.5); }
-    100% { box-shadow: 0 0 0 15px rgba(255, 107, 0, 0); }
-  }
-  .animate-pulse-ring {
-    animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-  }
-  .text-gradient-orange-blue {
-    background: linear-gradient(135deg, #f97316 0%, #93c5fd 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .bg-grid-pattern {
-    background-image: 
-      linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-  #globe-container canvas {
-    display: block;
-    width: 100% !important;
-    height: 100% !important;
-  }
-  .nav-link {
-    position: relative;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: color 0.3s;
-  }
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: #f97316;
-    transition: width 0.3s;
-  }
-  .nav-link:hover::after,
-  .nav-link.active::after {
-    width: 100%;
-  }
-
-  /* Scroll-triggered fade-in animation */
-  .fade-section {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
-  }
-  .fade-section.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Pulse dot for globe */
-  .globe-pulse {
-    animation: globePulse 3s ease-in-out infinite;
-  }
-  @keyframes globePulse {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
-  }
-`;
-
 const tabs = [
   { id: 'shipper', label: 'Shipper OS' },
   { id: 'transporter', label: 'Transporter OS' },
@@ -140,6 +30,7 @@ const Index = () => {
   const pointsMatRef = useRef<any>(null);
   const arcMatsRef = useRef<any[]>([]);
   const ambientRef = useRef<any>(null);
+  const globeObserverRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -278,12 +169,22 @@ const Index = () => {
           mouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
         });
 
+        // Pause globe when not visible (performance optimization)
+        let isGlobeVisible = true;
+        globeObserverRef.current = new IntersectionObserver(
+          ([entry]) => { isGlobeVisible = entry.isIntersecting; },
+          { threshold: 0.1 }
+        );
+        if (container) globeObserverRef.current.observe(container);
+
         const animate = () => {
           animationId = requestAnimationFrame(animate);
-          group.rotation.y += 0.003;
-          group.rotation.y += (mouseX * 0.5 - 0) * 0.05;
-          group.rotation.x += (mouseY * 0.5 - 0) * 0.03;
-          renderer.render(scene, camera);
+          if (isGlobeVisible) {
+            group.rotation.y += 0.003;
+            group.rotation.y += (mouseX * 0.5 - 0) * 0.05;
+            group.rotation.x += (mouseY * 0.5 - 0) * 0.03;
+            renderer.render(scene, camera);
+          }
         };
         animate();
 
@@ -306,6 +207,8 @@ const Index = () => {
 
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
+      if (globeObserverRef.current) globeObserverRef.current.disconnect();
+      window.removeEventListener('mousemove', () => {});
       if (renderer) {
         renderer.dispose();
         if (renderer.domElement && renderer.domElement.parentNode) {
@@ -338,7 +241,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
-      <style>{styles}</style>
       <OfflineBanner />
 
       <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-20">

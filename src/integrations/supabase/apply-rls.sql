@@ -20,9 +20,9 @@ BEGIN
     END LOOP;
 END $$;
 
--- Users can only see their own profile
-CREATE POLICY "Users can only see own profile" ON public.users
-FOR SELECT TO authenticated USING (auth.jwt()->>'sub' = id);
+-- Allow all authenticated users to read all users (needed for JOINs to show names)
+CREATE POLICY "Authenticated users can read all users" ON public.users
+FOR SELECT TO authenticated USING (true);
 
 -- Users can insert their own profile
 CREATE POLICY "Users can insert own profile" ON public.users

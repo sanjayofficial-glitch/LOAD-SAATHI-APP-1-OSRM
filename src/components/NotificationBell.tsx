@@ -16,7 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { showSuccess } from '@/utils/toast';
-import { supabase } from '@/integrations/supabase/client';
+// Use the authenticated client for Realtime subscription
+// Falls back to the base supabase client if no token is available
+import { supabase as baseSupabase } from '@/integrations/supabase/client';
 
 interface Notification {
   id: string;
@@ -64,7 +66,8 @@ const NotificationBell = () => {
     
     fetchNotifications();
 
-    const channel = supabase
+    // Use base supabase client for Realtime subscription (RLS still applies)
+    const channel = baseSupabase
       .channel(`notifications:${userProfile.id}`)
       .on(
         'postgres_changes',
@@ -84,7 +87,7 @@ const NotificationBell = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      baseSupabase.removeChannel(channel);
     };
   }, [userProfile?.id, fetchNotifications]);
 

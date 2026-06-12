@@ -1,5 +1,3 @@
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-
 export interface SearchFilters {
   origin?: string;
   destination?: string;
@@ -63,41 +61,24 @@ export const parseNaturalLanguageSearch = async (query: string): Promise<SearchF
   const regexResult = parseWithRegex(query);
   if (regexResult) return regexResult;
 
-  // Fallback: use Gemini for complex queries
-  if (!GEMINI_API_KEY) return {};
-
-  const today = new Date().toISOString().split('T')[0];
-  const prompt = `
-    Extract logistics search filters from this query: "${query}"
-    
-    Rules:
-    1. Return ONLY a JSON object with these keys: origin, destination, weight (number in tonnes), date (YYYY-MM-DD).
-    2. If the user says "now", "today", or "immediately", use "${today}" as the date.
-    3. If a value is missing, omit the key.
-    4. Clean city names (e.g., "delhi" -> "Delhi").
-    
-    Example: "I want to send 2 tonnes from Delhi to Mumbai now"
-    Output: {"origin": "Delhi", "destination": "Mumbai", "weight": 2, "date": "${today}"}
-    
-    Current date is ${today}.
-  `;
+  // Fallback: use secure Gemini proxy (Edge Function) for complex queries
+  // API key is stored server-side, not exposed to the client
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  if (!SUPABASE_URL) return {};
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
-    });
+    const response = await fetch(
+      `${SUPABASE_URL}/functions/v1/gemini-proxy`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+        signal: AbortSignal.timeout(10000), // 10s timeout
+      }
+    );
 
     if (!response.ok) return {};
-
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) return {};
-    const jsonString = text.replace(/```json|```/g, '').trim();
-    return JSON.parse(jsonString);
+    return await response.json();
   } catch {
     return {};
   }

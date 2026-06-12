@@ -71,12 +71,12 @@ function App() {
             <BrowserRouter>
               <Suspense fallback={<Skeleton className="h-screen w-full" />}>
                 <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/auth-sync" element={<AuthSync />} />
-                  <Route path="/choose-role" element={<ChooseRole />} />
+                  {/* Public routes with individual error boundaries */}
+                  <Route path="/" element={<ErrorBoundary><Index /></ErrorBoundary>} />
+                  <Route path="/login" element={<ErrorBoundary><Login /></ErrorBoundary>} />
+                  <Route path="/register" element={<ErrorBoundary><Register /></ErrorBoundary>} />
+                  <Route path="/auth-sync" element={<ErrorBoundary><AuthSync /></ErrorBoundary>} />
+                  <Route path="/choose-role" element={<ErrorBoundary><ChooseRole /></ErrorBoundary>} />
 
                   {/* Authenticated routes wrapped with Layout */}
                   <Route
