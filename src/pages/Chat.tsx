@@ -161,7 +161,7 @@ const Chat = () => {
                       }`}>
                         {msg.content}
                       </div>
-                      <p className={`text-[10px] text-gray-400 mt-1 px-1 ${isMe ? 'text-right' : 'text-left'}`}>
+                      <p className={`text-[10px] text-gray-400 dark:text-gray-500 mt-1 px-1 ${isMe ? 'text-right' : 'text-left'}`}>
                         {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
