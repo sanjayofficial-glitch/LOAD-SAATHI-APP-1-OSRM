@@ -130,7 +130,8 @@ const Index = () => {
     if (!container || globeInited.current) return;
     globeInited.current = true;
 
-    let scene: Record<string, unknown>, camera: Record<string, unknown>, renderer: Record<string, unknown>, group: Record<string, unknown>;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    let scene: any, camera: any, renderer: any, group: any;
     let animationId: number;
     let mouseX = 0, mouseY = 0;
 
@@ -246,6 +247,7 @@ const Index = () => {
         }
       }
     };
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }, [ready]);
 
   if (!ready || !isLoaded) {

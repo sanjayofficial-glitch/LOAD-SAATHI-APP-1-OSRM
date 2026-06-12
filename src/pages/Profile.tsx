@@ -138,8 +138,8 @@ const Profile = () => {
         showSuccess('Profile updated successfully!');
         refreshProfile();
       }
-    } catch (err: any) {
-      showError(err.message || 'Failed to update profile');
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -162,8 +162,8 @@ const Profile = () => {
 
       showSuccess('Account verified successfully!');
       await refreshProfile();
-    } catch (err: any) {
-      showError(err.message || 'Failed to verify account');
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'Failed to verify account');
     } finally {
       setVerifying(false);
     }
@@ -192,8 +192,8 @@ const Profile = () => {
       else if (newRole === 'trucker') navigate('/trucker/dashboard');
       else navigate('/shipper/dashboard');
       
-    } catch (err: any) {
-      showError(err.message || 'Failed to switch role');
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'Failed to switch role');
     } finally {
       setSwitching(false);
     }

@@ -24,7 +24,7 @@ const TripDetail = () => {
   const { getToken } = useClerkAuth();
   const navigate = useNavigate();
   const [trip, setTrip] = useState<Trip | null>(null);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [weight, setWeight] = useState('');
   const [description, setDescription] = useState('');
@@ -64,8 +64,8 @@ const TripDetail = () => {
         
         if (reviewData) setReviews(reviewData);
 
-      } catch (err: any) {
-        showError(err.message || 'Failed to load trip');
+      } catch (err: unknown) {
+        showError(err instanceof Error ? err.message : 'Failed to load trip');
       } finally {
         setLoading(false);
       }
@@ -129,9 +129,9 @@ const TripDetail = () => {
 
       showSuccess('Booking request sent successfully!');
       navigate('/shipper/my-shipments?tab=sent');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[handleRequest] Error:', err);
-      showError(err.message || 'An unexpected error occurred');
+      showError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setSubmitting(false);
     }

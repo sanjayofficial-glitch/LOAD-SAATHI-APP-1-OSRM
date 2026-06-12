@@ -87,10 +87,11 @@ const ChooseRole = () => {
 
       const targetPath = role === 'shipper' ? '/shipper/dashboard' : '/trucker/dashboard';
       navigate(targetPath, { replace: true });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to set role';
       console.error('[ChooseRole] Error:', err);
-      setError(err.message || 'Failed to set role');
-      showError(err.message || 'Failed to set role');
+      setError(msg);
+      showError(msg);
     } finally {
       setLoading(false);
     }

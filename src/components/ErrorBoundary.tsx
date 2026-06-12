@@ -27,7 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, info: ErrorInfo) {
     logger.error(`[ErrorBoundary] ${error.message}`, { info });
 
-    const sentry = (window as any).Sentry;
+    const sentry = (window as { Sentry?: { captureException: (err: Error, extra: object) => void } }).Sentry;
     if (sentry) {
       sentry.captureException(error, { extra: info });
     }

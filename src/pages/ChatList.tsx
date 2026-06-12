@@ -75,7 +75,7 @@ const ChatList = () => {
           const isFromMe = msg.sender_id === userProfile.id;
           const otherUserId = isFromMe ? msg.recipient_id : msg.sender_id;
           
-          const request = msg.request as any;
+          const request = msg.request as { shipper?: { id: string; full_name: string; user_type: string } };
           const otherUser = request?.shipper || { id: otherUserId, full_name: 'Unknown', user_type: '' };
 
           if (!existing) {
@@ -102,7 +102,7 @@ const ChatList = () => {
           .sort((a, b) => new Date(b.last_message_time).getTime() - new Date(a.last_message_time).getTime());
 
         setConversations(conversationsList);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('[ChatList] Error:', error);
         showError('Failed to load conversations');
       } finally {

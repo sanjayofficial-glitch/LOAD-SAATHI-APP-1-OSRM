@@ -67,7 +67,7 @@ const TripList = () => {
 
       if (error) throw error;
       setTrips(data || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[TripList] Error:', err);
       showError('Failed to load available trucks');
     } finally {

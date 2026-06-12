@@ -16,7 +16,7 @@ interface QuickStatsProps {
     pendingItems: number;
     completedItems: number;
     totalAmount: number;
-    upcomingItems?: any[];
+    upcomingItems?: Record<string, unknown>[];
   };
 }
 

@@ -32,7 +32,7 @@ const ForgotPassword = () => {
         setSubmitted(true);
         showSuccess('Password reset email sent! Check your inbox.');
       }
-    } catch (err: any) {
+    } catch {
       showError('An unexpected error occurred');
     } finally {
       setLoading(false);

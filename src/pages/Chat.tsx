@@ -34,7 +34,7 @@ const Chat = () => {
   useEffect(() => {
     if (!requestId || !userProfile) return;
 
-    let channel: any;
+    let channel: ReturnType<typeof supabase.channel> | undefined;
 
     const initChat = async () => {
       try {

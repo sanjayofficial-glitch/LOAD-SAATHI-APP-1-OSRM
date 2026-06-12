@@ -90,7 +90,7 @@ async function getCityCoords(city: string): Promise<[number, number] | null> {
 }
 
 async function resolveCoords(
-  item: any,
+  item: Record<string, unknown>,
   cityField: string,
   latField: string,
   lngField: string
@@ -98,7 +98,7 @@ async function resolveCoords(
   if (item[latField] != null && item[lngField] != null) {
     return [Number(item[latField]), Number(item[lngField])];
   }
-  return getCityCoords(item[cityField]);
+  return getCityCoords(item[cityField] as string);
 }
 
 const truckIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/1048/1048313.png', iconSize: [24, 24], iconAnchor: [12, 12] });
@@ -117,11 +117,11 @@ function MapResizer() {
   return null;
 }
 
-interface TripMapProps { trips: any[]; shipments: any[]; }
+interface TripMapProps { trips: Record<string, unknown>[]; shipments: Record<string, unknown>[]; }
 
 const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
-  const [resolvedTrips, setResolvedTrips] = useState<any[]>([]);
-  const [resolvedShipments, setResolvedShipments] = useState<any[]>([]);
+  const [resolvedTrips, setResolvedTrips] = useState<Record<string, unknown>[]>([]);
+  const [resolvedShipments, setResolvedShipments] = useState<Record<string, unknown>[]>([]);
   const [resolving, setResolving] = useState(false);
 
   useEffect(() => {
@@ -132,8 +132,8 @@ const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
       const activeShipments = shipments.filter(s => s.status !== 'cancelled');
 
       // Resolve all coords in parallel batches of 5 to respect Nominatim rate limits
-      const batchResolve = async (items: any[], isTrip: boolean) => {
-        const results: any[] = [];
+      const batchResolve = async (items: Record<string, unknown>[], isTrip: boolean) => {
+        const results: Record<string, unknown>[] = [];
         for (let i = 0; i < items.length; i += 5) {
           const batch = items.slice(i, i + 5);
           const batchResults = await Promise.all(

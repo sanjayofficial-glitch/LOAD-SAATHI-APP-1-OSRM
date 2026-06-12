@@ -11,8 +11,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { User, Truck, Package, Clock } from 'lucide-react';
 
+interface UserActivityTableUser {
+  id: string;
+  full_name?: string;
+  user_type: string;
+  created_at: string;
+}
 interface UserActivityTableProps {
-  users: any[];
+  users: UserActivityTableUser[];
 }
 
 const UserActivityTable: React.FC<UserActivityTableProps> = ({ users }) => {

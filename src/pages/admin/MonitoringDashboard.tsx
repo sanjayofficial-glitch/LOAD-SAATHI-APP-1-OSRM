@@ -55,8 +55,8 @@ const MonitoringDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
-  const supabaseRef = useRef<any>(null);
-  const channelRef = useRef<any>(null);
+  const supabaseRef = useRef<ReturnType<typeof createClerkSupabaseClient> | null>(null);
+  const channelRef = useRef<ReturnType<ReturnType<typeof createClerkSupabaseClient>['channel']> | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -103,7 +103,7 @@ const MonitoringDashboard = () => {
       
       const pending = requests?.filter(r => r.status === 'pending').length || 0;
       const accepted = requests?.filter(r => r.status === 'accepted') || [];
-      const revenue = accepted.reduce((sum: number, r: any) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0);
+      const revenue = accepted.reduce((sum: number, r: { weight_tonnes: number; trip?: { price_per_tonne: number } }) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0);
       const successRate = requests?.length ? Math.round((accepted.length / requests.length) * 100) : 0;
 
       setBusinessMetrics({

@@ -70,8 +70,8 @@ const ReviewDialog = ({
       showSuccess('Review submitted! Thank you for your feedback.');
       if (onSuccess) onSuccess();
       onClose();
-    } catch (err: any) {
-      showError(err.message || 'Failed to submit review');
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'Failed to submit review');
     } finally {
       setSubmitting(false);
     }
