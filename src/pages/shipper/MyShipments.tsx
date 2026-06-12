@@ -121,8 +121,7 @@ const MyShipments = () => {
       setShipments(mappedShipments);
       setSentRequests(mappedSent);
       setIncomingOffers(mappedIncoming);
-    } catch (err: any) {
-      console.error('[MyShipments] Fetch error:', err);
+    } catch {
       showError('Failed to fetch data');
     } finally {
       setLoading(false);
@@ -138,7 +137,7 @@ const MyShipments = () => {
       if (error) throw error;
       showSuccess('Shipment deleted successfully');
       fetchData();
-    } catch (err: any) {
+    } catch {
       showError('Failed to delete shipment');
     }
   };
@@ -183,7 +182,7 @@ const MyShipments = () => {
       }
       
       fetchData();
-    } catch (err: any) {
+    } catch {
       showError(`Failed to ${status} offer`);
     } finally {
       setActionLoading(null);

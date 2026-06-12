@@ -24,7 +24,7 @@ const TripDetail = () => {
   const { getToken } = useClerkAuth();
   const navigate = useNavigate();
   const [trip, setTrip] = useState<Trip | null>(null);
-  const [reviews, setReviews] = useState<Record<string, unknown>[]>([]);
+  const [reviews, setReviews] = useState<{ id: string; rating: number; comment?: string; shipper?: { full_name: string } }[]>([]);
   const [loading, setLoading] = useState(true);
   const [weight, setWeight] = useState('');
   const [description, setDescription] = useState('');

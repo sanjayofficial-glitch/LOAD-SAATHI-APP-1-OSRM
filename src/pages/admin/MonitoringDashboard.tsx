@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSupabase } from '@/hooks/useSupabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { 
   ResizableHandle, 
   ResizablePanel, 
@@ -55,8 +56,8 @@ const MonitoringDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
-  const supabaseRef = useRef<ReturnType<typeof createClerkSupabaseClient> | null>(null);
-  const channelRef = useRef<ReturnType<ReturnType<typeof createClerkSupabaseClient>['channel']> | null>(null);
+  const supabaseRef = useRef<SupabaseClient | null>(null);
+  const channelRef = useRef<ReturnType<SupabaseClient['channel']> | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -103,7 +104,10 @@ const MonitoringDashboard = () => {
       
       const pending = requests?.filter(r => r.status === 'pending').length || 0;
       const accepted = requests?.filter(r => r.status === 'accepted') || [];
-      const revenue = accepted.reduce((sum: number, r: { weight_tonnes: number; trip?: { price_per_tonne: number } }) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0);
+      const revenue = accepted.reduce((sum: number, r: { weight_tonnes: number; trip?: { price_per_tonne: number }[] | { price_per_tonne: number } }) => {
+        const tripPrice = Array.isArray(r.trip) ? r.trip[0]?.price_per_tonne : (r.trip as { price_per_tonne?: number })?.price_per_tonne;
+        return sum + (r.weight_tonnes * (tripPrice || 0));
+      }, 0);
       const successRate = requests?.length ? Math.round((accepted.length / requests.length) * 100) : 0;
 
       setBusinessMetrics({

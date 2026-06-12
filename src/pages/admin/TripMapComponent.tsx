@@ -117,11 +117,27 @@ function MapResizer() {
   return null;
 }
 
-interface TripMapProps { trips: Record<string, unknown>[]; shipments: Record<string, unknown>[]; }
+interface MapItem {
+  id: string;
+  status: string;
+  origin_city: string;
+  destination_city: string;
+  origin_lat?: number;
+  origin_lng?: number;
+  destination_lat?: number;
+  destination_lng?: number;
+  trucker?: { full_name: string };
+  shipper?: { full_name: string };
+}
+interface ResolvedMapItem extends MapItem {
+  origin: [number, number];
+  destination: [number, number];
+}
+interface TripMapProps { trips: MapItem[]; shipments: MapItem[]; }
 
 const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
-  const [resolvedTrips, setResolvedTrips] = useState<Record<string, unknown>[]>([]);
-  const [resolvedShipments, setResolvedShipments] = useState<Record<string, unknown>[]>([]);
+  const [resolvedTrips, setResolvedTrips] = useState<ResolvedMapItem[]>([]);
+  const [resolvedShipments, setResolvedShipments] = useState<ResolvedMapItem[]>([]);
   const [resolving, setResolving] = useState(false);
 
   useEffect(() => {
@@ -132,27 +148,26 @@ const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
       const activeShipments = shipments.filter(s => s.status !== 'cancelled');
 
       // Resolve all coords in parallel batches of 5 to respect Nominatim rate limits
-      const batchResolve = async (items: Record<string, unknown>[], isTrip: boolean) => {
-        const results: Record<string, unknown>[] = [];
+      const batchResolve = async (items: MapItem[], isTrip: boolean) => {
+        const results: ResolvedMapItem[] = [];
         for (let i = 0; i < items.length; i += 5) {
           const batch = items.slice(i, i + 5);
           const batchResults = await Promise.all(
             batch.map(async (item, idx) => {
-              const origin = await resolveCoords(item, 'origin_city', 'origin_lat', 'origin_lng');
-              const dest = await resolveCoords(item, 'destination_city', 'destination_lat', 'destination_lng');
+              const origin = await resolveCoords(item as unknown as Record<string, unknown>, 'origin_city', 'origin_lat', 'origin_lng');
+              const dest = await resolveCoords(item as unknown as Record<string, unknown>, 'destination_city', 'destination_lat', 'destination_lng');
               if (origin && dest) {
                 const globalIdx = i + idx;
                 return {
                   ...item,
                   origin: applyJitter(origin, isTrip ? globalIdx : globalIdx + 50),
                   destination: applyJitter(dest, isTrip ? globalIdx + 10 : globalIdx + 60),
-                };
+                } as ResolvedMapItem;
               }
               return null;
             })
           );
-          results.push(...batchResults.filter(Boolean));
-          // 200ms delay between batches to avoid rate limiting
+          results.push(...batchResults.filter((x): x is ResolvedMapItem => x !== null));
           if (i + 5 < items.length) await new Promise(r => setTimeout(r, 200));
         }
         return results;

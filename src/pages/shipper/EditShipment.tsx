@@ -61,7 +61,13 @@ const EditShipment = () => {
     }
   }, [shipment]);
 
-  const saveCoords = async (supabase: any, id: string) => {
+  const saveCoords = async (supabase: {
+    from: (t: string) => {
+      update: (d: Record<string, unknown>) => {
+        eq: (c: string, v: string) => Promise<{ error: Error | null }>;
+      };
+    };
+  }, id: string) => {
     try {
       const [originCoords, destCoords] = await Promise.all([
         geocodeCity(formData.origin_city),
@@ -87,7 +93,7 @@ const EditShipment = () => {
   };
 
   const mutation = useMutation({
-    mutationFn: async (updatedData: any) => {
+    mutationFn: async (updatedData: Record<string, unknown>) => {
       if (!shipmentId) throw new Error('No shipment ID');
       const token = await getToken({ template: 'supabase' });
       if (!token) throw new Error('No auth token');
@@ -108,7 +114,7 @@ const EditShipment = () => {
       queryClient.invalidateQueries({ queryKey: ["shipment", shipmentId] });
       navigate("/shipper/my-shipments");
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       showError(error.message || "Failed to update shipment");
     }
   });

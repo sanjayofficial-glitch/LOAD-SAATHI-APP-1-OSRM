@@ -45,7 +45,7 @@ const ShipperDashboard = () => {
     pendingRequests: 0, 
     completedShipments: 0,
     totalSpent: 0,
-    upcomingShipments: [] as any[]
+    upcomingShipments: [] as Record<string, unknown>[]
   });
   const [loading, setLoading] = useState(true);
 
@@ -87,8 +87,8 @@ const ShipperDashboard = () => {
         .eq('status', 'accepted');
 
       const totalSpent = (
-        (requestSpent?.reduce((sum, r: any) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0) || 0) +
-        (offerSpent?.reduce((sum, o: any) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.weight_tonnes || 0)), 0) || 0)
+        (requestSpent?.reduce((sum: number, r: { weight_tonnes: number; trip?: { price_per_tonne: number } }) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0) || 0) +
+        (offerSpent?.reduce((sum: number, o: { proposed_price_per_tonne: number; shipment?: { weight_tonnes: number } }) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.weight_tonnes || 0)), 0) || 0)
       );
 
       const { data: upcoming } = await supabase
@@ -106,7 +106,7 @@ const ShipperDashboard = () => {
         totalSpent,
         upcomingShipments: upcoming || []
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[ShipperDashboard] Error:', err);
       showError('Failed to load dashboard statistics');
     } finally {
@@ -134,7 +134,7 @@ const ShipperDashboard = () => {
       if (error) throw error;
       showSuccess('Shipment cancelled successfully');
       loadStats();
-    } catch (err: any) {
+    } catch {
       showError('Failed to cancel shipment');
     }
   };
@@ -303,7 +303,7 @@ const ShipperDashboard = () => {
         <div className="space-y-4 animate-fade-in-up" style={{ animationDelay: '350ms' }}>
           <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">Upcoming Shipments</h2>
           <div className="grid gap-4">
-            {stats.upcomingShipments.map((shipment: any, i: number) => (
+            {stats.upcomingShipments.map((shipment: Record<string, unknown>, i: number) => (
               <Card key={shipment.id} className={`border-blue-100 dark:border-blue-800 hover:shadow-md transition-all duration-300 group overflow-hidden animate-fade-in-up`} style={{ animationDelay: `${i * 100 + 400}ms` }}>
                 <CardContent className="p-0">
                   <div className="flex flex-col sm:flex-row">

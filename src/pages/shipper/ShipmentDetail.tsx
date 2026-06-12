@@ -93,9 +93,9 @@ const ShipmentDetail = () => {
           setHasReview(!!review?.length);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('[ShipmentDetail] Error:', error);
-      showError(error.message || 'Failed to load shipment details');
+      showError(error instanceof Error ? error.message : 'Failed to load shipment details');
       navigate(-1);
     } finally {
       setLoading(false);
@@ -139,8 +139,8 @@ const ShipmentDetail = () => {
       setOfferOpen(false);
       setProposedPrice('');
       setOfferMessage('');
-    } catch (err: any) {
-      showError(err.message || 'Failed to send offer');
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'Failed to send offer');
     } finally {
       setSendingOffer(false);
     }

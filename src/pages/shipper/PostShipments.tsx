@@ -127,8 +127,8 @@ const PostShipments = () => {
 
       showSuccess('Shipment posted successfully!');
       navigate('/shipper/dashboard');
-    } catch (err: any) {
-      showError(err.message || 'An unexpected error occurred.');
+    } catch (err: unknown) {
+      showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
