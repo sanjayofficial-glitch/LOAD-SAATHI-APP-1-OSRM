@@ -29,6 +29,18 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('loadsaathi-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => {
+      const stored = localStorage.getItem('loadsaathi-theme');
+      if (!stored) {
+        setIsDark(e.matches);
+      }
+    };
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
   const toggle = () => setIsDark(prev => !prev);
   const setDark = (v: boolean) => setIsDark(v);
 

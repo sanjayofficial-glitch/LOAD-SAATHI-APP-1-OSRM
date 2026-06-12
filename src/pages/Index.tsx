@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import OfflineBanner from '@/components/OfflineBanner';
 import ThemeToggle from '@/components/ThemeToggle';
 import IndexSkeleton from '@/components/IndexSkeleton';
+import { useTheme } from '@/theme/theme';
 
 const styles = `
   .glass-panel {
@@ -132,6 +133,13 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('shipper');
   const globeRef = useRef<HTMLDivElement>(null);
   const globeInited = useRef(false);
+  const { isDark } = useTheme();
+
+  const globeMatRef = useRef<any>(null);
+  const innerMatRef = useRef<any>(null);
+  const pointsMatRef = useRef<any>(null);
+  const arcMatsRef = useRef<any[]>([]);
+  const ambientRef = useRef<any>(null);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -198,7 +206,7 @@ const Index = () => {
         group = new THREE.Group();
         scene.add(group);
 
-        const isLightMode = !document.documentElement.classList.contains('dark');
+        const isLightMode = !isDark;
 
         const globeGeo = new THREE.SphereGeometry(2, 64, 64);
         const globeMat = new THREE.MeshPhongMaterial({
@@ -207,6 +215,7 @@ const Index = () => {
           transparent: true,
           opacity: isLightMode ? 0.25 : 0.15,
         });
+        globeMatRef.current = globeMat;
         group.add(new THREE.Mesh(globeGeo, globeMat));
 
         const innerGeo = new THREE.SphereGeometry(1.95, 64, 64);
@@ -215,6 +224,7 @@ const Index = () => {
           transparent: true,
           opacity: isLightMode ? 0.25 : 0.4,
         });
+        innerMatRef.current = innerMat;
         group.add(new THREE.Mesh(innerGeo, innerMat));
 
         const pointsCount = 500;
@@ -234,6 +244,7 @@ const Index = () => {
           transparent: true,
           opacity: isLightMode ? 0.5 : 0.8
         });
+        pointsMatRef.current = pointsMat;
         group.add(new THREE.Points(pointsGeo, pointsMat));
 
         for (let i = 0; i < 15; i++) {
@@ -249,13 +260,16 @@ const Index = () => {
             transparent: true,
             opacity: isLightMode ? 0.2 : 0.3
           });
+          arcMatsRef.current.push(arcMat);
           group.add(new THREE.Line(arcGeo, arcMat));
         }
 
         const light1 = new THREE.PointLight(0xffffff, 1);
         light1.position.set(5, 5, 5);
         scene.add(light1);
-        scene.add(new THREE.AmbientLight(isLightMode ? 0x888888 : 0x404040));
+        const ambient = new THREE.AmbientLight(isLightMode ? 0x888888 : 0x404040);
+        ambientRef.current = ambient;
+        scene.add(ambient);
 
         camera.position.z = 6;
 
@@ -301,6 +315,22 @@ const Index = () => {
     };
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }, [ready]);
+
+  useEffect(() => {
+    if (!globeMatRef.current) return;
+    const lightMode = !isDark;
+    globeMatRef.current.color.setHex(lightMode ? 0x4B8FD4 : 0x2E6FB5);
+    globeMatRef.current.opacity = lightMode ? 0.25 : 0.15;
+    innerMatRef.current.color.setHex(lightMode ? 0xCCE4F7 : 0x0D2340);
+    innerMatRef.current.opacity = lightMode ? 0.25 : 0.4;
+    pointsMatRef.current.color.setHex(lightMode ? 0xE8620C : 0xFF6B00);
+    pointsMatRef.current.opacity = lightMode ? 0.5 : 0.8;
+    arcMatsRef.current.forEach((mat: any) => {
+      mat.color.setHex(lightMode ? 0xE8620C : 0xFF6B00);
+      mat.opacity = lightMode ? 0.2 : 0.3;
+    });
+    ambientRef.current.color.setHex(lightMode ? 0x888888 : 0x404040);
+  }, [isDark]);
 
   if (!ready || !isLoaded) {
     return <IndexSkeleton />;

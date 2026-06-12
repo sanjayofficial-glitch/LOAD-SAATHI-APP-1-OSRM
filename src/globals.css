@@ -143,6 +143,40 @@
   border-radius: var(--radius) !important;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
 }
+.dark .cl-card {
+  background: hsl(222.2, 84%, 4.9%) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+.dark .cl-cardContent {
+  background: transparent;
+}
+.dark .cl-formFieldInput {
+  background: hsl(217.2, 32.6%, 17.5%) !important;
+  color: hsl(210, 40%, 98%) !important;
+  border-color: hsl(217.2, 32.6%, 17.5%) !important;
+}
+.dark .cl-socialButtonsIconButton {
+  background: hsl(217.2, 32.6%, 17.5%) !important;
+  border-color: hsl(217.2, 32.6%, 17.5%) !important;
+}
+.dark .cl-footer {
+  background: transparent !important;
+}
+.dark .cl-headerTitle {
+  color: hsl(210, 40%, 98%) !important;
+}
+.dark .cl-headerSubtitle {
+  color: hsl(215, 15%, 78%) !important;
+}
+.dark .cl-formFieldLabel {
+  color: hsl(215, 15%, 78%) !important;
+}
+.dark .cl-dividerText {
+  color: hsl(215, 15%, 78%) !important;
+}
+.dark .cl-dividerLine {
+  background: hsl(217.2, 32.6%, 17.5%) !important;
+}
 .cl-formButtonPrimary {
   background: hsl(25, 100%, 55%) !important;
 }

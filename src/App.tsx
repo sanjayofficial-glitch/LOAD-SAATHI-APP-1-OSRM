@@ -9,7 +9,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Skeleton } from "./components/ui/skeleton";
 import Layout from "./components/Layout";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
-import { ThemeProvider } from "@/theme/theme";
+import { ThemeProvider, useTheme } from "@/theme/theme";
 import { lazy, Suspense } from "react";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -44,6 +44,11 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const queryClient = new QueryClient();
 
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+function ThemedToaster() {
+  const { isDark } = useTheme();
+  return <Toaster position="top-center" richColors theme={isDark ? 'dark' : 'light'} key={String(isDark)} />;
+}
 
 function App() {
   if (!CLERK_PUBLISHABLE_KEY) {
@@ -186,11 +191,11 @@ function App() {
                 </Routes>
               </Suspense>
             </BrowserRouter>
+            <ThemedToaster />
           </AuthProvider>
         </ThemeProvider>
         </QueryClientProvider>
       </ClerkProvider>
-      <Toaster position="top-center" richColors theme={typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : 'light'} />
     </ErrorBoundary>
   );
 }
