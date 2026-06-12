@@ -275,7 +275,7 @@ const ShipperHistory = () => {
               </Select>
             </div>
             <div className="flex items-end">
-              <Button variant="ghost" onClick={() => setFilters({type: 'all', status: 'all'})} className="text-gray-400 hover:text-gray-900">
+              <Button variant="ghost" onClick={() => setFilters({type: 'all', status: 'all'})} className="text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100">
                 Clear Filters
               </Button>
             </div>
@@ -285,12 +285,12 @@ const ShipperHistory = () => {
 
       <div className="space-y-4">
         {filteredActivities.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100">
-            <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="h-10 w-10 text-gray-300" />
+          <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
+            <div className="bg-gray-50 dark:bg-gray-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search className="h-10 w-10 text-gray-300 dark:text-gray-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900">No activities found</h3>
-            <p className="text-gray-500 max-w-sm mx-auto mt-2">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">No activities found</h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mt-2">
               {activities.length === 0 
                 ? "Start posting loads or booking trucks to build your history." 
                 : "No results match your current filters."}
@@ -304,14 +304,14 @@ const ShipperHistory = () => {
           </div>
         ) : (
           filteredActivities.map((activity) => (
-            <Card key={activity.id} className="hover:shadow-xl transition-all duration-300 border-gray-100 overflow-hidden group">
+            <Card key={activity.id} className="hover:shadow-xl transition-all duration-300 border-gray-100 dark:border-gray-800 overflow-hidden group">
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row">
-                  <div className={`w-2 md:w-1.5 ${activity.type === 'shipment' ? 'bg-blue-600' : 'bg-orange-600'}`} />
+                  <div className={`w-2 md:w-1.5 ${activity.type === 'shipment' ? 'bg-blue-600 dark:bg-blue-500' : 'bg-orange-600 dark:bg-orange-500'}`} />
                   <div className="flex-1 p-6">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
                       <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-2xl ${activity.type === 'shipment' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'}`}>
+                        <div className={`p-3 rounded-2xl ${activity.type === 'shipment' ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400' : 'bg-orange-50 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400'}`}>
                           {activity.type === 'shipment' ? <Package className="h-6 w-6" /> : <Send className="h-6 w-6" />}
                         </div>
                         <div>
