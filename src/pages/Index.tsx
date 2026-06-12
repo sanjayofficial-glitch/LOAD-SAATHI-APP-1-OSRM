@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Truck, ArrowRight, Shield, Star, IndianRupee, Route, Handshake, EyeOff, CircuitBoard, Search, Bell, Map, Package, Send, Check, X, MessageSquare, Calendar, ChevronRight } from 'lucide-react';
+import { Truck, ArrowRight, Route, Handshake, EyeOff, CircuitBoard, Search, Bell, Map, Package, ChevronRight } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -130,7 +130,7 @@ const Index = () => {
     if (!container || globeInited.current) return;
     globeInited.current = true;
 
-    let scene: any, camera: any, renderer: any, group: any;
+    let scene: Record<string, unknown>, camera: Record<string, unknown>, renderer: Record<string, unknown>, group: Record<string, unknown>;
     let animationId: number;
     let mouseX = 0, mouseY = 0;
 
