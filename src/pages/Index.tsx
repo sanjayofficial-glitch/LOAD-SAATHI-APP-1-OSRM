@@ -172,7 +172,12 @@ const Index = () => {
         // Pause globe when not visible (performance optimization)
         let isGlobeVisible = true;
         globeObserverRef.current = new IntersectionObserver(
-          ([entry]) => { isGlobeVisible = entry.isIntersecting; },
+          (entries) => {
+            const entry = entries[0];
+            if (entry) {
+              isGlobeVisible = entry.isIntersecting;
+            }
+          },
           { threshold: 0.1 }
         );
         if (container) globeObserverRef.current.observe(container);
