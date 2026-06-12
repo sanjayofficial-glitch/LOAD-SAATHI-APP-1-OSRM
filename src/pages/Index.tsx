@@ -130,8 +130,20 @@ const Index = () => {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [activeTab, setActiveTab] = useState('shipper');
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.classList.contains('dark')
+  );
   const globeRef = useRef<HTMLDivElement>(null);
   const globeInited = useRef(false);
+
+  // Observe theme changes for globe
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -141,6 +153,23 @@ const Index = () => {
     }
     setReady(true);
   }, [isLoaded, isSignedIn, user, navigate]);
+
+  // Fade-in sections on scroll
+  useEffect(() => {
+    if (!ready) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.fade-section').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [ready]);
 
   useEffect(() => {
     if (!ready) return;
@@ -159,8 +188,14 @@ const Index = () => {
           const script = document.createElement('script');
           script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
           script.onload = () => resolve((window as any).THREE);
+          script.onerror = () => {
+            console.warn('Three.js CDN failed, using fallback');
+            resolve(null);
+          };
           document.body.appendChild(script);
         });
+
+        if (!THREE) return;
 
         const width = container.clientWidth || 800;
         const height = container.clientHeight || 500;
@@ -175,20 +210,22 @@ const Index = () => {
         group = new THREE.Group();
         scene.add(group);
 
+        const isLightMode = !document.documentElement.classList.contains('dark');
+
         const globeGeo = new THREE.SphereGeometry(2, 64, 64);
         const globeMat = new THREE.MeshPhongMaterial({
-          color: 0x2E6FB5,
+          color: isLightMode ? 0x4B8FD4 : 0x2E6FB5,
           wireframe: true,
           transparent: true,
-          opacity: 0.15,
+          opacity: isLightMode ? 0.25 : 0.15,
         });
         group.add(new THREE.Mesh(globeGeo, globeMat));
 
         const innerGeo = new THREE.SphereGeometry(1.95, 64, 64);
         const innerMat = new THREE.MeshPhongMaterial({
-          color: 0x0D2340,
+          color: isLightMode ? 0xCCE4F7 : 0x0D2340,
           transparent: true,
-          opacity: 0.4,
+          opacity: isLightMode ? 0.25 : 0.4,
         });
         group.add(new THREE.Mesh(innerGeo, innerMat));
 
@@ -203,7 +240,12 @@ const Index = () => {
         }
         const pointsGeo = new THREE.BufferGeometry();
         pointsGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const pointsMat = new THREE.PointsMaterial({ color: 0xFF6B00, size: 0.03, transparent: true, opacity: 0.8 });
+        const pointsMat = new THREE.PointsMaterial({
+          color: isLightMode ? 0xE8620C : 0xFF6B00,
+          size: 0.03,
+          transparent: true,
+          opacity: isLightMode ? 0.5 : 0.8
+        });
         group.add(new THREE.Points(pointsGeo, pointsMat));
 
         for (let i = 0; i < 15; i++) {
@@ -214,14 +256,18 @@ const Index = () => {
           const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5).setLength(2.5);
           const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
           const arcGeo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(50));
-          const arcMat = new THREE.LineBasicMaterial({ color: 0xFF6B00, transparent: true, opacity: 0.3 });
+          const arcMat = new THREE.LineBasicMaterial({
+            color: isLightMode ? 0xE8620C : 0xFF6B00,
+            transparent: true,
+            opacity: isLightMode ? 0.2 : 0.3
+          });
           group.add(new THREE.Line(arcGeo, arcMat));
         }
 
         const light1 = new THREE.PointLight(0xffffff, 1);
         light1.position.set(5, 5, 5);
         scene.add(light1);
-        scene.add(new THREE.AmbientLight(0x404040));
+        scene.add(new THREE.AmbientLight(isLightMode ? 0x888888 : 0x404040));
 
         camera.position.z = 6;
 
@@ -386,7 +432,7 @@ const Index = () => {
         </section>
 
         {/* PROOF BAR */}
-        <section className="border-y border-border dark:border-white/5 bg-muted/50 dark:bg-[#010f1f]/80 backdrop-blur-sm">
+        <section className="fade-section border-y border-border dark:border-white/5 bg-muted/50 dark:bg-[#010f1f]/80 backdrop-blur-sm">
           <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-8 flex flex-col md:flex-row justify-around items-center gap-8">
             {[
               { value: '40%', label: 'Empty Kilometers Today' },
@@ -402,7 +448,7 @@ const Index = () => {
         </section>
 
         {/* BENTO GRID */}
-        <section className="py-24 relative">
+        <section className="fade-section py-24 relative">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-[0.08] dark:opacity-[0.12] pointer-events-none"
             style={{ background: 'radial-gradient(circle, #f97316 0%, transparent 70%)', filter: 'blur(60px)' }} />
           <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
@@ -433,7 +479,7 @@ const Index = () => {
         </section>
 
         {/* PLATFORM TABS */}
-        <section className="py-24 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 relative overflow-hidden">
+        <section className="fade-section py-24 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 relative overflow-hidden">
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full opacity-[0.08] dark:opacity-[0.12] pointer-events-none"
             style={{ background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', filter: 'blur(60px)' }} />
           <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
@@ -564,7 +610,7 @@ const Index = () => {
         </section>
 
         {/* VISION SECTION */}
-        <section id="vision" className="min-h-[716px] flex items-center justify-center relative bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 py-24 overflow-hidden">
+        <section id="vision" className="fade-section min-h-[716px] flex items-center justify-center relative bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 py-24 overflow-hidden">
           <div className="absolute inset-0 opacity-30"
             style={{
               backgroundImage: `url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDEwZjFmIiAvPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDUpIiAvPgo8L3N2Zz4=")`,
@@ -588,7 +634,7 @@ const Index = () => {
         </section>
 
         {/* CTA */}
-        <section className="py-32 relative overflow-hidden flex items-center justify-center">
+        <section className="fade-section py-32 relative overflow-hidden flex items-center justify-center">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-900/5 to-transparent dark:bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.12),transparent_70%)]" />
           <div className="max-w-xl w-full mx-auto px-6 sm:px-12 relative z-10">
             <div className="glass-card p-10 sm:p-14 rounded-2xl border border-orange-500/20 shadow-[0_0_50px_rgba(249,115,22,0.1)] text-center">
