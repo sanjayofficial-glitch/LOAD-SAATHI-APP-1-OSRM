@@ -93,7 +93,7 @@ const ShipperHistory = () => {
 
       // Process shipments
       if (shipmentsData) {
-        shipmentsData.forEach((s: any) => {
+        shipmentsData.forEach((s: Record<string, unknown>) => {
           items.push({
             id: `ship-${s.id}`,
             relatedId: s.id,
@@ -111,8 +111,8 @@ const ShipperHistory = () => {
 
       // Process requests
       if (requestsData) {
-        requestsData.forEach((r: any) => {
-          const trip = r.trips;
+        requestsData.forEach((r: Record<string, unknown>) => {
+          const trip = r.trips as Record<string, unknown> | undefined;
           items.push({
             id: `req-${r.id}`,
             relatedId: r.trip_id || '',
