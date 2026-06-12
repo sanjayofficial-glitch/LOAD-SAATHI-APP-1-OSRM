@@ -236,8 +236,8 @@ const BrowseShipments = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900">Find Goods to Carry</h1>
-        <p className="text-gray-600 mt-2">Browse available shipments posted by shippers and send your best offer</p>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">Find Goods to Carry</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">Browse available shipments posted by shippers and send your best offer</p>
       </div>
 
       <div className="grid lg:grid-cols-4 gap-8">
@@ -245,10 +245,10 @@ const BrowseShipments = () => {
           <Card className="border-blue-100 shadow-sm overflow-hidden">
             <CardContent className="p-5 space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-gray-700">AI Search</Label>
+                <Label className="text-sm font-semibold text-gray-700 dark:text-gray-200">AI Search</Label>
                 <form onSubmit={handleAiSearch} className="space-y-3">
                   <div className="relative">
-                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500" />
+                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500 dark:text-blue-400" />
                     <Input 
                       placeholder="e.g. '10 tonnes from Mumbai'" 
                       className="pl-10 border-blue-100"
@@ -265,9 +265,9 @@ const BrowseShipments = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-gray-100 shadow-sm">
+          <Card className="border-gray-100 dark:border-gray-800 shadow-sm">
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold text-gray-700">Filters</CardTitle>
+              <CardTitle className="text-sm font-bold text-gray-700 dark:text-gray-200">Filters</CardTitle>
               <Button variant="ghost" size="sm" onClick={() => setShowFilters(!showFilters)}>
                 {showFilters ? 'Hide' : 'Show'}
               </Button>
@@ -275,7 +275,7 @@ const BrowseShipments = () => {
             {showFilters && (
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-gray-500 uppercase">Origin State</Label>
+                  <Label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Origin State</Label>
                   <Select value={filters.originState} onValueChange={(val) => setFilters({...filters, originState: val})}>
                     <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
                     <SelectContent>
@@ -284,7 +284,7 @@ const BrowseShipments = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-gray-500 uppercase">Min Weight (t)</Label>
+                  <Label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Min Weight (t)</Label>
                   <Input type="number" value={filters.minWeight} onChange={(e) => setFilters({...filters, minWeight: e.target.value})} />
                 </div>
                 <Button variant="outline" className="w-full" onClick={() => {
@@ -298,7 +298,7 @@ const BrowseShipments = () => {
 
         <div className="lg:col-span-3 space-y-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
             <Input 
               placeholder="Search by city or goods type..." 
               className="pl-10 py-6 rounded-xl border-gray-200"
@@ -312,21 +312,21 @@ const BrowseShipments = () => {
               {[1, 2, 3].map((i) => <Skeleton key={i} className="h-48 w-full rounded-xl" />)}
             </div>
           ) : filteredShipments.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200">
-              <Package className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900">No shipments found</h3>
-              <p className="text-gray-500">Try adjusting your filters or check back later.</p>
+            <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+              <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">No shipments found</h3>
+              <p className="text-gray-500 dark:text-gray-400">Try adjusting your filters or check back later.</p>
             </div>
           ) : (
             <div className="grid gap-6">
               {filteredShipments.map((shipment) => (
-                <Card key={shipment.id} className="overflow-hidden border-orange-100 hover:shadow-lg transition-all">
+                <Card key={shipment.id} className="overflow-hidden border-orange-100 dark:border-orange-800 hover:shadow-lg transition-all">
                   <CardContent className="p-0">
                     <div className="flex flex-col md:flex-row">
                       <div className="flex-1 p-6 space-y-4">                          <div className="flex items-start justify-between">
                             <div className="flex items-center space-x-3">
-                              <div className="bg-orange-100 p-3 rounded-full">
-                                <Package className="h-6 w-6 text-orange-600" />
+                              <div className="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-full">
+                                <Package className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                               </div>
                               <div>
                                 <h3 className="text-lg font-bold text-gray-900">

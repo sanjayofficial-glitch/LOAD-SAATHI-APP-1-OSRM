@@ -155,8 +155,8 @@ const TripList = () => {
   if (!userProfile) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <AlertCircle className="h-12 w-12 text-orange-600 mb-4" />
-        <p className="text-lg font-medium text-gray-900">Please log in to browse trucks</p>
+        <AlertCircle className="h-12 w-12 text-orange-600 dark:text-orange-400 mb-4" />
+        <p className="text-lg font-medium text-gray-900 dark:text-gray-100">Please log in to browse trucks</p>
       </div>
     );
   }

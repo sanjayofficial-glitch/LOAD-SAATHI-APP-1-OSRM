@@ -355,7 +355,7 @@ const ShipperHistory = () => {
                           variant="ghost" 
                           size="sm" 
                           onClick={() => navigate(activity.type === 'shipment' ? `/shipper/shipments/${activity.relatedId}` : `/trips/${activity.relatedId}`)}
-                          className="text-orange-600 font-black text-xs hover:bg-orange-50 group-hover:translate-x-1 transition-transform"
+                          className="text-orange-600 dark:text-orange-400 font-black text-xs hover:bg-orange-50 dark:hover:bg-orange-950/50 group-hover:translate-x-1 transition-transform"
                         >
                           DETAILS <Eye className="h-3.5 w-3.5 ml-2" />
                         </Button>

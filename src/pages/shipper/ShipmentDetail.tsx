@@ -210,8 +210,8 @@ const ShipmentDetail = () => {
       <div className="grid md:grid-cols-3 gap-8">
         {/* Main Details */}
         <div className="md:col-span-2 space-y-6">
-          <Card className="border-blue-100 shadow-sm">
-            <CardHeader className="bg-blue-50/50 border-b border-blue-100">
+          <Card className="border-blue-100 dark:border-blue-800 shadow-sm">
+            <CardHeader className="bg-blue-50/50 dark:bg-blue-950/50 border-b border-blue-100 dark:border-blue-800">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                   {shipment.origin_city} → {shipment.destination_city}
@@ -388,7 +388,7 @@ const ShipmentDetail = () => {
                       <p>Your shipment is currently <strong>{shipment.status}</strong>.</p>
                     </div>
                     <div className="flex gap-3">
-                      <div className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold">2</div>
+                      <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold">2</div>
                       <p>Truckers can view and send offers. You have <strong>{offerCount} offer{offerCount !== 1 ? 's' : ''}</strong> so far.</p>
                     </div>
                     <div className="flex gap-3">
