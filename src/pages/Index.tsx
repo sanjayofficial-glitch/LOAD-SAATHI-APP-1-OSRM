@@ -347,17 +347,17 @@ const Index = () => {
             </div>
             <div className="relative animate-float h-full min-h-[500px] flex items-center justify-center">
               <div className="glass-panel w-full h-[600px] rounded-xl p-6 flex flex-col shadow-2xl">
-                <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
+                <div className="flex justify-between items-center border-b border-border pb-4 mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-orange-600 animate-pulse-ring" />
-                    <span className="text-xs text-muted-foreground dark:text-gray-400 uppercase tracking-widest">Live Network Stream</span>
+                    <span className="text-xs text-muted-foreground uppercase tracking-widest">Live Network Stream</span>
                   </div>
                   <div className="flex gap-2">
                     <span className="text-xs bg-blue-900/30 text-blue-400 px-2 py-1 rounded border border-blue-800/30">SYS.ON</span>
                     <span className="text-xs bg-orange-900/30 text-orange-400 px-2 py-1 rounded border border-orange-800/30">AI.SYNC</span>
                   </div>
                 </div>
-                <div className="flex-grow relative bg-[#010f1f]/50 rounded border border-white/5 overflow-hidden">
+                <div className="flex-grow relative bg-card/50 rounded border border-border overflow-hidden">
                   <svg className="absolute inset-0 opacity-40" viewBox="0 0 500 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                     <path d="M200,50 L250,10 L300,50 L320,120 L400,200 L380,300 L250,480 L180,400 L120,350 L100,250 L80,150 Z" fill="none" stroke="#233143" strokeWidth="2" />
                     {[100, 200, 300, 400].map(y => <line key={`h${y}`} x1="0" y1={y} x2="500" y2={y} stroke="rgba(255,255,255,0.03)" strokeWidth="1" />)}
@@ -372,11 +372,11 @@ const Index = () => {
                     <circle cx="220" cy="180" fill="#fff" r="4" />
                   </svg>
                   <div className="absolute top-8 left-8 glass-card p-3 rounded-lg shadow-lg">
-                    <div className="text-xs text-muted-foreground dark:text-gray-400 uppercase mb-1">AI Match Score</div>
+                    <div className="text-xs text-muted-foreground uppercase mb-1">AI Match Score</div>
                     <div className="text-xl font-bold text-orange-600 dark:text-orange-400">98.2%</div>
                   </div>
                   <div className="absolute bottom-12 right-8 glass-card p-3 rounded-lg shadow-lg">
-                    <div className="text-xs text-muted-foreground dark:text-gray-400 uppercase mb-1">Capacity Filled</div>
+                    <div className="text-xs text-muted-foreground uppercase mb-1">Capacity Filled</div>
                     <div className="text-xl font-bold text-blue-400">+34%</div>
                   </div>
                 </div>
@@ -412,18 +412,17 @@ const Index = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-min">
               {[
-                { icon: Route, title: 'Empty Return Trips', desc: 'Trucks frequently return empty after a delivery, burning fuel and wasting economic potential due to lack of network visibility.', badge: 'CRITICAL INEFFICIENCY', badgeClass: 'text-red-500 bg-red-900/20 border-red-800/30', colSpan: 'md:col-span-2', iconColor: 'text-orange-600 dark:text-orange-400' },
-                { icon: Handshake, title: 'Broker Dependency', desc: 'Opaque pricing and multiple intermediaries erode margins for both shippers and transporters.', badge: null, iconColor: 'text-blue-400' },
-                { icon: EyeOff, title: 'Zero Visibility', desc: 'Lack of real-time tracking leads to supply chain anxiety and manual intervention.', badge: null, iconColor: 'text-gray-400' },
+                { icon: Route, title: 'Empty Return Trips', desc: 'Trucks frequently return empty after a delivery, burning fuel and wasting economic potential due to lack of network visibility.', badge: 'CRITICAL INEFFICIENCY', badgeClass: 'text-red-500 dark:bg-red-900/20 dark:border-red-800/30 bg-red-100 border-red-200', colSpan: 'md:col-span-2', iconColor: 'text-orange-600 dark:text-orange-400' },
+                { icon: Handshake, title: 'Broker Dependency', desc: 'Opaque pricing and multiple intermediaries erode margins for both shippers and transporters.', badge: null, iconColor: 'text-blue-500' },
+                { icon: EyeOff, title: 'Zero Visibility', desc: 'Lack of real-time tracking leads to supply chain anxiety and manual intervention.', badge: null, iconColor: 'text-muted-foreground' },
                 { icon: CircuitBoard, title: 'Fragmented Data Silos', desc: 'Disconnected systems prevent systemic optimization and intelligent capacity planning.', badge: null, iconColor: 'text-orange-500', colSpan: 'md:col-span-2' },
               ].map((card, i) => (
-                <div key={i} className={`glass-card p-8 rounded-xl ${card.colSpan || ''} hover:border-orange-500/30 transition-colors group`}
-                  style={{ background: '#0B1220', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <card.icon className={`${card.iconColor} text-3xl mb-4 group-hover:scale-110 transition-transform`} />
-                  <h3 className="text-lg font-bold text-white mb-2">{card.title}</h3>
-                  <p className="text-sm text-gray-400">{card.desc}</p>
+                <div key={i} className={`glass-card p-8 rounded-xl ${card.colSpan || ''} hover:border-orange-500/30 transition-all duration-300 group`}>
+                  <card.icon className={`${card.iconColor} text-3xl mb-4 group-hover:scale-110 transition-transform duration-300`} />
+                  <h3 className="text-lg font-bold text-foreground mb-2">{card.title}</h3>
+                  <p className="text-sm text-muted-foreground">{card.desc}</p>
                   {card.badge && (
-                    <div className="mt-6 border-t border-white/5 pt-4">
+                    <div className="mt-6 border-t border-border pt-4">
                       <span className={`text-xs font-semibold ${card.badgeClass} px-2 py-1 rounded border`}>{card.badge}</span>
                     </div>
                   )}
@@ -461,74 +460,74 @@ const Index = () => {
             </div>
             <div className="relative w-full aspect-[16/9] max-h-[700px]">
               {/* Shipper OS */}
-              <div className={`tab-content ${activeTab === 'shipper' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border border-white/10 overflow-hidden shadow-2xl flex-col`}
+              <div className={`tab-content ${activeTab === 'shipper' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border-border overflow-hidden shadow-2xl flex-col`}
                 style={{ display: activeTab === 'shipper' ? 'flex' : 'none' }}>
-                <div className="h-12 border-b border-white/10 bg-[#0B1220]/80 flex items-center px-4 gap-4">
-                  <span className="text-xs text-gray-400">SHIPPER_WORKSPACE</span>
+                <div className="h-12 border-b border-border bg-card/80 flex items-center px-4 gap-4">
+                  <span className="text-xs text-muted-foreground">SHIPPER_WORKSPACE</span>
                   <div className="flex-grow" />
-                  <Search className="h-4 w-4 text-gray-400" />
-                  <Bell className="h-4 w-4 text-gray-400" />
+                  <Search className="h-4 w-4 text-muted-foreground" />
+                  <Bell className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <div className="flex-grow p-6 grid grid-cols-3 gap-6 bg-[#050816]/50">
+                <div className="flex-grow p-6 grid grid-cols-3 gap-6 bg-background/50 dark:bg-[#050816]/50">
                   <div className="col-span-1 space-y-4">
-                    <div className="glass-card p-4 rounded border border-white/5">
-                      <div className="text-xs text-gray-400 uppercase mb-2">Active Shipments</div>
-                      <div className="text-3xl font-black text-white">124</div>
+                    <div className="glass-card p-4 rounded">
+                      <div className="text-xs text-muted-foreground uppercase mb-2">Active Shipments</div>
+                      <div className="text-3xl font-black text-foreground">124</div>
                     </div>
-                    <div className="glass-card p-4 rounded border border-white/5">
-                      <div className="text-xs text-gray-400 uppercase mb-2">Pending Tenders</div>
+                    <div className="glass-card p-4 rounded">
+                      <div className="text-xs text-muted-foreground uppercase mb-2">Pending Tenders</div>
                       <div className="space-y-2 mt-4">
-                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                          <span className="text-xs text-white">MUM-DEL (FTL)</span>
+                        <div className="flex justify-between items-center border-b border-border pb-2">
+                          <span className="text-xs text-foreground">MUM-DEL (FTL)</span>
                           <span className="text-xs text-blue-400">Awaiting Bid</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                          <span className="text-xs text-white">BLR-HYD (PTL)</span>
+                        <div className="flex justify-between items-center border-b border-border pb-2">
+                          <span className="text-xs text-foreground">BLR-HYD (PTL)</span>
                           <span className="text-xs text-orange-400">Matched</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="col-span-2 glass-card p-4 rounded border border-white/5 relative overflow-hidden">
-                    <div className="text-xs text-gray-400 uppercase mb-4 border-b border-white/10 pb-2">Live Tracking Heatmap</div>
-                    <div className="absolute inset-x-4 top-16 bottom-4 bg-[#0B1220] rounded border border-white/5 flex items-center justify-center opacity-50 bg-grid-pattern">
-                      <Map className="text-4xl text-gray-500" />
+                  <div className="col-span-2 glass-card p-4 rounded relative overflow-hidden">
+                    <div className="text-xs text-muted-foreground uppercase mb-4 border-b border-border pb-2">Live Tracking Heatmap</div>
+                    <div className="absolute inset-x-4 top-16 bottom-4 bg-card/50 dark:bg-[#0B1220] rounded border border-border flex items-center justify-center opacity-50 bg-grid-pattern">
+                      <Map className="text-4xl text-muted-foreground" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Transporter OS */}
-              <div className={`tab-content ${activeTab === 'transporter' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border border-white/10 overflow-hidden shadow-2xl flex-col`}
+              <div className={`tab-content ${activeTab === 'transporter' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border-border overflow-hidden shadow-2xl flex-col`}
                 style={{ display: activeTab === 'transporter' ? 'flex' : 'none' }}>
-                <div className="h-12 border-b border-white/10 bg-[#0B1220]/80 flex items-center px-4 gap-4">
-                  <span className="text-xs text-gray-400">FLEET_MANAGER</span>
+                <div className="h-12 border-b border-border bg-card/80 flex items-center px-4 gap-4">
+                  <span className="text-xs text-muted-foreground">FLEET_MANAGER</span>
                 </div>
-                <div className="flex-grow p-6 grid grid-cols-3 gap-6 bg-[#050816]/50">
+                <div className="flex-grow p-6 grid grid-cols-3 gap-6 bg-background/50 dark:bg-[#050816]/50">
                   <div className="col-span-1 space-y-4">
-                    <div className="glass-card p-4 rounded border border-white/5">
-                      <div className="text-xs text-gray-400 uppercase mb-2">Fleet Utilization</div>
+                    <div className="glass-card p-4 rounded">
+                      <div className="text-xs text-muted-foreground uppercase mb-2">Fleet Utilization</div>
                       <div className="text-3xl font-black text-orange-400">87%</div>
-                      <div className="text-xs text-gray-500 mt-1">+12% this month</div>
+                      <div className="text-xs text-muted-foreground mt-1">+12% this month</div>
                     </div>
-                    <div className="glass-card p-4 rounded border border-white/5">
-                      <div className="text-xs text-gray-400 uppercase mb-2">Active Routes</div>
+                    <div className="glass-card p-4 rounded">
+                      <div className="text-xs text-muted-foreground uppercase mb-2">Active Routes</div>
                       <div className="space-y-2 mt-4">
-                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                          <span className="text-xs text-white">DEL-MUM</span>
+                        <div className="flex justify-between items-center border-b border-border pb-2">
+                          <span className="text-xs text-foreground">DEL-MUM</span>
                           <span className="text-xs text-green-400">On Time</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                          <span className="text-xs text-white">BLR-CCU</span>
+                        <div className="flex justify-between items-center border-b border-border pb-2">
+                          <span className="text-xs text-foreground">BLR-CCU</span>
                           <span className="text-xs text-yellow-400">Delayed 2h</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="col-span-2 glass-card p-4 rounded border border-white/5 relative overflow-hidden">
-                    <div className="text-xs text-gray-400 uppercase mb-4 border-b border-white/10 pb-2">Capacity Planning Map</div>
-                    <div className="absolute inset-x-4 top-16 bottom-4 bg-[#0B1220] rounded border border-white/5 flex items-center justify-center opacity-50 bg-grid-pattern">
-                      <Package className="text-4xl text-gray-500" />
+                  <div className="col-span-2 glass-card p-4 rounded relative overflow-hidden">
+                    <div className="text-xs text-muted-foreground uppercase mb-4 border-b border-border pb-2">Capacity Planning Map</div>
+                    <div className="absolute inset-x-4 top-16 bottom-4 bg-card/50 dark:bg-[#0B1220] rounded border border-border flex items-center justify-center opacity-50 bg-grid-pattern">
+                      <Package className="text-4xl text-muted-foreground" />
                     </div>
                   </div>
                 </div>
@@ -541,20 +540,20 @@ const Index = () => {
                   <span className="text-xs font-bold text-orange-400">CORE_INTELLIGENCE_NODE</span>
                   <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse-ring" />
                 </div>
-                <div className="flex-grow relative bg-[#010f1f]">
+                <div className="flex-grow relative dark:bg-[#010f1f] bg-background">
                   <div className="absolute inset-0 bg-grid-pattern opacity-30" />
                   <div className="absolute inset-0 p-6 flex flex-col justify-between pointer-events-none">
                     <div className="flex justify-between">
                       <div className="glass-panel p-3 rounded border border-orange-500/20">
                         <div className="text-xs text-orange-400 uppercase mb-1">Network Density</div>
-                        <div className="text-lg font-bold text-white">HIGH OPTIMIZATION</div>
+                        <div className="text-lg font-bold text-foreground">HIGH OPTIMIZATION</div>
                       </div>
                     </div>
-                    <div className="glass-panel p-4 rounded border border-white/10 self-end w-64">
-                      <div className="text-xs text-gray-400 uppercase border-b border-white/10 pb-2 mb-2">Algorithm Status</div>
+                    <div className="glass-panel p-4 rounded border-border self-end w-64">
+                      <div className="text-xs text-muted-foreground uppercase border-b border-border pb-2 mb-2">Algorithm Status</div>
                       <div className="space-y-1">
-                        <div className="flex justify-between text-xs"><span className="text-white">Route Matching</span><span className="text-blue-400">ACTIVE</span></div>
-                        <div className="flex justify-between text-xs"><span className="text-white">Price Prediction</span><span className="text-blue-400">TRAINING</span></div>
+                        <div className="flex justify-between text-xs"><span className="text-foreground">Route Matching</span><span className="text-blue-400">ACTIVE</span></div>
+                        <div className="flex justify-between text-xs"><span className="text-foreground">Price Prediction</span><span className="text-blue-400">TRAINING</span></div>
                       </div>
                     </div>
                   </div>
@@ -592,13 +591,12 @@ const Index = () => {
         <section className="py-32 relative overflow-hidden flex items-center justify-center">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-900/5 to-transparent dark:bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.12),transparent_70%)]" />
           <div className="max-w-xl w-full mx-auto px-6 sm:px-12 relative z-10">
-            <div className="glass-card p-10 sm:p-14 rounded-2xl border border-orange-500/20 shadow-[0_0_50px_rgba(249,115,22,0.1)] text-center"
-              style={{ background: '#0B1220', border: '1px solid rgba(249,115,22,0.2)' }}>
+            <div className="glass-card p-10 sm:p-14 rounded-2xl border border-orange-500/20 shadow-[0_0_50px_rgba(249,115,22,0.1)] text-center">
               <div className="bg-orange-600/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Truck className="h-8 w-8 text-orange-400" />
               </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">Ready to Transform Your Freight?</h2>
-              <p className="text-sm sm:text-base text-gray-400 mb-8">Join India&apos;s intelligent freight network. Sign up as a shipper or trucker and start optimizing today.</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-foreground mb-4">Ready to Transform Your Freight?</h2>
+              <p className="text-sm sm:text-base text-muted-foreground mb-8">Join India&apos;s intelligent freight network. Sign up as a shipper or trucker and start optimizing today.</p>
               <div className="space-y-4">
                 <Link to="/register?type=shipper" className="block">
                   <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-6 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.3)]">
@@ -606,11 +604,11 @@ const Index = () => {
                   </Button>
                 </Link>
                 <Link to="/register?type=trucker" className="block">
-                  <Button variant="outline" className="w-full text-sm font-bold tracking-wider uppercase px-6 py-4 h-auto rounded-lg border border-white/10 text-white hover:bg-white/5">
+                  <Button variant="outline" className="w-full text-sm font-bold tracking-wider uppercase px-6 py-4 h-auto rounded-lg border-border text-foreground hover:bg-accent">
                     <Truck className="mr-2 h-5 w-5" /> I Have Truck Space
                   </Button>
                 </Link>
-                <p className="text-xs text-gray-500 pt-4">
+                <p className="text-xs text-muted-foreground pt-4">
                   Already have an account? <Link to="/login" className="text-orange-400 hover:text-orange-300 underline underline-offset-2">Sign in</Link>
                 </p>
               </div>
