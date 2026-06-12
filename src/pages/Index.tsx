@@ -11,22 +11,20 @@ import IndexSkeleton from '@/components/IndexSkeleton';
 
 const styles = `
   .glass-panel {
-    background: rgba(11, 18, 32, 0.6);
+    background: hsl(var(--card) / 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid hsl(var(--border));
   }
   .dark .glass-panel {
-    background: rgba(11, 18, 32, 0.6);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: hsl(var(--card) / 0.6);
   }
   .glass-card {
-    background: #0B1220;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
   }
   .dark .glass-card {
-    background: #0B1220;
-    border-color: rgba(255, 255, 255, 0.08);
+    background: hsl(var(--card));
   }
   .animate-float {
     animation: floatAnim 6s ease-in-out infinite;
@@ -68,8 +66,8 @@ const styles = `
   }
   .bg-grid-pattern {
     background-image: 
-      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
     background-size: 40px 40px;
   }
   #globe-container canvas {
@@ -98,6 +96,26 @@ const styles = `
   .nav-link:hover::after,
   .nav-link.active::after {
     width: 100%;
+  }
+
+  /* Scroll-triggered fade-in animation */
+  .fade-section {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .fade-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Pulse dot for globe */
+  .globe-pulse {
+    animation: globePulse 3s ease-in-out infinite;
+  }
+  @keyframes globePulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
   }
 `;
 
