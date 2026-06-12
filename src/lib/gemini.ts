@@ -14,7 +14,7 @@ function parseWithRegex(query: string): SearchFilters | null {
   // Extract weight: "5 tonnes", "5 ton", "5t", "5 tons"
   const weightMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:tonne|ton|t)(?:s)?/i);
   if (weightMatch) {
-    filters.weight = parseFloat(weightMatch[1]);
+    filters.weight = parseFloat(weightMatch[1] ?? '');
   }
 
   // Extract date mentions
@@ -37,8 +37,8 @@ function parseWithRegex(query: string): SearchFilters | null {
   for (const pattern of fromToPatterns) {
     const match = q.match(pattern);
     if (match) {
-      filters.origin = capitalize(match[1].trim());
-      filters.destination = capitalize(match[2].trim());
+      filters.origin = capitalize(match[1]);
+      filters.destination = capitalize(match[2]);
       break;
     }
   }
@@ -47,15 +47,15 @@ function parseWithRegex(query: string): SearchFilters | null {
   if (!filters.origin && !filters.destination) {
     const cityMatch = q.match(/(?:to|in|at|near|for)\s+([A-Za-z\s]{3,}?)(?:\s+(?:with|for|weight|tonne|ton|on|at|by|$))/i);
     if (cityMatch) {
-      filters.destination = capitalize(cityMatch[1].trim());
+      filters.destination = capitalize(cityMatch[1]);
     }
   }
 
   return Object.keys(filters).length > 0 ? filters : null;
 }
 
-function capitalize(s: string): string {
-  return s.trim().replace(/\b\w/g, c => c.toUpperCase());
+function capitalize(s: string | undefined): string {
+  return (s ?? '').trim().replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export const parseNaturalLanguageSearch = async (query: string): Promise<SearchFilters> => {
@@ -94,7 +94,8 @@ export const parseNaturalLanguageSearch = async (query: string): Promise<SearchF
     if (!response.ok) return {};
 
     const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text;
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) return {};
     const jsonString = text.replace(/```json|```/g, '').trim();
     return JSON.parse(jsonString);
   } catch {

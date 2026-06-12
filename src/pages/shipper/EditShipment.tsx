@@ -88,6 +88,7 @@ const EditShipment = () => {
 
   const mutation = useMutation({
     mutationFn: async (updatedData: any) => {
+      if (!shipmentId) throw new Error('No shipment ID');
       const token = await getToken({ template: 'supabase' });
       if (!token) throw new Error('No auth token');
       const supabase = createClerkSupabaseClient(token);
@@ -100,7 +101,6 @@ const EditShipment = () => {
 
       if (error) throw error;
 
-      // Persist coordinates after save
       await saveCoords(supabase, shipmentId);
     },
     onSuccess: () => {

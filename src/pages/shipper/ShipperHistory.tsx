@@ -301,7 +301,7 @@ const ShipperHistory = () => {
                         <div>
                           <div className="flex items-center gap-2">
                             <h3 className="text-xl font-black text-gray-900 leading-none">{activity.title}</h3>
-                            <span className="text-[10px] font-black uppercase text-gray-300 tracking-tighter">#{activity.id.split('-')[1].slice(0, 6)}</span>
+                            <span className="text-[10px] font-black uppercase text-gray-300 tracking-tighter">#{activity.id.split('-')[1]?.slice(0, 6) ?? ''}</span>
                           </div>
                           <p className="text-xs font-bold text-gray-400 mt-1 flex items-center gap-1">
                             <Calendar className="h-3 w-3" /> {formatDate(activity.date)}

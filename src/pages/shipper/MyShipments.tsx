@@ -165,8 +165,8 @@ const MyShipments = () => {
           truckerId: offer.trucker_id,
           shipperName: userProfile?.full_name || 'The shipper',
           shipperPhone: userProfile?.phone || 'N/A',
-          originCity: offer.shipment?.origin_city,
-          destinationCity: offer.shipment?.destination_city,
+          originCity: offer.shipment?.origin_city ?? '',
+          destinationCity: offer.shipment?.destination_city ?? '',
           requestId: offer.id,
           getToken: () => getToken({ template: 'supabase' }),
         });
@@ -175,8 +175,8 @@ const MyShipments = () => {
         await notifyTruckerOfOfferDeclined({
           truckerId: offer.trucker_id,
           shipperName: userProfile?.full_name || 'The shipper',
-          originCity: offer.shipment?.origin_city,
-          destinationCity: offer.shipment?.destination_city,
+          originCity: offer.shipment?.origin_city ?? '',
+          destinationCity: offer.shipment?.destination_city ?? '',
           getToken: () => getToken({ template: 'supabase' }),
         });
         showSuccess('Offer declined.');
@@ -321,13 +321,13 @@ const MyShipments = () => {
                       <div className="flex-1 space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center text-lg font-bold text-gray-900">
-                            {request.trip.origin_city} <ArrowRight className="h-4 w-4 text-gray-400 mx-2" /> {request.trip.destination_city}
+                            {request.trip?.origin_city ?? 'Unknown'} <ArrowRight className="h-4 w-4 text-gray-400 mx-2" /> {request.trip?.destination_city ?? 'Unknown'}
                           </div>
                           <StatusBadge status={request.status} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-                          <div className="flex items-center"><Calendar className="h-4 w-4 mr-2 text-blue-500" />Trip Date: {new Date(request.trip.departure_date).toLocaleDateString()}</div>
-                          <div className="flex items-center font-bold text-green-700"><IndianRupee className="h-4 w-4 mr-1" />Price: {request.trip.price_per_tonne?.toLocaleString()} /t</div>
+                          <div className="flex items-center"><Calendar className="h-4 w-4 mr-2 text-blue-500" />Trip Date: {request.trip?.departure_date ? new Date(request.trip.departure_date).toLocaleDateString() : 'N/A'}</div>
+                          <div className="flex items-center font-bold text-green-700"><IndianRupee className="h-4 w-4 mr-1" />Price: {request.trip?.price_per_tonne?.toLocaleString() ?? 'N/A'} /t</div>
                         </div>
                         <div className="bg-gray-50 p-3 rounded-lg">
                           <p className="text-xs text-gray-500 uppercase font-bold">Goods</p>
@@ -365,12 +365,12 @@ const MyShipments = () => {
                       <div className="flex-1 space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center text-lg font-bold text-gray-900">
-                            {offer.shipment.origin_city} <ArrowRight className="h-4 w-4 text-gray-400 mx-2" /> {offer.shipment.destination_city}
+                            {offer.shipment?.origin_city ?? 'Unknown'} <ArrowRight className="h-4 w-4 text-gray-400 mx-2" /> {offer.shipment?.destination_city ?? 'Unknown'}
                           </div>
                           <StatusBadge status={offer.status} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-                          <div className="flex items-center"><Calendar className="h-4 w-4 mr-2 text-blue-500" />Ready: {new Date(offer.shipment.departure_date).toLocaleDateString()}</div>
+                          <div className="flex items-center"><Calendar className="h-4 w-4 mr-2 text-blue-500" />Ready: {offer.shipment?.departure_date ? new Date(offer.shipment.departure_date).toLocaleDateString() : 'N/A'}</div>
                           <div className="flex items-center font-bold text-orange-600"><IndianRupee className="h-4 w-4 mr-1" />Offer: {offer.proposed_price_per_tonne?.toLocaleString()} /t</div>
                         </div>
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">

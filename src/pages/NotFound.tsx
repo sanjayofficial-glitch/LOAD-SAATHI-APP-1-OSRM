@@ -1,11 +1,11 @@
 "use client";
 
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Truck, ArrowLeft, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const NotFound = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
       <div className="text-center max-w-md animate-scale-in">
