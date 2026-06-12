@@ -98,7 +98,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             {item.icon}
             {item.label}
-            {active && <div className="w-1.5 h-1.5 rounded-full bg-orange-500 ml-auto" />}
+            {active && <div className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-400 ml-auto" />}
           </Link>
         );
       })}
@@ -221,7 +221,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={handleSignOut}
-                    className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+                    className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 focus:bg-red-50 dark:focus:bg-red-950"
                   >
                     <LogOut className="h-4 w-4" />
                     Sign Out

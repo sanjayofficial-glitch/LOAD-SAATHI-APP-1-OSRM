@@ -153,7 +153,7 @@ const TruckerDashboard = () => {
             Welcome, {userProfile?.full_name || 'Partner'}! {isOnline ? (
               <>You have <span className="text-orange-600 dark:text-orange-400 font-bold">{stats.activeTrips}</span> active trips.</>
             ) : (
-              <span className="text-yellow-600">You are offline. Showing cached data.</span>
+              <span className="text-yellow-600 dark:text-yellow-400">You are offline. Showing cached data.</span>
             )}
           </p>
         </div>

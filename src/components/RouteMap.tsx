@@ -122,7 +122,7 @@ const RouteMap = ({
   if (loading) return <Skeleton className="w-full rounded-lg" style={{ height }} />;
   if (error || !origin || !destination) {
     return (
-      <div className="flex items-center justify-center rounded-lg bg-gray-100 text-gray-500 text-sm" style={{ height }}>
+      <div className="flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-sm" style={{ height }}>
         Map unavailable for these cities
       </div>
     );
@@ -138,7 +138,7 @@ const RouteMap = ({
 
   return (
     <div>
-      <div className="rounded-lg overflow-hidden border border-gray-200" style={{ height }}>
+      <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style={{ height }}>
         <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -172,7 +172,7 @@ const RouteMap = ({
         </MapContainer>
       </div>
       {displayDistanceKm && displayDurationMin && (
-        <div className="mt-2 text-sm text-gray-500 text-center">
+        <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
           📍 {displayDistanceKm.toLocaleString()} km &nbsp; ⏱ ~{displayDurationMin} min (~{Math.round(displayDurationMin / 60)} hrs)
         </div>
       )}

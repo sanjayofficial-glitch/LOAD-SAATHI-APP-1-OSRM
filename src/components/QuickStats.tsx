@@ -31,9 +31,9 @@ const QuickStats: React.FC<QuickStatsProps> = ({ userType, stats }) => {
             {isTrucker ? 'Active Trips' : 'Active Shipments'}
           </CardTitle>
           {isTrucker ? (
-            <Truck className="h-4 w-4 text-orange-600" />
+            <Truck className="h-4 w-4 text-orange-600 dark:text-orange-400" />
           ) : (
-            <Package className="h-4 w-4 text-blue-600" />
+            <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           )}
         </CardHeader>
         <CardContent>
@@ -44,7 +44,7 @@ const QuickStats: React.FC<QuickStatsProps> = ({ userType, stats }) => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
-          <Clock className="h-4 w-4 text-yellow-600" />
+          <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.pendingItems}</div>
@@ -56,7 +56,7 @@ const QuickStats: React.FC<QuickStatsProps> = ({ userType, stats }) => {
           <CardTitle className="text-sm font-medium">
             {isTrucker ? 'Completed Trips' : 'Completed Shipments'}
           </CardTitle>
-          <CheckCircle className="h-4 w-4 text-green-600" />
+          <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.completedItems}</div>
@@ -68,10 +68,10 @@ const QuickStats: React.FC<QuickStatsProps> = ({ userType, stats }) => {
           <CardTitle className="text-sm font-medium">
             {isTrucker ? 'Total Earnings' : 'Total Spent'}
           </CardTitle>
-          <DollarSign className="h-4 w-4 text-green-600" />
+          <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
             ₹{stats.totalAmount.toLocaleString()}
           </div>
         </CardContent>

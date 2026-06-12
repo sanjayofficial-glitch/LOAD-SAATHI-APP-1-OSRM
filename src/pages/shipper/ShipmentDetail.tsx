@@ -148,7 +148,7 @@ const ShipmentDetail = () => {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
-      <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
     </div>
   );
 
@@ -162,13 +162,13 @@ const ShipmentDetail = () => {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Back + Actions */}
       <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="text-gray-600">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="text-gray-600 dark:text-gray-300">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
         <div className="flex gap-2">
           {isOwner && !isCompleted && (
             <Link to={`/shipper/shipments/${id}/edit`}>
-              <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+              <Button variant="outline" className="border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950">
                 <Edit className="mr-2 h-4 w-4" /> Edit Shipment
               </Button>
             </Link>
@@ -213,14 +213,14 @@ const ShipmentDetail = () => {
           <Card className="border-blue-100 shadow-sm">
             <CardHeader className="bg-blue-50/50 border-b border-blue-100">
               <div className="flex justify-between items-start">
-                <CardTitle className="text-2xl font-bold text-gray-900">
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                   {shipment.origin_city} → {shipment.destination_city}
                 </CardTitle>
                 <Badge className={
-                  shipment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                  shipment.status === 'matched' ? 'bg-green-100 text-green-700' :
-                  shipment.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                  'bg-gray-100 text-gray-700'
+                  shipment.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' :
+                  shipment.status === 'matched' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
+                  shipment.status === 'completed' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
+                  'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200'
                 }>
                   {shipment.status.toUpperCase()}
                 </Badge>
@@ -229,30 +229,30 @@ const ShipmentDetail = () => {
             <CardContent className="pt-6 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1">
-                  <p className="text-xs text-gray-500 uppercase font-bold">Departure Date</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Departure Date</p>
                   <div className="flex items-center font-medium">
-                    <Calendar className="h-4 w-4 mr-2 text-blue-600" />
+                    <Calendar className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
                     {new Date(shipment.departure_date).toLocaleDateString('en-IN', { dateStyle: 'long' })}
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-gray-500 uppercase font-bold">Weight</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Weight</p>
                   <div className="flex items-center font-medium">
-                    <Package className="h-4 w-4 mr-2 text-purple-600" />
+                    <Package className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
                     {shipment.weight_tonnes} Tonnes
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-gray-500 uppercase font-bold">Budget</p>
-                  <div className="flex items-center font-bold text-green-600">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Budget</p>
+                  <div className="flex items-center font-bold text-green-600 dark:text-green-400">
                     <IndianRupee className="h-4 w-4 mr-1" />
                     {shipment.budget_per_tonne.toLocaleString()} /t
                   </div>
                 </div>
                 {isOwner && (
                   <div className="space-y-1">
-                    <p className="text-xs text-gray-500 uppercase font-bold">Offers Received</p>
-                    <div className="flex items-center font-bold text-orange-600">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Offers Received</p>
+                    <div className="flex items-center font-bold text-orange-600 dark:text-orange-400">
                       <Truck className="h-4 w-4 mr-2" />
                       {offerCount} offer{offerCount !== 1 ? 's' : ''}
                     </div>
@@ -262,21 +262,21 @@ const ShipmentDetail = () => {
 
               <div className="space-y-3 pt-4 border-t">
                 <div>
-                  <p className="text-xs text-gray-500 uppercase font-bold mb-1">Goods Description</p>
-                  <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{shipment.goods_description}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Goods Description</p>
+                  <p className="text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">{shipment.goods_description}</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 uppercase font-bold mb-1">Pickup Address</p>
-                    <p className="text-sm text-gray-600 flex items-start">
-                      <MapPin className="h-4 w-4 mr-2 text-red-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Pickup Address</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 flex items-start">
+                      <MapPin className="h-4 w-4 mr-2 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" />
                       {shipment.pickup_address}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase font-bold mb-1">Delivery Address</p>
-                    <p className="text-sm text-gray-600 flex items-start">
-                      <MapPin className="h-4 w-4 mr-2 text-green-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Delivery Address</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 flex items-start">
+                      <MapPin className="h-4 w-4 mr-2 text-green-500 dark:text-green-400 flex-shrink-0 mt-0.5" />
                       {shipment.delivery_address}
                     </p>
                   </div>
@@ -290,28 +290,28 @@ const ShipmentDetail = () => {
         <div className="space-y-6">
           {/* Shipper Info (for truckers browsing) */}
           {isTrucker && shipment.shipper && (
-            <Card className="border-orange-100">
-              <CardHeader className="bg-orange-50/50 pb-3">
-                <CardTitle className="text-sm font-bold uppercase text-gray-500">Shipper Details</CardTitle>
+            <Card className="border-orange-100 dark:border-orange-800">
+              <CardHeader className="bg-orange-50/50 dark:bg-orange-950/50 pb-3">
+                <CardTitle className="text-sm font-bold uppercase text-gray-500 dark:text-gray-400">Shipper Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 pt-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center font-bold text-orange-600">
+                  <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center font-bold text-orange-600 dark:text-orange-400">
                     {shipment.shipper?.full_name?.charAt(0) || '?'}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{shipment.shipper?.full_name}</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{shipment.shipper?.full_name}</p>
                     {shipment.shipper?.city && (
-                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                         {shipment.shipper.city}
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center text-sm text-yellow-500 gap-1">
+                <div className="flex items-center text-sm text-yellow-500 dark:text-yellow-400 gap-1">
                   <Star className="h-4 w-4" />
-                  <span className="font-medium text-gray-700">{shipment.shipper?.rating?.toFixed(1) || '0.0'}</span>
-                  <span className="text-gray-400">rating</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-200">{shipment.shipper?.rating?.toFixed(1) || '0.0'}</span>
+                  <span className="text-gray-400 dark:text-gray-500">rating</span>
                 </div>
                 {!isCompleted && (
                   <Button
@@ -328,18 +328,18 @@ const ShipmentDetail = () => {
           {/* Status card for owner */}
           {/* Accepted Trucker Contact (for shipper) */}
           {isOwner && acceptedTrucker && acceptedTrucker.phone && (
-            <Card className="border-green-100">
-              <CardHeader className="bg-green-50/50 pb-3">
-                <CardTitle className="text-sm font-bold uppercase text-gray-500">Trucker Contact</CardTitle>
+            <Card className="border-green-100 dark:border-green-800">
+              <CardHeader className="bg-green-50/50 dark:bg-green-950/50 pb-3">
+                <CardTitle className="text-sm font-bold uppercase text-gray-500 dark:text-gray-400">Trucker Contact</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 pt-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-600">
+                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center font-bold text-green-600 dark:text-green-400">
                     {acceptedTrucker.full_name?.charAt(0) || 'T'}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{acceptedTrucker.full_name || 'Trucker'}</p>
-                    <p className="text-xs text-gray-500">{acceptedTrucker.phone}</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{acceptedTrucker.full_name || 'Trucker'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{acceptedTrucker.phone}</p>
                   </div>
                 </div>
                 <a
@@ -364,13 +364,13 @@ const ShipmentDetail = () => {
           {isOwner && (
             <Card>
               <CardHeader><CardTitle>Shipment Status</CardTitle></CardHeader>
-              <CardContent className="text-sm text-gray-600 space-y-4">
+              <CardContent className="text-sm text-gray-600 dark:text-gray-300 space-y-4">
                 {isCompleted ? (
                   <div className="flex flex-col items-center text-center py-4 space-y-3">
-                    <div className="bg-green-100 p-3 rounded-full">
-                      <CheckCircle className="h-8 w-8 text-green-600" />
+                    <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
+                      <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
                     </div>
-                    <p className="font-bold text-gray-900">Trip Completed!</p>
+                    <p className="font-bold text-gray-900 dark:text-white">Trip Completed!</p>
                     <p>This shipment has been successfully delivered.</p>
                     {!hasReview && (
                       <Button 
@@ -384,7 +384,7 @@ const ShipmentDetail = () => {
                 ) : (
                   <>
                     <div className="flex gap-3">
-                      <div className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold">1</div>
+                      <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold">1</div>
                       <p>Your shipment is currently <strong>{shipment.status}</strong>.</p>
                     </div>
                     <div className="flex gap-3">
@@ -392,7 +392,7 @@ const ShipmentDetail = () => {
                       <p>Truckers can view and send offers. You have <strong>{offerCount} offer{offerCount !== 1 ? 's' : ''}</strong> so far.</p>
                     </div>
                     <div className="flex gap-3">
-                      <div className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold">3</div>
+                      <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold">3</div>
                       <p>Go to <strong>My Shipments → Incoming</strong> tab to review and accept offers.</p>
                     </div>
                     {offerCount > 0 && (
@@ -425,7 +425,7 @@ const ShipmentDetail = () => {
             <div className="space-y-2">
               <Label htmlFor="price">Your Price per Tonne (₹)</Label>
               <div className="relative">
-                <RupeeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <RupeeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                 <Input
                   id="price"
                   type="number"
@@ -446,9 +446,9 @@ const ShipmentDetail = () => {
               />
             </div>
             {proposedPrice && (
-              <div className="bg-orange-50 p-3 rounded-lg text-sm flex justify-between">
-                <span className="text-gray-600">Total offer:</span>
-                <span className="font-bold text-orange-700">
+              <div className="bg-orange-50 dark:bg-orange-950 p-3 rounded-lg text-sm flex justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Total offer:</span>
+                <span className="font-bold text-orange-700 dark:text-orange-300">
                   ₹{((parseFloat(proposedPrice) || 0) * shipment.weight_tonnes).toLocaleString()}
                 </span>
               </div>

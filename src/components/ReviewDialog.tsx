@@ -89,7 +89,7 @@ const ReviewDialog = ({
         
         <div className="py-6 space-y-6">
           <div className="flex flex-col items-center space-y-2">
-            <Label className="text-sm font-medium text-gray-500">Overall Rating</Label>
+            <Label className="text-sm font-medium text-gray-500 dark:text-gray-400">Overall Rating</Label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button

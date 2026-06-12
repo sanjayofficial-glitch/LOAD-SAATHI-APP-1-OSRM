@@ -87,11 +87,11 @@ const UserManagement = () => {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'admin':
-        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200">Admin</Badge>;
+        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/30 dark:border-red-800">Admin</Badge>;
       case 'trucker':
-        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200">Trucker</Badge>;
+        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:border-blue-800">Trucker</Badge>;
       case 'shipper':
-        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">Shipper</Badge>;
+        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/30 dark:border-green-800">Shipper</Badge>;
       default:
         return <Badge variant="outline">{role}</Badge>;
     }
@@ -118,8 +118,8 @@ const UserManagement = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''} found
           </p>
         </div>
@@ -130,7 +130,7 @@ const UserManagement = () => {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
           <Input
             placeholder="Search by name, email, company, or phone..."
             value={search}
@@ -151,7 +151,7 @@ const UserManagement = () => {
         </Select>
       </div>
 
-      <div className="rounded-lg border border-gray-200 overflow-hidden">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -167,7 +167,7 @@ const UserManagement = () => {
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-12 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-12 text-gray-500 dark:text-gray-400">
                   No users found matching your filters
                 </TableCell>
               </TableRow>
@@ -177,12 +177,12 @@ const UserManagement = () => {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback className="text-xs bg-orange-100 text-orange-700">
+                        <AvatarFallback className="text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
                           {getInitials(user.full_name)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{user.full_name}</p>
                       </div>
                     </div>
                   </TableCell>
@@ -193,7 +193,7 @@ const UserManagement = () => {
                       <span className="text-sm font-medium">{user.rating?.toFixed(1) || '0.0'}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center text-sm text-gray-600">
+                  <TableCell className="text-center text-sm text-gray-600 dark:text-gray-300">
                     {user.total_trips || 0}
                   </TableCell>
                   <TableCell className="text-center">
@@ -203,7 +203,7 @@ const UserManagement = () => {
                       <UserX className="h-4 w-4 text-gray-300 mx-auto" />
                     )}
                   </TableCell>
-                  <TableCell className="text-center text-sm text-gray-500">
+                  <TableCell className="text-center text-sm text-gray-500 dark:text-gray-400">
                     {new Date(user.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-center">
@@ -213,7 +213,7 @@ const UserManagement = () => {
                         disabled={verifying[user.id]}
                         onCheckedChange={() => toggleVerification(user)}
                       />
-                      <span className="text-xs text-gray-400 w-16">
+                      <span className="text-xs text-gray-400 dark:text-gray-500 w-16">
                         {verifying[user.id] ? (
                           <Loader2 className="h-3 w-3 animate-spin inline" />
                         ) : user.is_verified ? (

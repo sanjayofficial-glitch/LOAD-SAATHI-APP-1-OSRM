@@ -44,14 +44,14 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-          <div className="bg-white p-8 rounded-xl shadow-lg text-center w-full max-w-md">
-            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
-            <p className="text-gray-600 mb-2">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center w-full max-w-md">
+            <AlertTriangle className="h-12 w-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Something went wrong</h1>
+            <p className="text-gray-600 dark:text-gray-300 mb-2">
               An unexpected error occurred.
             </p>
-            <p className="text-sm text-gray-400 mb-6 font-mono bg-gray-50 p-2 rounded">
+            <p className="text-sm text-gray-400 dark:text-gray-400 mb-6 font-mono bg-gray-50 dark:bg-gray-800 p-2 rounded">
               {this.state.error?.message || "Unknown error"}
             </p>
             <div className="flex gap-3 justify-center">

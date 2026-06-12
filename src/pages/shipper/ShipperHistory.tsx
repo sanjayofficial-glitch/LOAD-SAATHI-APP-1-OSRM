@@ -176,13 +176,13 @@ const ShipperHistory = () => {
   const getStatusBadge = (status: string = 'pending') => {
     const s = status.toLowerCase();
     const config: Record<string, string> = {
-      completed: 'bg-green-100 text-green-800 border-green-200',
-      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      matched: 'bg-blue-100 text-blue-800 border-blue-200',
-      accepted: 'bg-green-100 text-green-800 border-green-200',
-      declined: 'bg-red-100 text-red-800 border-red-200',
-      cancelled: 'bg-gray-100 text-gray-800 border-gray-200',
-      active: 'bg-blue-100 text-blue-800 border-blue-200'
+      completed: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800',
+      pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-800',
+      matched: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800',
+      accepted: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800',
+      declined: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 border-red-200 dark:border-red-800',
+      cancelled: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+      active: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800'
     };
     return (
       <Badge variant="outline" className={`${config[s] || config.pending} font-semibold`}>
@@ -204,17 +204,17 @@ const ShipperHistory = () => {
   if (isLoading) return (
     <div className="container mx-auto px-4 py-12 flex flex-col items-center justify-center">
       <Loader2 className="h-10 w-10 text-orange-600 animate-spin mb-4" />
-      <p className="text-gray-500 font-medium">Loading your activity history...</p>
+      <p className="text-gray-500 dark:text-gray-400 font-medium">Loading your activity history...</p>
     </div>
   );
 
   if (error) return (
     <div className="container mx-auto px-4 py-12">
-      <Card className="border-red-100 bg-red-50/30">
+      <Card className="border-red-100 dark:border-red-900 bg-red-50/30 dark:bg-red-950/20">
         <CardContent className="pt-6 text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Failed to load history</h3>
-          <p className="text-gray-600 mb-6">We encountered an error while fetching your activities.</p>
+          <AlertCircle className="h-12 w-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Failed to load history</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">We encountered an error while fetching your activities.</p>
           <Button onClick={() => refetch()} className="bg-red-600 hover:bg-red-700">Try Again</Button>
         </CardContent>
       </Card>
@@ -224,36 +224,36 @@ const ShipperHistory = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">History & Activity</h1>
-        <p className="text-gray-500 mt-1">Review all your past loads and bookings in one place.</p>
+        <h1 className="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight">History & Activity</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Review all your past loads and bookings in one place.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Total', val: stats.total, icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Completed', val: stats.completed, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Pending', val: stats.pending, icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-          { label: 'This Month', val: stats.thisMonth, icon: Calendar, color: 'text-purple-600', bg: 'bg-purple-50' }
+          { label: 'Total', val: stats.total, icon: TrendingUp, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/50' },
+          { label: 'Completed', val: stats.completed, icon: CheckCircle, color: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-950/50' },
+          { label: 'Pending', val: stats.pending, icon: Clock, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-950/50' },
+          { label: 'This Month', val: stats.thisMonth, icon: Calendar, color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/50' }
         ].map((stat, i) => (
-          <Card key={i} className="border-gray-100">
+          <Card key={i} className="border-gray-100 dark:border-gray-800">
             <CardContent className="p-4 flex items-center gap-4">
               <div className={`${stat.bg} p-3 rounded-xl`}><stat.icon className={`h-5 w-5 ${stat.color}`} /></div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{stat.label}</p>
-                <p className="text-2xl font-black text-gray-900">{stat.val}</p>
+                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-2xl font-black text-gray-900 dark:text-gray-100">{stat.val}</p>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Card className="mb-8 border-gray-100">
+      <Card className="mb-8 border-gray-100 dark:border-gray-800">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase ml-1">Activity Type</label>
+              <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase ml-1">Activity Type</label>
               <Select value={filters.type} onValueChange={(v) => setFilters(f => ({...f, type: v}))}>
-                <SelectTrigger className="bg-gray-50 border-gray-100"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Activities</SelectItem>
                   <SelectItem value="shipment">Posted Loads</SelectItem>
@@ -262,9 +262,9 @@ const ShipperHistory = () => {
               </Select>
             </div>
             <div className="flex-1 space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase ml-1">Status</label>
+              <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase ml-1">Status</label>
               <Select value={filters.status} onValueChange={(v) => setFilters(f => ({...f, status: v}))}>
-                <SelectTrigger className="bg-gray-50 border-gray-100"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>

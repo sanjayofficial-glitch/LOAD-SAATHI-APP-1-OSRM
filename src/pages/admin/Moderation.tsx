@@ -108,11 +108,11 @@ const Moderation = () => {
   const getTripStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-700 border-green-200">Active</Badge>;
+        return <Badge className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800">Active</Badge>;
       case 'completed':
-        return <Badge className="bg-blue-100 text-blue-700 border-blue-200">Completed</Badge>;
+        return <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800">Completed</Badge>;
       case 'cancelled':
-        return <Badge className="bg-red-100 text-red-700 border-red-200">Cancelled</Badge>;
+        return <Badge className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">Cancelled</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -121,13 +121,13 @@ const Moderation = () => {
   const getShipmentStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">Pending</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800">Pending</Badge>;
       case 'matched':
-        return <Badge className="bg-purple-100 text-purple-700 border-purple-200">Matched</Badge>;
+        return <Badge className="bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800">Matched</Badge>;
       case 'completed':
-        return <Badge className="bg-blue-100 text-blue-700 border-blue-200">Completed</Badge>;
+        return <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800">Completed</Badge>;
       case 'cancelled':
-        return <Badge className="bg-red-100 text-red-700 border-red-200">Cancelled</Badge>;
+        return <Badge className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">Cancelled</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -163,8 +163,8 @@ const Moderation = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Content Moderation</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Content Moderation</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Review and manage trips and shipments across the platform
           </p>
         </div>
@@ -188,7 +188,7 @@ const Moderation = () => {
         <TabsContent value="trips" className="space-y-4 mt-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder="Search by city or vehicle number..."
                 value={tripSearch}
@@ -209,7 +209,7 @@ const Moderation = () => {
             </Select>
           </div>
 
-          <div className="rounded-lg border border-gray-200 overflow-hidden">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -225,7 +225,7 @@ const Moderation = () => {
               <TableBody>
                 {filteredTrips.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12 text-gray-500">
+                    <TableCell colSpan={7} className="text-center py-12 text-gray-500 dark:text-gray-400">
                       No trips found
                     </TableCell>
                   </TableRow>
@@ -234,24 +234,24 @@ const Moderation = () => {
                     <TableRow key={trip.id}>
                       <TableCell>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
                             {trip.origin_city} → {trip.destination_city}
                           </p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="text-sm text-gray-900">{trip.vehicle_type}</p>
-                          <p className="text-xs text-gray-500">{trip.vehicle_number}</p>
+                          <p className="text-sm text-gray-900 dark:text-white">{trip.vehicle_type}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{trip.vehicle_number}</p>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-gray-600 dark:text-gray-300">
                         {trip.available_capacity_tonnes}t
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-gray-600 dark:text-gray-300">
                         ₹{trip.price_per_tonne}
                       </TableCell>
-                      <TableCell className="text-sm text-gray-500">
+                      <TableCell className="text-sm text-gray-500 dark:text-gray-400">
                         {new Date(trip.departure_date).toLocaleDateString()}
                       </TableCell>
                       <TableCell>{getTripStatusBadge(trip.status)}</TableCell>
@@ -259,7 +259,7 @@ const Moderation = () => {
                         {trip.status === 'active' && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                              <Button variant="ghost" size="sm" className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30">
                                 <Ban className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
@@ -284,13 +284,13 @@ const Moderation = () => {
                           </AlertDialog>
                         )}
                         {trip.status === 'cancelled' && (
-                          <Badge variant="outline" className="text-gray-400 border-gray-200">
+                          <Badge variant="outline" className="text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700">
                             <XCircle className="h-3 w-3 mr-1" />
                             Cancelled
                           </Badge>
                         )}
                         {trip.status === 'completed' && (
-                          <span className="text-xs text-gray-400">No action needed</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">No action needed</span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -304,7 +304,7 @@ const Moderation = () => {
         <TabsContent value="shipments" className="space-y-4 mt-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder="Search by goods, city, or description..."
                 value={shipmentSearch}
@@ -326,7 +326,7 @@ const Moderation = () => {
             </Select>
           </div>
 
-          <div className="rounded-lg border border-gray-200 overflow-hidden">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -342,7 +342,7 @@ const Moderation = () => {
               <TableBody>
                 {filteredShipments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12 text-gray-500">
+                    <TableCell colSpan={7} className="text-center py-12 text-gray-500 dark:text-gray-400">
                       No shipments found
                     </TableCell>
                   </TableRow>
@@ -350,22 +350,22 @@ const Moderation = () => {
                   filteredShipments.map(shipment => (
                     <TableRow key={shipment.id}>
                       <TableCell>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
                           {shipment.goods_description}
                         </p>
                       </TableCell>
                       <TableCell>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
                           {shipment.origin_city} → {shipment.destination_city}
                         </p>
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-gray-600 dark:text-gray-300">
                         {shipment.weight_tonnes}t
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-gray-600 dark:text-gray-300">
                         ₹{shipment.budget_per_tonne}
                       </TableCell>
-                      <TableCell className="text-sm text-gray-500">
+                      <TableCell className="text-sm text-gray-500 dark:text-gray-400">
                         {new Date(shipment.departure_date).toLocaleDateString()}
                       </TableCell>
                       <TableCell>{getShipmentStatusBadge(shipment.status)}</TableCell>
@@ -373,7 +373,7 @@ const Moderation = () => {
                         {(shipment.status === 'pending' || shipment.status === 'matched') && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                              <Button variant="ghost" size="sm" className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30">
                                 <Ban className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
@@ -399,13 +399,13 @@ const Moderation = () => {
                           </AlertDialog>
                         )}
                         {shipment.status === 'cancelled' && (
-                          <Badge variant="outline" className="text-gray-400 border-gray-200">
+                          <Badge variant="outline" className="text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700">
                             <XCircle className="h-3 w-3 mr-1" />
                             Cancelled
                           </Badge>
                         )}
                         {shipment.status === 'completed' && (
-                          <span className="text-xs text-gray-400">No action needed</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">No action needed</span>
                         )}
                       </TableCell>
                     </TableRow>

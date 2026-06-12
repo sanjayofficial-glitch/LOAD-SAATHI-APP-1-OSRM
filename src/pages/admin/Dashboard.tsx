@@ -34,7 +34,7 @@ const AdminDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-6">Admin Dashboard</h1>
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-orange-600 dark:text-orange-400" />
         </div>
       </div>
     );
