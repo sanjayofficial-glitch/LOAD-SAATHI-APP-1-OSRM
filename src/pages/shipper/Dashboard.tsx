@@ -87,8 +87,8 @@ const ShipperDashboard = () => {
         .eq('status', 'accepted');
 
       const totalSpent = (
-        (requestSpent?.reduce((sum: number, r: { weight_tonnes: number; trip?: { price_per_tonne: number } }) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0) || 0) +
-        (offerSpent?.reduce((sum: number, o: { proposed_price_per_tonne: number; shipment?: { weight_tonnes: number } }) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.weight_tonnes || 0)), 0) || 0)
+        (requestSpent?.reduce((sum: number, r: { weight_tonnes: number; trip: { price_per_tonne: number }[] }) => sum + (r.weight_tonnes * (r.trip?.[0]?.price_per_tonne || 0)), 0) || 0) +
+        (offerSpent?.reduce((sum: number, o: { proposed_price_per_tonne: number; shipment: { weight_tonnes: number }[] }) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.[0]?.weight_tonnes || 0)), 0) || 0)
       );
 
       const { data: upcoming } = await supabase
