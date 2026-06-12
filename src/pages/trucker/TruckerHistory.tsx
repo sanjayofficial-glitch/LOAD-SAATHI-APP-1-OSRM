@@ -40,10 +40,10 @@ interface ActivityItem {
 }
 
 const statCards: { label: string; key: keyof typeof defaultStats; icon: LucideIcon; color: string; bg: string }[] = [
-  { label: 'Total', key: 'total', icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
-  { label: 'Completed', key: 'completed', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
-  { label: 'Pending', key: 'pending', icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-  { label: 'This Month', key: 'thisMonth', icon: Calendar, color: 'text-purple-600', bg: 'bg-purple-50' }
+  { label: 'Total', key: 'total', icon: TrendingUp, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/50' },
+  { label: 'Completed', key: 'completed', icon: CheckCircle, color: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-950/50' },
+  { label: 'Pending', key: 'pending', icon: Clock, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-950/50' },
+  { label: 'This Month', key: 'thisMonth', icon: Calendar, color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/50' }
 ];
 
 const defaultStats = { total: 0, completed: 0, pending: 0, thisMonth: 0 };
@@ -165,13 +165,13 @@ const TruckerHistory = () => {
   const getStatusBadge = (status: string = 'pending') => {
     const s = status.toLowerCase();
     const config: Record<string, string> = {
-      completed: 'bg-green-100 text-green-800 border-green-200',
-      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      active: 'bg-blue-100 text-blue-800 border-blue-200',
-      accepted: 'bg-green-100 text-green-800 border-green-200',
-      declined: 'bg-red-100 text-red-800 border-red-200',
-      cancelled: 'bg-gray-100 text-gray-800 border-gray-200',
-      matched: 'bg-blue-100 text-blue-800 border-blue-200'
+      completed: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800',
+      pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-800',
+      active: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800',
+      accepted: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800',
+      declined: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 border-red-200 dark:border-red-800',
+      cancelled: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+      matched: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800'
     };
     return (
       <Badge variant="outline" className={`${config[s] || config.pending} font-semibold`}>
@@ -192,8 +192,8 @@ const TruckerHistory = () => {
 
   if (isLoading) return (
     <div className="container mx-auto px-4 py-12 flex flex-col items-center justify-center">
-      <Loader2 className="h-10 w-10 text-orange-600 animate-spin mb-4" />
-      <p className="text-gray-500 font-medium">Loading your activity history...</p>
+      <Loader2 className="h-10 w-10 text-orange-600 dark:text-orange-400 animate-spin mb-4" />
+      <p className="text-gray-500 dark:text-gray-400 font-medium">Loading your activity history...</p>
     </div>
   );
 
@@ -201,9 +201,9 @@ const TruckerHistory = () => {
     <div className="container mx-auto px-4 py-12">
       <Card className="border-red-100 bg-red-50/30">
         <CardContent className="pt-6 text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Failed to load history</h3>
-          <p className="text-gray-600 mb-6">We encountered an error while fetching your activities.</p>
+          <AlertCircle className="h-12 w-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Failed to load history</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">We encountered an error while fetching your activities.</p>
           <Button onClick={() => refetch()} className="bg-orange-600 hover:bg-orange-700">Try Again</Button>
         </CardContent>
       </Card>
@@ -213,20 +213,20 @@ const TruckerHistory = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Activity History</h1>
-        <p className="text-gray-500 mt-1">Review all your past trips and sent offers in one place.</p>
+        <h1 className="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight">Activity History</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Review all your past trips and sent offers in one place.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         {statCards.map((card, i) => {
           const val = stats[card.key];
           return (
-          <Card key={i} className="border-gray-100">
+          <Card key={i} className="border-gray-100 dark:border-gray-800">
             <CardContent className="p-4 flex items-center gap-4">
               <div className={`${card.bg} p-3 rounded-xl`}><card.icon className={`h-5 w-5 ${card.color}`} /></div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.label}</p>
-                <p className="text-2xl font-black text-gray-900">{val}</p>
+                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{card.label}</p>
+                <p className="text-2xl font-black text-gray-900 dark:text-gray-100">{val}</p>
               </div>
             </CardContent>
           </Card>
@@ -234,13 +234,13 @@ const TruckerHistory = () => {
         })}
       </div>
 
-      <Card className="mb-8 border-gray-100">
+      <Card className="mb-8 border-gray-100 dark:border-gray-800">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase ml-1">Activity Type</label>
+              <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase ml-1">Activity Type</label>
               <Select value={filters.type} onValueChange={(v) => setFilters(f => ({...f, type: v}))}>
-                <SelectTrigger className="bg-gray-50 border-gray-100"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Activities</SelectItem>
                   <SelectItem value="trip">Posted Trips</SelectItem>
@@ -249,9 +249,9 @@ const TruckerHistory = () => {
               </Select>
             </div>
             <div className="flex-1 space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase ml-1">Status</label>
+              <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase ml-1">Status</label>
               <Select value={filters.status} onValueChange={(v) => setFilters(f => ({...f, status: v}))}>
-                <SelectTrigger className="bg-gray-50 border-gray-100"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
@@ -262,7 +262,7 @@ const TruckerHistory = () => {
               </Select>
             </div>
             <div className="flex items-end">
-              <Button variant="ghost" onClick={() => setFilters({type: 'all', status: 'all'})} className="text-gray-400 hover:text-gray-900">
+              <Button variant="ghost" onClick={() => setFilters({type: 'all', status: 'all'})} className="text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100">
                 Clear Filters
               </Button>
             </div>
@@ -272,12 +272,12 @@ const TruckerHistory = () => {
 
       <div className="space-y-4">
         {filteredActivities.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100">
-            <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Inbox className="h-10 w-10 text-gray-300" />
+          <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Inbox className="h-10 w-10 text-gray-300 dark:text-gray-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900">No activities found</h3>
-            <p className="text-gray-500 max-w-sm mx-auto mt-2">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">No activities found</h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mt-2">
               {activities.length === 0 
                 ? "You haven't posted any trips or sent any offers yet." 
                 : "No activities match your selected filters."}
@@ -291,22 +291,22 @@ const TruckerHistory = () => {
           </div>
         ) : (
           filteredActivities.map((activity) => (
-            <Card key={activity.id} className="hover:shadow-xl transition-all duration-300 border-gray-100 overflow-hidden group">
+            <Card key={activity.id} className="hover:shadow-xl transition-all duration-300 border-gray-100 dark:border-gray-800 overflow-hidden group">
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row">
                   <div className={`w-2 md:w-1.5 ${activity.type === 'trip' ? 'bg-orange-600' : 'bg-blue-600'}`} />
                   <div className="flex-1 p-6">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
                       <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-2xl ${activity.type === 'trip' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
+                        <div className={`p-3 rounded-2xl ${activity.type === 'trip' ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' : 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'}`}>
                           {activity.type === 'trip' ? <Truck className="h-6 w-6" /> : <Package className="h-6 w-6" />}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="text-xl font-black text-gray-900 leading-none">{activity.title}</h3>
-                            <span className="text-[10px] font-black uppercase text-gray-300 tracking-tighter">#{activity.id.split('-')[1]?.slice(0, 6) ?? ''}</span>
+                            <h3 className="text-xl font-black text-gray-900 dark:text-gray-100 leading-none">{activity.title}</h3>
+                            <span className="text-[10px] font-black uppercase text-gray-300 dark:text-gray-600 tracking-tighter">#{activity.id.split('-')[1]?.slice(0, 6) ?? ''}</span>
                           </div>
-                          <p className="text-xs font-bold text-gray-400 mt-1 flex items-center gap-1">
+                          <p className="text-xs font-bold text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1">
                             <Calendar className="h-3 w-3" /> {formatDate(activity.date)}
                           </p>
                         </div>
@@ -314,26 +314,26 @@ const TruckerHistory = () => {
                       <div className="flex items-center gap-2">{getStatusBadge(activity.status)}</div>
                     </div>
                     
-                    <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50 mb-6">
-                      <p className="text-sm text-gray-600 font-medium">{activity.description}</p>
+                    <div className="bg-gray-50/50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100/50 dark:border-gray-700/50 mb-6">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">{activity.description}</p>
                     </div>
                     
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                       <div className="space-y-1">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Client</p>
-                        <p className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Client</p>
+                        <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                           <MapPin className="h-3 w-3 text-red-400" /> {activity.counterparty}
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Payload</p>
-                        <p className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Payload</p>
+                        <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                           <Package className="h-3 w-3 text-blue-400" /> {activity.capacity}t
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Revenue</p>
-                        <p className="text-sm font-bold text-green-600 flex items-center gap-1">
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Revenue</p>
+                        <p className="text-sm font-bold text-green-600 dark:text-green-400 flex items-center gap-1">
                           <IndianRupee className="h-3 w-3" /> {activity.amount.toLocaleString('en-IN')} /t
                         </p>
                       </div>
@@ -342,7 +342,7 @@ const TruckerHistory = () => {
                           variant="ghost" 
                           size="sm" 
                           onClick={() => navigate(activity.type === 'trip' ? `/trucker/trips/${activity.relatedId}` : `/shipper/shipments/${activity.relatedId}`)}
-                          className="text-orange-600 font-black text-xs hover:bg-orange-50 group-hover:translate-x-1 transition-transform"
+                          className="text-orange-600 dark:text-orange-400 font-black text-xs hover:bg-orange-50 dark:hover:bg-orange-950/30 group-hover:translate-x-1 transition-transform"
                         >
                           VIEW <Eye className="h-3.5 w-3.5 ml-2" />
                         </Button>

@@ -329,10 +329,10 @@ const BrowseShipments = () => {
                                 <Package className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-bold text-gray-900">
-                                  {shipment.origin_city} <ArrowRight className="h-4 w-4 inline mx-1 text-gray-400" /> {shipment.destination_city}
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                                  {shipment.origin_city} <ArrowRight className="h-4 w-4 inline mx-1 text-gray-400 dark:text-gray-500" /> {shipment.destination_city}
                                 </h3>
-                                <p className="text-sm text-gray-600">{shipment.goods_description}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-300">{shipment.goods_description}</p>
                               </div>
                             </div>
                             <div className="flex flex-col items-end gap-1">
@@ -340,7 +340,7 @@ const BrowseShipments = () => {
                                 const { label, color } = getMatchLabel(shipment._matchScore);
                                 return <Badge className={`${color} text-xs font-semibold`}>{label}</Badge>;
                               })()}
-                              <Badge className="bg-blue-100 text-blue-700">
+                              <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
                                 {shipment.weight_tonnes} Tonnes
                               </Badge>
                             </div>
@@ -348,40 +348,40 @@ const BrowseShipments = () => {
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                           <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-2 text-orange-600" />
+                            <Calendar className="h-4 w-4 mr-2 text-orange-600 dark:text-orange-400" />
                             <div>
-                              <p className="text-gray-500 text-xs">Ready Date</p>
+                              <p className="text-gray-500 dark:text-gray-400 text-xs">Ready Date</p>
                               <p className="font-medium">{new Date(shipment.departure_date).toLocaleDateString()}</p>
                             </div>
                           </div>
                           <div className="flex items-center">
-                            <IndianRupee className="h-4 w-4 mr-2 text-green-600" />
+                            <IndianRupee className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
                             <div>
-                              <p className="text-gray-500 text-xs">Budget</p>
-                              <p className="font-bold text-green-600">₹{shipment.budget_per_tonne.toLocaleString()} /t</p>
+                              <p className="text-gray-500 dark:text-gray-400 text-xs">Budget</p>
+                              <p className="font-bold text-green-600 dark:text-green-400">₹{shipment.budget_per_tonne.toLocaleString()} /t</p>
                             </div>
                           </div>
                           <div className="flex items-center">
-                            <User className="h-4 w-4 mr-2 text-blue-600" />
+                            <User className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
                             <div>
-                              <p className="text-gray-500 text-xs">Shipper</p>
+                              <p className="text-gray-500 dark:text-gray-400 text-xs">Shipper</p>
                               <p className="font-medium">{shipment.shipper?.full_name || 'Verified Shipper'}</p>
                             </div>
                           </div>
                           {shipment.estimated_distance_km && (
                             <div className="flex items-center">
-                              <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                              <MapPin className="h-4 w-4 mr-2 text-blue-500 dark:text-blue-400" />
                               <div>
-                                <p className="text-gray-500 text-xs">Distance</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-xs">Distance</p>
                                 <p className="font-medium">{shipment.estimated_distance_km.toLocaleString()} km</p>
                               </div>
                             </div>
                           )}
                           {shipment.estimated_duration_min && (
                             <div className="flex items-center">
-                              <Clock className="h-4 w-4 mr-2 text-blue-500" />
+                              <Clock className="h-4 w-4 mr-2 text-blue-500 dark:text-blue-400" />
                               <div>
-                                <p className="text-gray-500 text-xs">Duration</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-xs">Duration</p>
                                 <p className="font-medium">
                                   {formatDuration(shipment.estimated_duration_min)}
                                 </p>
@@ -391,7 +391,7 @@ const BrowseShipments = () => {
                         </div>
                       </div>
 
-                      <div className="md:w-48 bg-gray-50 p-6 border-t md:border-t-0 md:border-l border-gray-100 flex flex-col justify-center gap-2">
+                      <div className="md:w-48 bg-gray-50 dark:bg-gray-800 p-6 border-t md:border-t-0 md:border-l border-gray-100 dark:border-gray-700 flex flex-col justify-center gap-2">
                         <Button className="w-full bg-orange-600" onClick={() => openOfferDialog(shipment)}>
                           Send Offer
                         </Button>
@@ -418,9 +418,9 @@ const BrowseShipments = () => {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Your Price per Tonne (₹)</Label>
+              <Label className="text-gray-700 dark:text-gray-200">Your Price per Tonne (₹)</Label>
               <div className="relative">
-                <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                 <Input 
                   type="number" 
                   className="pl-10"
@@ -428,10 +428,10 @@ const BrowseShipments = () => {
                   onChange={(e) => setProposedPrice(e.target.value)} 
                 />
               </div>
-              <p className="text-xs text-gray-500">Shipper's budget: ₹{selectedShipment?.budget_per_tonne}/t</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Shipper's budget: ₹{selectedShipment?.budget_per_tonne}/t</p>
             </div>
             <div className="space-y-2">
-              <Label>Message (Optional)</Label>
+              <Label className="text-gray-700 dark:text-gray-200">Message (Optional)</Label>
               <Input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="e.g. I have a 12-wheeler available." />
             </div>
           </div>

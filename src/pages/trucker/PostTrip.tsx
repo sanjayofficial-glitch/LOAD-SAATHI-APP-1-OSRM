@@ -128,22 +128,22 @@ const PostTrip = () => {
       </Button>
 
       {!isOnline && (
-        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800">
+        <div className="mb-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-300">
           <WifiOff className="h-4 w-4 shrink-0" />
           <span>You are offline. You cannot post trips until reconnected.</span>
         </div>
       )}
 
-      <Card className="border-orange-100 shadow-lg">
-        <CardHeader className="bg-orange-50/50 border-b border-orange-100 px-4 sm:px-6">
-          <CardTitle className="flex items-center text-orange-900 text-lg sm:text-xl">
-            <Truck className="mr-2 text-orange-600 h-5 w-5 sm:h-6 sm:w-6" /> Post a New Trip
+      <Card className="border-orange-100 dark:border-orange-800 shadow-lg">
+        <CardHeader className="bg-orange-50/50 dark:bg-orange-950/30 border-b border-orange-100 dark:border-orange-800 px-4 sm:px-6">
+          <CardTitle className="flex items-center text-orange-900 dark:text-orange-100 text-lg sm:text-xl">
+            <Truck className="mr-2 text-orange-600 dark:text-orange-400 h-5 w-5 sm:h-6 sm:w-6" /> Post a New Trip
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6 px-4 sm:px-6">
           <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Origin Location</Label>
+              <Label className="text-gray-700 dark:text-gray-200 font-medium">Origin Location</Label>
                 <LocationSelector
                   label="Origin"
                   data={locationData || {}}
@@ -152,7 +152,7 @@ const PostTrip = () => {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-700 font-medium">Destination Location</Label>
+                <Label className="text-gray-700 dark:text-gray-200 font-medium">Destination Location</Label>
                 <LocationSelector
                   label="Destination"
                   data={locationData || {}}
@@ -164,7 +164,7 @@ const PostTrip = () => {
               <div className="space-y-2">
                 <Label htmlFor="date">Departure Date</Label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                   <Input
                     id="date"
                     type="date"
@@ -192,7 +192,7 @@ const PostTrip = () => {
             <div className="space-y-2">
               <Label htmlFor="price">Price per Tonne (₹)</Label>
               <div className="relative">
-                <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                 <Input
                   id="price"
                   type="number"
@@ -229,7 +229,7 @@ const PostTrip = () => {
             </div>
 
             {!isOnline && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800">
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-300">
                 <WifiOff className="h-4 w-4 shrink-0" />
                 <span>Posting trips is unavailable while offline.</span>
               </div>

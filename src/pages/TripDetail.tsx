@@ -361,14 +361,14 @@ const TripDetail = () => {
                     />
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Estimated Cost:</span>
-                      <span className="font-bold text-gray-900">
+                      <span className="text-gray-500 dark:text-gray-400">Estimated Cost:</span>
+                      <span className="font-bold text-gray-900 dark:text-gray-100">
                         ₹{((parseFloat(weight) || 0) * (trip.price_per_tonne || 0)).toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-[10px] text-gray-400 italic">
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 italic">
                       * Final price to be confirmed with the trucker.
                     </p>
                   </div>

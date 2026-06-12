@@ -182,7 +182,7 @@ const EditTrip = () => {
                   data={locationData || {}}  
                 onChange={(value) => handleLocationChange('destination_city', value)}                />  
             </div>              <div className="space-y-2">  
-              <Label htmlFor="date">Departure Date</Label>  
+              <Label htmlFor="date" className="text-gray-700 dark:text-gray-200">Departure Date</Label>  
               <div className="relative">  
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />  
                 <Input  
@@ -197,7 +197,7 @@ const EditTrip = () => {
             </div>  
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">  
-              <div className="space-y-2">                  <Label htmlFor="capacity">Available Capacity (Tonnes)</Label>  
+              <div className="space-y-2">                  <Label htmlFor="capacity" className="text-gray-700 dark:text-gray-200">Available Capacity (Tonnes)</Label>  
                 <Input  
                   id="capacity"  
                   type="number"  
@@ -209,7 +209,7 @@ const EditTrip = () => {
               </div>  
 
               <div className="space-y-2">  
-                <Label htmlFor="price">Price per Tonne (₹)</Label>  
+                <Label htmlFor="price" className="text-gray-700 dark:text-gray-200">Price per Tonne (₹)</Label>  
                 <div className="relative">  
                   <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />  
                   <Input  
@@ -224,7 +224,7 @@ const EditTrip = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">  
               <div className="space-y-2">  
-                <Label htmlFor="vehicleType">Vehicle Type</Label>  
+                <Label htmlFor="vehicleType" className="text-gray-700 dark:text-gray-200">Vehicle Type</Label>  
                 <Input  
                   id="vehicleType"  
                   value={formData.vehicle_type}  
@@ -234,7 +234,7 @@ const EditTrip = () => {
               </div>  
 
               <div className="space-y-2">  
-                <Label htmlFor="vehicleNumber">Vehicle Number</Label>                  <Input  
+                <Label htmlFor="vehicleNumber" className="text-gray-700 dark:text-gray-200">Vehicle Number</Label>                  <Input  
                   id="vehicleNumber"  
                   value={formData.vehicle_number}  
                   onChange={(e) => setFormData({...formData, vehicle_number: e.target.value})}  
