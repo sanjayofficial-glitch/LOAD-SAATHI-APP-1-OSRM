@@ -1,228 +1,598 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Truck, Package, CheckCircle, ArrowRight, Calendar, IndianRupee, Star, Shield, Zap } from 'lucide-react';
+import { Truck, ArrowRight, Shield, Star, IndianRupee, Route, Handshake, EyeOff, CircuitBoard, Search, Bell, Map, Package, Send, Check, X, MessageSquare, Calendar, ChevronRight } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
-import IndexSkeleton from '@/components/IndexSkeleton';
+import { Button } from '@/components/ui/button';
 import OfflineBanner from '@/components/OfflineBanner';
 import ThemeToggle from '@/components/ThemeToggle';
-import { Trip } from '@/types';
+import IndexSkeleton from '@/components/IndexSkeleton';
+
+const styles = `
+  .glass-panel {
+    background: rgba(11, 18, 32, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .dark .glass-panel {
+    background: rgba(11, 18, 32, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .glass-card {
+    background: #0B1220;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .dark .glass-card {
+    background: #0B1220;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .animate-float {
+    animation: floatAnim 6s ease-in-out infinite;
+  }
+  .route-line {
+    stroke-dasharray: 10, 10;
+    animation: dashAnim 30s linear infinite;
+  }
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: flex;
+    animation: tabFadeIn 0.4s ease;
+  }
+  @keyframes floatAnim {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes dashAnim {
+    to { stroke-dashoffset: -1000; }
+  }
+  @keyframes tabFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseRing {
+    0% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.5); }
+    100% { box-shadow: 0 0 0 15px rgba(255, 107, 0, 0); }
+  }
+  .animate-pulse-ring {
+    animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+  .text-gradient-orange-blue {
+    background: linear-gradient(135deg, #f97316 0%, #93c5fd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  #globe-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .nav-link {
+    position: relative;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #f97316;
+    transition: width 0.3s;
+  }
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    width: 100%;
+  }
+`;
+
+const tabs = [
+  { id: 'shipper', label: 'Shipper OS' },
+  { id: 'transporter', label: 'Transporter OS' },
+  { id: 'command', label: 'AI Command Center' },
+] as const;
 
 const Index = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const navigate = useNavigate();
-  const [tripsLoaded, setTripsLoaded] = useState(false);
-  const [recentTrips, setRecentTrips] = useState<Trip[]>([]);
-
-
-  useEffect(() => {
-    const fetchRecentTrips = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('trips')
-          .select('id, origin_city, destination_city, departure_date, price_per_tonne, status, created_at')
-          .eq('status', 'active')
-          .order('created_at', { ascending: false })
-          .limit(3);
-        
-        if (!error && data) {
-          setRecentTrips(data as unknown as Trip[]);
-        }
-      } catch (err) {
-        console.error("Error fetching trips for landing page:", err);
-      } finally {
-        setTripsLoaded(true);
-      }
-    };
-
-    fetchRecentTrips();
-  }, []);
+  const [ready, setReady] = useState(false);
+  const [activeTab, setActiveTab] = useState('shipper');
+  const globeRef = useRef<HTMLDivElement>(null);
+  const globeInited = useRef(false);
 
   useEffect(() => {
     if (!isLoaded) return;
     if (isSignedIn && user) {
       navigate('/auth-sync', { replace: true });
+      return;
     }
+    setReady(true);
   }, [isLoaded, isSignedIn, user, navigate]);
 
-  if (!tripsLoaded || !isLoaded) {
+  useEffect(() => {
+    if (!ready) return;
+    const container = globeRef.current;
+    if (!container || globeInited.current) return;
+    globeInited.current = true;
+
+    let scene: any, camera: any, renderer: any, group: any;
+    let animationId: number;
+    let mouseX = 0, mouseY = 0;
+
+    const init = async () => {
+      try {
+        const THREE = await new Promise<any>((resolve) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+          script.onload = () => resolve((window as any).THREE);
+          document.body.appendChild(script);
+        });
+
+        const width = container.clientWidth || 800;
+        const height = container.clientHeight || 500;
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        container.appendChild(renderer.domElement);
+
+        group = new THREE.Group();
+        scene.add(group);
+
+        const globeGeo = new THREE.SphereGeometry(2, 64, 64);
+        const globeMat = new THREE.MeshPhongMaterial({
+          color: 0x2E6FB5,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.15,
+        });
+        group.add(new THREE.Mesh(globeGeo, globeMat));
+
+        const innerGeo = new THREE.SphereGeometry(1.95, 64, 64);
+        const innerMat = new THREE.MeshPhongMaterial({
+          color: 0x0D2340,
+          transparent: true,
+          opacity: 0.4,
+        });
+        group.add(new THREE.Mesh(innerGeo, innerMat));
+
+        const pointsCount = 500;
+        const positions = new Float32Array(pointsCount * 3);
+        for (let i = 0; i < pointsCount; i++) {
+          const phi = Math.acos(-1 + (2 * i) / pointsCount);
+          const theta = Math.sqrt(pointsCount * Math.PI) * phi;
+          positions[i * 3] = 2 * Math.cos(theta) * Math.sin(phi);
+          positions[i * 3 + 1] = 2 * Math.sin(theta) * Math.sin(phi);
+          positions[i * 3 + 2] = 2 * Math.cos(phi);
+        }
+        const pointsGeo = new THREE.BufferGeometry();
+        pointsGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const pointsMat = new THREE.PointsMaterial({ color: 0xFF6B00, size: 0.03, transparent: true, opacity: 0.8 });
+        group.add(new THREE.Points(pointsGeo, pointsMat));
+
+        for (let i = 0; i < 15; i++) {
+          const si = Math.floor(Math.random() * pointsCount) * 3;
+          const ei = Math.floor(Math.random() * pointsCount) * 3;
+          const start = new THREE.Vector3(positions[si], positions[si + 1], positions[si + 2]);
+          const end = new THREE.Vector3(positions[ei], positions[ei + 1], positions[ei + 2]);
+          const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5).setLength(2.5);
+          const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+          const arcGeo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(50));
+          const arcMat = new THREE.LineBasicMaterial({ color: 0xFF6B00, transparent: true, opacity: 0.3 });
+          group.add(new THREE.Line(arcGeo, arcMat));
+        }
+
+        const light1 = new THREE.PointLight(0xffffff, 1);
+        light1.position.set(5, 5, 5);
+        scene.add(light1);
+        scene.add(new THREE.AmbientLight(0x404040));
+
+        camera.position.z = 6;
+
+        window.addEventListener('mousemove', (e) => {
+          mouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+          mouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+        });
+
+        const animate = () => {
+          animationId = requestAnimationFrame(animate);
+          group.rotation.y += 0.003;
+          group.rotation.y += (mouseX * 0.5 - 0) * 0.05;
+          group.rotation.x += (mouseY * 0.5 - 0) * 0.03;
+          renderer.render(scene, camera);
+        };
+        animate();
+
+        const resize = () => {
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          if (w > 0 && h > 0) {
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+          }
+        };
+        window.addEventListener('resize', resize);
+      } catch (e) {
+        console.error('Globe init failed:', e);
+      }
+    };
+
+    init();
+
+    return () => {
+      if (animationId) cancelAnimationFrame(animationId);
+      if (renderer) {
+        renderer.dispose();
+        if (renderer.domElement && renderer.domElement.parentNode) {
+          renderer.domElement.parentNode.removeChild(renderer.domElement);
+        }
+      }
+    };
+  }, [ready]);
+
+  if (!ready || !isLoaded) {
     return <IndexSkeleton />;
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">
+    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+      <style>{styles}</style>
       <OfflineBanner />
-      
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
-        <div className="container mx-auto px-4 py-3 sm:py-4">
-          <nav className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-xl shadow-md">
-                <Truck className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-              </div>
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent">LoadSaathi</span>
+
+      <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-20">
+        <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-full">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-xl shadow-md">
+              <Truck className="h-5 w-5 text-white" />
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <ThemeToggle />
-              <Link to="/login" className="text-sm sm:text-base text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium px-3 sm:px-5 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">Login</Link>
-              <Link to="/register" className="text-sm sm:text-base bg-gradient-to-r from-orange-600 to-orange-500 text-white px-4 sm:px-6 py-2 rounded-lg hover:from-orange-700 hover:to-orange-600 transition-all font-medium shadow-md hover:shadow-lg whitespace-nowrap">
+            <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            {['Platform', 'Solutions', 'Network', 'Vision'].map(item => (
+              <a key={item} href="#" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">
+                {item}
+              </a>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <ThemeToggle />
+            <Link to="/login" className="hidden sm:inline-block text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
+              Sign In
+            </Link>
+            <Link to="/register">
+              <Button className="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold tracking-wider uppercase px-5 py-2 h-auto shadow-lg">
                 Get Started
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      <main className="pt-20">
+        {/* HERO */}
+        <section className="relative min-h-[800px] lg:min-h-[921px] flex items-center overflow-hidden">
+          <div className="absolute inset-0 bg-grid-pattern opacity-50" />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 -left-32 w-[600px] h-[600px] rounded-full opacity-[0.12] dark:opacity-[0.15]"
+              style={{ background: 'radial-gradient(circle, #f97316 0%, transparent 70%)', filter: 'blur(60px)' }} />
+            <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] rounded-full opacity-[0.10] dark:opacity-[0.15]"
+              style={{ background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', filter: 'blur(60px)' }} />
+          </div>
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10 py-20">
+            <div className="flex flex-col justify-center space-y-8">
+              <div className="inline-flex items-center gap-2 w-fit">
+                <span className="text-xs font-semibold tracking-widest uppercase bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-3 py-1.5 rounded-full border border-orange-200 dark:border-orange-700/30">
+                  AI-Powered Shared Freight Network
+                </span>
+              </div>
+              <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tight">
+                Move freight smarter.<br />
+                Fill every truck.<br />
+                <span className="text-gradient-orange-blue">Build India&apos;s freight OS.</span>
+              </h1>
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-xl leading-relaxed">
+                We transform unused truck capacity into economic opportunity. LoadSaathi is the high-precision intelligence platform designed to eliminate empty return trips.
+              </p>
+              <div className="flex items-center gap-4 pt-4">
+                <Link to="/register">
+                  <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-6 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)] group">
+                    Deploy Intelligence
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <a href="#vision">
+                  <Button variant="outline" className="text-sm font-bold tracking-wider uppercase px-8 py-6 h-auto rounded-lg border-border dark:border-white/10 hover:border-blue-400 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all">
+                    View Vision
+                  </Button>
+                </a>
+              </div>
+            </div>
+            <div className="relative animate-float h-full min-h-[500px] flex items-center justify-center">
+              <div className="glass-panel w-full h-[600px] rounded-xl p-6 flex flex-col shadow-2xl">
+                <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-orange-600 animate-pulse-ring" />
+                    <span className="text-xs text-muted-foreground dark:text-gray-400 uppercase tracking-widest">Live Network Stream</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-xs bg-blue-900/30 text-blue-400 px-2 py-1 rounded border border-blue-800/30">SYS.ON</span>
+                    <span className="text-xs bg-orange-900/30 text-orange-400 px-2 py-1 rounded border border-orange-800/30">AI.SYNC</span>
+                  </div>
+                </div>
+                <div className="flex-grow relative bg-[#010f1f]/50 rounded border border-white/5 overflow-hidden">
+                  <svg className="absolute inset-0 opacity-40" viewBox="0 0 500 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M200,50 L250,10 L300,50 L320,120 L400,200 L380,300 L250,480 L180,400 L120,350 L100,250 L80,150 Z" fill="none" stroke="#233143" strokeWidth="2" />
+                    {[100, 200, 300, 400].map(y => <line key={`h${y}`} x1="0" y1={y} x2="500" y2={y} stroke="rgba(255,255,255,0.03)" strokeWidth="1" />)}
+                    {[100, 200, 300, 400].map(x => <line key={`v${x}`} x1={x} y1="0" x2={x} y2="500" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />)}
+                    <path className="route-line" d="M150,200 Q200,150 280,220" fill="none" stroke="#f97316" strokeWidth="2" />
+                    <path className="route-line" d="M280,220 Q320,300 250,400" fill="none" stroke="#3b82f6" strokeWidth="2" />
+                    <path className="route-line" d="M120,300 Q180,280 220,180" fill="none" stroke="#f97316" strokeWidth="2" style={{ animationDuration: '40s' }} />
+                    <circle cx="150" cy="200" fill="#f97316" r="4" />
+                    <circle cx="280" cy="220" fill="#fff" r="4" />
+                    <circle cx="250" cy="400" fill="#3b82f6" r="4" />
+                    <circle cx="120" cy="300" fill="#f97316" r="4" />
+                    <circle cx="220" cy="180" fill="#fff" r="4" />
+                  </svg>
+                  <div className="absolute top-8 left-8 glass-card p-3 rounded-lg shadow-lg">
+                    <div className="text-xs text-muted-foreground dark:text-gray-400 uppercase mb-1">AI Match Score</div>
+                    <div className="text-xl font-bold text-orange-600 dark:text-orange-400">98.2%</div>
+                  </div>
+                  <div className="absolute bottom-12 right-8 glass-card p-3 rounded-lg shadow-lg">
+                    <div className="text-xs text-muted-foreground dark:text-gray-400 uppercase mb-1">Capacity Filled</div>
+                    <div className="text-xl font-bold text-blue-400">+34%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* PROOF BAR */}
+        <section className="border-y border-border dark:border-white/5 bg-muted/50 dark:bg-[#010f1f]/80 backdrop-blur-sm">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-8 flex flex-col md:flex-row justify-around items-center gap-8">
+            {[
+              { value: '40%', label: 'Empty Kilometers Today' },
+              { value: '₹1.5L Cr', label: 'Annual Economic Loss' },
+              { value: '0%', label: 'Tolerance for Inefficiency' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <div className="text-4xl sm:text-5xl font-black text-orange-600 dark:text-orange-400 tracking-tight">{stat.value}</div>
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-2">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* BENTO GRID */}
+        <section className="py-24 relative">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-[0.08] dark:opacity-[0.12] pointer-events-none"
+            style={{ background: 'radial-gradient(circle, #f97316 0%, transparent 70%)', filter: 'blur(60px)' }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="mb-16">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">The Utilization Crisis</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl">India doesn&apos;t have a truck shortage. India has a utilization problem. Legacy systems create friction, leaving capacity stranded.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-min">
+              {[
+                { icon: Route, title: 'Empty Return Trips', desc: 'Trucks frequently return empty after a delivery, burning fuel and wasting economic potential due to lack of network visibility.', badge: 'CRITICAL INEFFICIENCY', badgeClass: 'text-red-500 bg-red-900/20 border-red-800/30', colSpan: 'md:col-span-2', iconColor: 'text-orange-600 dark:text-orange-400' },
+                { icon: Handshake, title: 'Broker Dependency', desc: 'Opaque pricing and multiple intermediaries erode margins for both shippers and transporters.', badge: null, iconColor: 'text-blue-400' },
+                { icon: EyeOff, title: 'Zero Visibility', desc: 'Lack of real-time tracking leads to supply chain anxiety and manual intervention.', badge: null, iconColor: 'text-gray-400' },
+                { icon: CircuitBoard, title: 'Fragmented Data Silos', desc: 'Disconnected systems prevent systemic optimization and intelligent capacity planning.', badge: null, iconColor: 'text-orange-500', colSpan: 'md:col-span-2' },
+              ].map((card, i) => (
+                <div key={i} className={`glass-card p-8 rounded-xl ${card.colSpan || ''} hover:border-orange-500/30 transition-colors group`}
+                  style={{ background: '#0B1220', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <card.icon className={`${card.iconColor} text-3xl mb-4 group-hover:scale-110 transition-transform`} />
+                  <h3 className="text-lg font-bold text-white mb-2">{card.title}</h3>
+                  <p className="text-sm text-gray-400">{card.desc}</p>
+                  {card.badge && (
+                    <div className="mt-6 border-t border-white/5 pt-4">
+                      <span className={`text-xs font-semibold ${card.badgeClass} px-2 py-1 rounded border`}>{card.badge}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PLATFORM TABS */}
+        <section className="py-24 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 relative overflow-hidden">
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full opacity-[0.08] dark:opacity-[0.12] pointer-events-none"
+            style={{ background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', filter: 'blur(60px)' }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="text-center mb-16 max-w-3xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">The Freight Operating System</h2>
+              <p className="text-lg text-muted-foreground">A unified architecture serving every node in the logistics network, powered by advanced matching algorithms.</p>
+            </div>
+            <div className="flex justify-center mb-12">
+              <div className="glass-panel p-1 rounded-lg inline-flex gap-1">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-6 py-2 rounded text-xs font-bold uppercase tracking-wider transition-all ${
+                      activeTab === tab.id
+                        ? 'bg-white/10 text-foreground dark:text-white'
+                        : 'text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="relative w-full aspect-[16/9] max-h-[700px]">
+              {/* Shipper OS */}
+              <div className={`tab-content ${activeTab === 'shipper' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border border-white/10 overflow-hidden shadow-2xl flex-col`}
+                style={{ display: activeTab === 'shipper' ? 'flex' : 'none' }}>
+                <div className="h-12 border-b border-white/10 bg-[#0B1220]/80 flex items-center px-4 gap-4">
+                  <span className="text-xs text-gray-400">SHIPPER_WORKSPACE</span>
+                  <div className="flex-grow" />
+                  <Search className="h-4 w-4 text-gray-400" />
+                  <Bell className="h-4 w-4 text-gray-400" />
+                </div>
+                <div className="flex-grow p-6 grid grid-cols-3 gap-6 bg-[#050816]/50">
+                  <div className="col-span-1 space-y-4">
+                    <div className="glass-card p-4 rounded border border-white/5">
+                      <div className="text-xs text-gray-400 uppercase mb-2">Active Shipments</div>
+                      <div className="text-3xl font-black text-white">124</div>
+                    </div>
+                    <div className="glass-card p-4 rounded border border-white/5">
+                      <div className="text-xs text-gray-400 uppercase mb-2">Pending Tenders</div>
+                      <div className="space-y-2 mt-4">
+                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                          <span className="text-xs text-white">MUM-DEL (FTL)</span>
+                          <span className="text-xs text-blue-400">Awaiting Bid</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                          <span className="text-xs text-white">BLR-HYD (PTL)</span>
+                          <span className="text-xs text-orange-400">Matched</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-2 glass-card p-4 rounded border border-white/5 relative overflow-hidden">
+                    <div className="text-xs text-gray-400 uppercase mb-4 border-b border-white/10 pb-2">Live Tracking Heatmap</div>
+                    <div className="absolute inset-x-4 top-16 bottom-4 bg-[#0B1220] rounded border border-white/5 flex items-center justify-center opacity-50 bg-grid-pattern">
+                      <Map className="text-4xl text-gray-500" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Transporter OS */}
+              <div className={`tab-content ${activeTab === 'transporter' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border border-white/10 overflow-hidden shadow-2xl flex-col`}
+                style={{ display: activeTab === 'transporter' ? 'flex' : 'none' }}>
+                <div className="h-12 border-b border-white/10 bg-[#0B1220]/80 flex items-center px-4 gap-4">
+                  <span className="text-xs text-gray-400">FLEET_MANAGER</span>
+                </div>
+                <div className="flex-grow p-6 grid grid-cols-3 gap-6 bg-[#050816]/50">
+                  <div className="col-span-1 space-y-4">
+                    <div className="glass-card p-4 rounded border border-white/5">
+                      <div className="text-xs text-gray-400 uppercase mb-2">Fleet Utilization</div>
+                      <div className="text-3xl font-black text-orange-400">87%</div>
+                      <div className="text-xs text-gray-500 mt-1">+12% this month</div>
+                    </div>
+                    <div className="glass-card p-4 rounded border border-white/5">
+                      <div className="text-xs text-gray-400 uppercase mb-2">Active Routes</div>
+                      <div className="space-y-2 mt-4">
+                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                          <span className="text-xs text-white">DEL-MUM</span>
+                          <span className="text-xs text-green-400">On Time</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                          <span className="text-xs text-white">BLR-CCU</span>
+                          <span className="text-xs text-yellow-400">Delayed 2h</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-2 glass-card p-4 rounded border border-white/5 relative overflow-hidden">
+                    <div className="text-xs text-gray-400 uppercase mb-4 border-b border-white/10 pb-2">Capacity Planning Map</div>
+                    <div className="absolute inset-x-4 top-16 bottom-4 bg-[#0B1220] rounded border border-white/5 flex items-center justify-center opacity-50 bg-grid-pattern">
+                      <Package className="text-4xl text-gray-500" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Command Center */}
+              <div className={`tab-content ${activeTab === 'command' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border border-orange-500/20 overflow-hidden shadow-[0_0_30px_rgba(249,115,22,0.1)] flex-col`}
+                style={{ display: activeTab === 'command' ? 'flex' : 'none' }}>
+                <div className="h-12 border-b border-orange-500/20 bg-orange-900/10 flex items-center px-4 gap-4">
+                  <span className="text-xs font-bold text-orange-400">CORE_INTELLIGENCE_NODE</span>
+                  <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse-ring" />
+                </div>
+                <div className="flex-grow relative bg-[#010f1f]">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+                  <div className="absolute inset-0 p-6 flex flex-col justify-between pointer-events-none">
+                    <div className="flex justify-between">
+                      <div className="glass-panel p-3 rounded border border-orange-500/20">
+                        <div className="text-xs text-orange-400 uppercase mb-1">Network Density</div>
+                        <div className="text-lg font-bold text-white">HIGH OPTIMIZATION</div>
+                      </div>
+                    </div>
+                    <div className="glass-panel p-4 rounded border border-white/10 self-end w-64">
+                      <div className="text-xs text-gray-400 uppercase border-b border-white/10 pb-2 mb-2">Algorithm Status</div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs"><span className="text-white">Route Matching</span><span className="text-blue-400">ACTIVE</span></div>
+                        <div className="flex justify-between text-xs"><span className="text-white">Price Prediction</span><span className="text-blue-400">TRAINING</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* VISION SECTION */}
+        <section id="vision" className="min-h-[716px] flex items-center justify-center relative bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 py-24 overflow-hidden">
+          <div className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: `url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDEwZjFmIiAvPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDUpIiAvPgo8L3N2Zz4=")`,
+            }} />
+          <div ref={globeRef} id="globe-container" className="absolute inset-0 z-0" />
+          <div className="max-w-4xl mx-auto px-6 sm:px-12 text-center relative z-10 pointer-events-none">
+            <h2 className="text-5xl sm:text-7xl lg:text-8xl font-black text-foreground dark:text-white tracking-tighter leading-none mb-6">
+              Building the<br />operating system<br />for freight.
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+              A future where every load finds its perfect space instantly, transparently, and efficiently.
+            </p>
+            <div className="mt-12 pointer-events-auto">
+              <Link to="/register">
+                <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+                  Join the Network <ChevronRight className="ml-2 h-5 w-5" />
+                </Button>
               </Link>
             </div>
-          </nav>
-        </div>
-      </header>
-
-      <main>
-        {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900" />
-          <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, #f97316 0%, transparent 50%), radial-gradient(circle at 75% 75%, #3b82f6 0%, transparent 50%)`
-          }} />
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="py-16 sm:py-20 md:py-28 max-w-4xl mx-auto text-center">
-              <div className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full mb-6 sm:mb-8 animate-fade-in">
-                <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
-                India's First Truck Space Marketplace
-              </div>
-              
-              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-gray-900 dark:text-white mb-4 sm:mb-6 leading-[1.1] tracking-tight text-balance animate-fade-in-up">
-                India's Truck Space
-                <span className="block mt-2 bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">Marketplace</span>
-              </h1>
-              
-              <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '150ms' }}>
-                Connect directly with truckers and shippers. Fill empty truck space, save on freight costs — no middlemen, no commission.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-                <Link to="/register?type=shipper" className="group bg-gradient-to-r from-orange-600 to-orange-500 text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-base sm:text-lg font-bold hover:from-orange-700 hover:to-orange-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                  Find Trucks <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link to="/register?type=trucker" className="group bg-white dark:bg-gray-800 text-orange-600 dark:text-orange-400 border-2 border-orange-600 dark:border-orange-500 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-base sm:text-lg font-bold hover:bg-orange-50 dark:hover:bg-gray-700 transition-all flex items-center justify-center gap-2">
-                  Earn Extra <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-
-              <div className="mt-8 sm:mt-12 flex items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm text-gray-400 dark:text-gray-500 animate-fade-in" style={{ animationDelay: '500ms' }}>
-                <div className="flex items-center gap-1.5"><Shield className="h-3 w-3 sm:h-4 sm:w-4" /> Verified Partners</div>
-                <div className="flex items-center gap-1.5"><Star className="h-3 w-3 sm:h-4 sm:w-4" /> 10K+ Trips Completed</div>
-                <div className="flex items-center gap-1.5"><IndianRupee className="h-3 w-3 sm:h-4 sm:w-4" /> No Commission</div>
-              </div>
-            </div>
           </div>
         </section>
 
-        {/* Stats Strip */}
-        <section className="bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600 dark:from-orange-800 dark:via-orange-700 dark:to-orange-800">
-          <div className="container mx-auto px-4 py-10 sm:py-14">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-12 text-center">
-              {[
-                { value: "12M+", label: "Trucks in India" },
-                { value: "30%", label: "Empty Return Rate" },
-                { value: "₹15K", label: "Extra Earnings/Trip" },
-                { value: "50%", label: "Cost Savings" },
-              ].map((stat, i) => (
-                <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 100}ms` }}>
-                  <div className="text-3xl sm:text-4xl md:text-5xl font-black text-white drop-shadow-sm">{stat.value}</div>
-                  <div className="text-orange-100 font-semibold uppercase tracking-widest text-[10px] sm:text-xs mt-1">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Recent Trips */}
-        {recentTrips.length > 0 && (
-          <section className="container mx-auto px-4 py-16 sm:py-20">
-            <div className="text-center mb-10 sm:mb-14">
-              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-3">Recently Posted Trips</h2>
-              <p className="text-gray-500 dark:text-gray-400">Available space on trucks heading your way</p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
-              {recentTrips.map((trip, i) => (
-                <div key={trip.id} className="group bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: `${i * 100}ms` }}>
-                  <div className="flex items-center justify-between mb-4 sm:mb-6">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/50 dark:to-orange-800/50 p-2.5 sm:p-3 rounded-xl shrink-0 group-hover:scale-110 transition-transform duration-300">
-                        <Package className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600 dark:text-orange-400" />
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">
-                          {trip.origin_city} → {trip.destination_city}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{trip.vehicle_type || 'Available Truck'}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
-                    <div className="flex items-center text-gray-500 dark:text-gray-400">
-                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-orange-600 dark:text-orange-400 shrink-0" /> 
-                      <span>{new Date(trip.departure_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                    </div>
-                    <div className="flex items-center text-gray-500 dark:text-gray-400">
-                      <Package className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-blue-600 dark:text-blue-400 shrink-0" /> 
-                      Available space
-                    </div>
-                    <div className="flex items-center font-bold text-gray-900 dark:text-white text-sm sm:text-base">
-                      <IndianRupee className="h-3 w-3 sm:h-4 sm:w-4 mr-1 shrink-0" /> {trip.price_per_tonne.toLocaleString()} /tonne
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* How It Works */}
-        <section className="bg-gray-50 dark:bg-gray-900/50 py-16 sm:py-24">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12 sm:mb-20">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">How LoadSaathi Works</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-2xl mx-auto">A simple, transparent marketplace for India's logistics ecosystem.</p>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8 sm:gap-12 max-w-6xl mx-auto">
-              <div className="bg-white dark:bg-gray-900 p-6 sm:p-10 rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:border-orange-200 dark:hover:border-orange-700 transition-all hover:shadow-lg">
-                <div className="flex items-center mb-6 sm:mb-8">
-                  <div className="bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/50 dark:to-orange-800/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl mr-4 sm:mr-5">
-                    <Truck className="h-8 w-8 sm:h-10 sm:w-10 text-orange-600 dark:text-orange-400" />
-                  </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">For Truckers</h3>
-                </div>
-                <ul className="space-y-3 sm:space-y-5">
-                  {['Post your trip with available space', 'Set your price per tonne', 'Receive booking requests instantly', 'Accept or decline as you prefer', "Get shipper's contact after acceptance", 'Earn extra on empty return trips'].map((item, idx) => (
-                    <li key={idx} className="flex items-start animate-fade-in-up" style={{ animationDelay: `${idx * 80}ms` }}>
-                      <div className="bg-green-100 dark:bg-green-900/30 p-1 rounded-full mr-3 sm:mr-4 mt-0.5 shrink-0">
-                        <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 dark:text-green-400" />
-                      </div>
-                      <span className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+        {/* CTA */}
+        <section className="py-32 relative overflow-hidden flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-900/5 to-transparent dark:bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.12),transparent_70%)]" />
+          <div className="max-w-xl w-full mx-auto px-6 sm:px-12 relative z-10">
+            <div className="glass-card p-10 sm:p-14 rounded-2xl border border-orange-500/20 shadow-[0_0_50px_rgba(249,115,22,0.1)] text-center"
+              style={{ background: '#0B1220', border: '1px solid rgba(249,115,22,0.2)' }}>
+              <div className="bg-orange-600/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Truck className="h-8 w-8 text-orange-400" />
               </div>
-              <div className="bg-white dark:bg-gray-900 p-6 sm:p-10 rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-700 transition-all hover:shadow-lg">
-                <div className="flex items-center mb-6 sm:mb-8">
-                  <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl mr-4 sm:mr-5">
-                    <Package className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">For Shippers</h3>
-                </div>
-                <ul className="space-y-3 sm:space-y-5">
-                  {['Search available trucks by route', 'Filter by date, capacity, price', 'View trucker ratings and details', 'Send booking requests with one click', 'Pay only for space you need', 'Save up to 50% vs full truck'].map((item, idx) => (
-                    <li key={idx} className="flex items-start animate-fade-in-up" style={{ animationDelay: `${idx * 80}ms` }}>
-                      <div className="bg-green-100 dark:bg-green-900/30 p-1 rounded-full mr-3 sm:mr-4 mt-0.5 shrink-0">
-                        <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 dark:text-green-400" />
-                      </div>
-                      <span className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+              <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">Ready to Transform Your Freight?</h2>
+              <p className="text-sm sm:text-base text-gray-400 mb-8">Join India&apos;s intelligent freight network. Sign up as a shipper or trucker and start optimizing today.</p>
+              <div className="space-y-4">
+                <Link to="/register?type=shipper" className="block">
+                  <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-6 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.3)]">
+                    <Package className="mr-2 h-5 w-5" /> I Want to Ship Goods
+                  </Button>
+                </Link>
+                <Link to="/register?type=trucker" className="block">
+                  <Button variant="outline" className="w-full text-sm font-bold tracking-wider uppercase px-6 py-4 h-auto rounded-lg border border-white/10 text-white hover:bg-white/5">
+                    <Truck className="mr-2 h-5 w-5" /> I Have Truck Space
+                  </Button>
+                </Link>
+                <p className="text-xs text-gray-500 pt-4">
+                  Already have an account? <Link to="/login" className="text-orange-400 hover:text-orange-300 underline underline-offset-2">Sign in</Link>
+                </p>
               </div>
             </div>
           </div>
@@ -230,24 +600,33 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-black text-white py-12 sm:py-20">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center border-b border-gray-800 pb-8 sm:pb-12 mb-8 sm:mb-12">
-            <div className="flex items-center gap-3 mb-6 sm:mb-8 md:mb-0">
+      <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
+          <div className="col-span-2 md:col-span-1 mb-4 md:mb-0">
+            <div className="flex items-center gap-2 mb-4">
               <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-xl">
-                <Truck className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                <Truck className="h-5 w-5 text-white" />
               </div>
-              <span className="text-2xl sm:text-3xl font-bold text-white">LoadSaathi</span>
+              <span className="text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
             </div>
-            <div className="flex gap-6 sm:gap-8 text-sm sm:text-base text-gray-400 font-medium">
-              <a href="#" className="hover:text-white transition-colors">About</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
-            </div>
+            <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} LoadSaathi. Precision Freight Intelligence.</p>
           </div>
-          <div className="text-center text-gray-500 text-xs sm:text-sm">
-            © {new Date().getFullYear()} LoadSaathi. All rights reserved.
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Platform</span>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Overview</a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Features</a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Network</a>
+          </div>
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Company</span>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">About</a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Blog</a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Contact</a>
+          </div>
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Legal</span>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Privacy</a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Terms</a>
           </div>
         </div>
       </footer>
