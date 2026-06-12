@@ -10,20 +10,36 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Package, 
-  Clock, 
-  TrendingUp, 
-  Calendar, 
-  MapPin, 
-  Eye,
-  CheckCircle,
-  Search,
-  Loader2,
-  Send,
-  IndianRupee,
-  AlertCircle
-} from 'lucide-react';
+import { Package, Clock, TrendingUp, Calendar, MapPin, Eye, CheckCircle, Search, Loader2, Send, IndianRupee, AlertCircle } from 'lucide-react';
+
+interface ShipmentRecord {
+  id: string;
+  origin_city: string;
+  destination_city: string;
+  goods_description: string;
+  weight_tonnes: number;
+  budget_per_tonne: number;
+  departure_date: string;
+  status: string;
+  created_at: string;
+}
+
+interface TripRecord {
+  id: string;
+  origin_city: string;
+  destination_city: string;
+  price_per_tonne: number;
+}
+
+interface RequestRecord {
+  id: string;
+  created_at: string;
+  status: string;
+  weight_tonnes: number;
+  goods_description: string;
+  trip_id: string;
+  trips: TripRecord[];
+}
 
 interface ActivityItem {
   id: string;
@@ -93,7 +109,7 @@ const ShipperHistory = () => {
 
       // Process shipments
       if (shipmentsData) {
-        shipmentsData.forEach((s: Record<string, unknown>) => {
+        shipmentsData.forEach((s: ShipmentRecord) => {
           items.push({
             id: `ship-${s.id}`,
             relatedId: s.id,
@@ -111,8 +127,8 @@ const ShipperHistory = () => {
 
       // Process requests
       if (requestsData) {
-        requestsData.forEach((r: Record<string, unknown>) => {
-          const trip = r.trips as Record<string, unknown> | undefined;
+        requestsData.forEach((r: RequestRecord) => {
+          const trip = r.trips?.[0];
           items.push({
             id: `req-${r.id}`,
             relatedId: r.trip_id || '',

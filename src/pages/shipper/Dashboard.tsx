@@ -36,6 +36,16 @@ const StatCardSkeleton = () => (
   </Card>
 );
 
+interface UpcomingShipment {
+  id: string;
+  origin_city: string;
+  destination_city: string;
+  goods_description: string;
+  weight_tonnes: number;
+  departure_date: string;
+  status: string;
+}
+
 const ShipperDashboard = () => {
   const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
@@ -45,7 +55,7 @@ const ShipperDashboard = () => {
     pendingRequests: 0, 
     completedShipments: 0,
     totalSpent: 0,
-    upcomingShipments: [] as Record<string, unknown>[]
+    upcomingShipments: [] as UpcomingShipment[]
   });
   const [loading, setLoading] = useState(true);
 
@@ -104,7 +114,7 @@ const ShipperDashboard = () => {
         pendingRequests: pendingOffersCount || 0, 
         completedShipments: completedCount || 0,
         totalSpent,
-        upcomingShipments: upcoming || []
+        upcomingShipments: (upcoming || []) as UpcomingShipment[]
       });
     } catch (err: unknown) {
       console.error('[ShipperDashboard] Error:', err);
@@ -303,7 +313,7 @@ const ShipperDashboard = () => {
         <div className="space-y-4 animate-fade-in-up" style={{ animationDelay: '350ms' }}>
           <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">Upcoming Shipments</h2>
           <div className="grid gap-4">
-            {stats.upcomingShipments.map((shipment: Record<string, unknown>, i: number) => (
+            {stats.upcomingShipments.map((shipment: UpcomingShipment, i: number) => (
               <Card key={shipment.id} className={`border-blue-100 dark:border-blue-800 hover:shadow-md transition-all duration-300 group overflow-hidden animate-fade-in-up`} style={{ animationDelay: `${i * 100 + 400}ms` }}>
                 <CardContent className="p-0">
                   <div className="flex flex-col sm:flex-row">

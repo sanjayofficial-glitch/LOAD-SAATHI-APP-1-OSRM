@@ -61,13 +61,7 @@ const EditShipment = () => {
     }
   }, [shipment]);
 
-  const saveCoords = async (supabase: {
-    from: (t: string) => {
-      update: (d: Record<string, unknown>) => {
-        eq: (c: string, v: string) => Promise<{ error: Error | null }>;
-      };
-    };
-  }, id: string) => {
+  const saveCoords = async (supabase: ReturnType<typeof createClerkSupabaseClient>, id: string) => {
     try {
       const [originCoords, destCoords] = await Promise.all([
         geocodeCity(formData.origin_city),
