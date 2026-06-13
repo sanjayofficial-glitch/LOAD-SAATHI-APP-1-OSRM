@@ -3,9 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
-
-if (!supabaseConfigured) {
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error(
     '[LoadSaathi] Missing Supabase environment variables. '
     + 'Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY '
@@ -29,4 +27,3 @@ export const supabase = createClient(
   }
 );
 
-export { supabaseConfigured };
