@@ -13,6 +13,7 @@ export default defineConfig(() => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    deduplicate: ["react", "react-dom"],
   },
   build: {
     // Increase warning threshold (our chunks are intentionally split)

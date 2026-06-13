@@ -42,6 +42,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
+  // Skip non-http(s) schemes (e.g. chrome-extension://)
+  if (!event.request.url.startsWith('http://') && !event.request.url.startsWith('https://')) return;
+
   if (event.request.url.includes('/api/') || event.request.url.includes('supabase')) {
     event.respondWith(
       fetch(event.request).catch(() => {
