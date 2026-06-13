@@ -9,7 +9,6 @@ import OfflineBanner from '@/components/OfflineBanner';
 import ThemeToggle from '@/components/ThemeToggle';
 import IndexSkeleton from '@/components/IndexSkeleton';
 import { useTheme } from '@/theme/theme';
-import * as THREE from 'three';
 
 const tabs = [
   { id: 'shipper', label: 'Shipper OS' },
@@ -26,11 +25,11 @@ const Index = () => {
   const globeInited = useRef(false);
   const { isDark } = useTheme();
 
-  const globeMatRef = useRef<THREE.MeshPhongMaterial | null>(null);
-  const innerMatRef = useRef<THREE.MeshPhongMaterial | null>(null);
-  const pointsMatRef = useRef<THREE.PointsMaterial | null>(null);
-  const arcMatsRef = useRef<THREE.LineBasicMaterial[]>([]);
-  const ambientRef = useRef<THREE.AmbientLight | null>(null);
+  const globeMatRef = useRef<any>(null);
+  const innerMatRef = useRef<any>(null);
+  const pointsMatRef = useRef<any>(null);
+  const arcMatsRef = useRef<any[]>([]);
+  const ambientRef = useRef<any>(null);
   const globeObserverRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -70,8 +69,20 @@ const Index = () => {
     let animationId: number;
     let mouseX = 0, mouseY = 0;
 
-    const init = () => {
+    const init = async () => {
       try {
+        const THREE = await new Promise<any>((resolve) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+          script.onload = () => resolve((window as any).THREE);
+          script.onerror = () => {
+            console.warn('Three.js CDN failed, using fallback');
+            resolve(null);
+          };
+          document.body.appendChild(script);
+        });
+
+        if (!THREE) return;
 
         const width = container.clientWidth || 800;
         const height = container.clientHeight || 500;
@@ -214,7 +225,7 @@ const Index = () => {
   }, [ready]);
 
   useEffect(() => {
-    if (!globeMatRef.current) return;
+    if (!globeMatRef.current || !innerMatRef.current || !pointsMatRef.current || !ambientRef.current) return;
     const lightMode = !isDark;
     globeMatRef.current.color.setHex(lightMode ? 0x4B8FD4 : 0x2E6FB5);
     globeMatRef.current.opacity = lightMode ? 0.25 : 0.15;
@@ -222,7 +233,7 @@ const Index = () => {
     innerMatRef.current.opacity = lightMode ? 0.25 : 0.4;
     pointsMatRef.current.color.setHex(lightMode ? 0xE8620C : 0xFF6B00);
     pointsMatRef.current.opacity = lightMode ? 0.5 : 0.8;
-    arcMatsRef.current.forEach((mat) => {
+    arcMatsRef.current.forEach((mat: any) => {
       mat.color.setHex(lightMode ? 0xE8620C : 0xFF6B00);
       mat.opacity = lightMode ? 0.2 : 0.3;
     });
