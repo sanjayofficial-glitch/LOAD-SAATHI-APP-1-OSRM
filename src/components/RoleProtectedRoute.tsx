@@ -5,6 +5,8 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
+const VALID_USER_TYPES = ['shipper', 'trucker', 'admin'] as const;
+
 interface RoleProtectedRouteProps {
   children: React.ReactNode;
   allowedRole?: 'shipper' | 'trucker' | 'both' | 'admin';
@@ -24,6 +26,12 @@ const RoleProtectedRoute = ({ children, allowedRole }: RoleProtectedRouteProps) 
 
   // No user – redirect to home
   if (!userProfile) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Whitelist check: reject unknown/malformed user_type (RBAC bypass guard)
+  if (userProfile.user_type && !VALID_USER_TYPES.includes(userProfile.user_type as any)) {
+    console.warn(`[Security] Invalid user_type "${userProfile.user_type}" for user ${userProfile.id} — access denied`);
     return <Navigate to="/" replace />;
   }
 

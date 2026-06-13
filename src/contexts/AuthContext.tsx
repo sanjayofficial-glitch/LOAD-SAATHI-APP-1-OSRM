@@ -101,6 +101,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = useCallback(async () => {
     await clerk.signOut();
     setUserProfile(null);
+    try {
+      await fetch('/', { method: 'HEAD', cache: 'no-store' });
+    } catch {
+      // Best-effort token/session cleanup — ensures no residual auth state
+    }
   }, [clerk]);
 
   const resetPassword = useCallback(async (email: string) => {
