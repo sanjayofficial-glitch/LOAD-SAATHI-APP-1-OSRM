@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Package, MapPin, Calendar, IndianRupee, ArrowLeft, Loader2,
-  Edit, Send, Star, Truck, IndianRupee as RupeeIcon,
+  Edit, Send, Star, Truck,
   CheckCircle
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
@@ -425,7 +425,7 @@ const ShipmentDetail = () => {
             <div className="space-y-2">
               <Label htmlFor="price">Your Price per Tonne (₹)</Label>
               <div className="relative">
-                <RupeeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                 <Input
                   id="price"
                   type="number"

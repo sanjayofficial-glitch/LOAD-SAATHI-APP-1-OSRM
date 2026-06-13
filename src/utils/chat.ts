@@ -2,7 +2,6 @@ import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Message } from '@/types/chat';
 import { supabase } from '@/integrations/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-export { showSuccess, showError, showLoading, dismissToast } from '@/utils/toast';
 
 /**
  * Send a new message in a chat conversation.
