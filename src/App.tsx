@@ -11,6 +11,7 @@ import Layout from "./components/Layout";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { ThemeProvider, useTheme } from "@/theme/theme";
 import { lazy, Suspense } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
@@ -198,6 +199,7 @@ function App() {
         </ThemeProvider>
         </QueryClientProvider>
       </ClerkProvider>
+      <Analytics />
     </ErrorBoundary>
   );
 }
