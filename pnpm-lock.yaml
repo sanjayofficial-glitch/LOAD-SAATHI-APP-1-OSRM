@@ -175,7 +175,7 @@ importers:
         version: 3.25.76
     devDependencies:
       '@dyad-sh/react-vite-component-tagger':
-        specifier: latest
+        specifier: ^0.9.0
         version: 0.9.0(vite@6.4.3(@types/node@25.9.3)(jiti@1.21.7))
       '@eslint/js':
         specifier: ^9.9.0
@@ -184,7 +184,7 @@ importers:
         specifier: ^7946.0.16
         version: 7946.0.16
       '@types/node':
-        specifier: latest
+        specifier: ^25.9.3
         version: 25.9.3
       '@types/react':
         specifier: ^19.2.8
