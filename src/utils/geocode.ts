@@ -1,6 +1,10 @@
 export interface Coords { lat: number; lon: number; }
 
-const geocodeCache = new Map<string, Coords | null>();
+interface CacheEntry extends Coords {
+  _ts: number;
+}
+
+const geocodeCache = new Map<string, CacheEntry | null>();
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export async function geocodeCity(
@@ -9,7 +13,7 @@ export async function geocodeCity(
 ): Promise<Coords | null> {
   const cacheKey = `${city.toLowerCase().trim()},${country}`;
   const cached = geocodeCache.get(cacheKey);
-  if (cached && Date.now() - (cached as Coords & { _ts: number })._ts < CACHE_TTL_MS) {
+  if (cached && Date.now() - cached._ts < CACHE_TTL_MS) {
     return cached;
   }
 
@@ -21,7 +25,7 @@ export async function geocodeCity(
     );
     const data = await res.json();
     if (data.length > 0) {
-      const result: Coords & { _ts: number } = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), _ts: Date.now() };
+      const result: CacheEntry = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), _ts: Date.now() };
       geocodeCache.set(cacheKey, result);
       return result;
     }

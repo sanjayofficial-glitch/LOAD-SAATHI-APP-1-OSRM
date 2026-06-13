@@ -17,6 +17,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const AuthSync = lazy(() => import("./components/AuthSync"));
 const ChooseRole = lazy(() => import("./pages/ChooseRole"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const TruckerDashboard = lazy(() => import("./pages/trucker/Dashboard"));
 const PostTrip = lazy(() => import("./pages/trucker/PostTrip"));
 const TruckerHub = lazy(() => import("./pages/trucker/TruckerHub"));
@@ -77,6 +78,7 @@ function App() {
                   <Route path="/register" element={<ErrorBoundary><Register /></ErrorBoundary>} />
                   <Route path="/auth-sync" element={<ErrorBoundary><AuthSync /></ErrorBoundary>} />
                   <Route path="/choose-role" element={<ErrorBoundary><ChooseRole /></ErrorBoundary>} />
+                  <Route path="/forgot-password" element={<ErrorBoundary><ForgotPassword /></ErrorBoundary>} />
 
                   {/* Authenticated routes wrapped with Layout */}
                   <Route
@@ -162,7 +164,7 @@ function App() {
                         <MyShipments />
                       </RoleProtectedRoute>
                     } />
-                    <Route path="/shipper/shipments/:id" element={<ShipmentDetail />} />
+                    <Route path="/shipper/shipments/:id" element={<RoleProtectedRoute allowedRole="shipper"><ShipmentDetail /></RoleProtectedRoute>} />
                     <Route path="/shipper/shipments/:shipmentId/edit" element={
                       <RoleProtectedRoute allowedRole="shipper">
                         <EditShipment />

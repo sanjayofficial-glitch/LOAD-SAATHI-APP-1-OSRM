@@ -171,7 +171,10 @@ const BrowseShipments = () => {
     setAiLoading(true);
     try {
       const parsedFilters = await parseNaturalLanguageSearch(aiSearchQuery);
-      if (parsedFilters.origin) setSearchTerm(parsedFilters.origin);
+      const searchTerms: string[] = [];
+      if (parsedFilters.origin) searchTerms.push(parsedFilters.origin);
+      if (parsedFilters.destination) searchTerms.push(parsedFilters.destination);
+      setSearchTerm(searchTerms.join(' '));
       if (parsedFilters.weight) setFilters(f => ({ ...f, minWeight: parsedFilters.weight!.toString() }));
       if (parsedFilters.date) setFilters(f => ({ ...f, departureDate: parsedFilters.date! }));
       showSuccess('AI parsed your search!');
