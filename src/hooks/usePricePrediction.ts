@@ -16,6 +16,8 @@ export interface PricePrediction {
   confidence: 'high' | 'medium' | 'low'
   trend: 'rising' | 'falling' | 'stable'
   reasoning: string
+  historicalLoads?: number | null
+  historicalAvgPrice?: number | null
 }
 
 function useDebounce<T>(value: T, delay: number): T {

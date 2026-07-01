@@ -1,6 +1,6 @@
 import { usePricePrediction } from '@/hooks/usePricePrediction'
 import type { PricePredictionInput } from '@/hooks/usePricePrediction'
-import { Sparkles, Loader2, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { Sparkles, Loader2, TrendingUp, TrendingDown, Minus, Database } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface PricePredictorProps extends PricePredictionInput {
@@ -99,6 +99,14 @@ export function PricePredictor(props: PricePredictorProps) {
           </Button>
         )}
       </div>
+      {data.historicalLoads != null && (
+        <div className="flex items-center gap-1 text-xs text-blue-500/60 dark:text-blue-400/50">
+          <Database className="h-3 w-3" />
+          <span>Based on {data.historicalLoads} recent load{data.historicalLoads !== 1 ? 's' : ''}
+            {data.historicalAvgPrice != null && <> · avg ₹{data.historicalAvgPrice.toLocaleString()}/t</>}
+          </span>
+        </div>
+      )}
       <p className="text-xs text-blue-600/70 dark:text-blue-400/70 italic">
         {data.reasoning}
       </p>

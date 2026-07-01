@@ -52,6 +52,8 @@ Deno.serve(async (req: Request) => {
     }
 
     let historyInfo = ""
+    let historicalLoads: number | null = null
+    let historicalAvgPrice: number | null = null
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const url = `${SUPABASE_URL}/rest/v1/rpc/get_route_history`
@@ -74,6 +76,8 @@ Deno.serve(async (req: Request) => {
             const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(0)
             const min = Math.min(...prices)
             const max = Math.max(...prices)
+            historicalLoads = prices.length
+            historicalAvgPrice = parseFloat(avg)
             historyInfo = `Historical data: ₹${min}–${max}/t (avg ₹${avg}) from ${prices.length} loads on this route`
           }
         }
@@ -139,7 +143,11 @@ Consider: route distance, seasonal factors, typical Indian freight rates, fuel c
     const jsonString = text.replace(/```json|```/g, "").trim()
     const result = JSON.parse(jsonString)
 
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify({
+      ...result,
+      historicalLoads,
+      historicalAvgPrice,
+    }), {
       status: 200,
       headers,
     })
