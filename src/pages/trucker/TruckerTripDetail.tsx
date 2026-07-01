@@ -270,7 +270,7 @@ const TruckerTripDetail = () => {
 
   const pendingCount = bookingRequests.filter(r => r.status === 'pending').length;
   const hasAcceptedRequests = bookingRequests.some(r => r.status === 'accepted');
-  const canCompleteTrip = trip.status === 'in_transit' || trip.status === 'delivered' || (trip.status === 'active' && hasAcceptedRequests);
+  const canCompleteTrip = hasAcceptedRequests && (trip.status === 'active' || trip.status === 'in_transit' || trip.status === 'delivered');
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
