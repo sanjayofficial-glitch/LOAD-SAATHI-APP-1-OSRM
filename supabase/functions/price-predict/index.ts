@@ -1,4 +1,6 @@
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? ""
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? ""
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
 
 interface PricePredictRequest {
   originCity: string
@@ -7,10 +9,10 @@ interface PricePredictRequest {
   destinationState?: string
   weightTonnes: number
   vehicleType?: string
-  historicalAvg?: number
-  historicalMin?: number
-  historicalMax?: number
-  historicalCount?: number
+}
+
+interface HistoryRow {
+  price_per_tonne: number
 }
 
 Deno.serve(async (req: Request) => {
@@ -49,6 +51,37 @@ Deno.serve(async (req: Request) => {
       })
     }
 
+    let historyInfo = ""
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/rpc/get_route_history`
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          },
+          body: JSON.stringify({
+            p_origin: body.originCity,
+            p_dest: body.destinationCity,
+          }),
+        })
+        if (res.ok) {
+          const rows: HistoryRow[] = await res.json()
+          if (rows.length > 0) {
+            const prices = rows.map(r => r.price_per_tonne)
+            const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(0)
+            const min = Math.min(...prices)
+            const max = Math.max(...prices)
+            historyInfo = `Historical data: ₹${min}–${max}/t (avg ₹${avg}) from ${prices.length} loads on this route`
+          }
+        }
+      } catch {
+        // history is optional — silently continue
+      }
+    }
+
     const prompt = `
 You are a logistics pricing expert for the Indian freight market.
 Given the following shipment details, suggest a fair price per tonne in INR.
@@ -56,7 +89,7 @@ Given the following shipment details, suggest a fair price per tonne in INR.
 Route: ${body.originCity}${body.originState ? `, ${body.originState}` : ""} → ${body.destinationCity}${body.destinationState ? `, ${body.destinationState}` : ""}
 Weight: ${body.weightTonnes} tonnes
 Vehicle Type: ${body.vehicleType || "Not specified"}
-${body.historicalCount ? `Historical data: ₹${body.historicalMin}–${body.historicalMax}/t (avg ₹${body.historicalAvg}) from ${body.historicalCount} loads` : ""}
+${historyInfo}
 
 Return ONLY a JSON object (no markdown, no explanation outside the JSON):
 {

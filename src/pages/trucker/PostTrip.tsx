@@ -87,8 +87,20 @@ const PostTrip = () => {
 
       if (error) throw error;
 
-      // Save coordinates — runs after trip is already created, non-blocking
+      // Save price history — fire-and-forget, non-blocking
       if (tripData?.id) {
+        supabaseClient.from('price_history').insert({
+          origin_city: formData.origin_city.trim(),
+          destination_city: formData.destination_city.trim(),
+          origin_state: formData.origin_state || null,
+          destination_state: formData.destination_state || null,
+          weight_tonnes: capacity,
+          price_per_tonne: price,
+          vehicle_type: formData.vehicle_type || null,
+          user_id: userProfile.id,
+          user_type: 'trucker',
+        }).then().catch(() => {});
+
         try {
           const [originCoords, destCoords] = await Promise.all([
             geocodeCity(formData.origin_city),
