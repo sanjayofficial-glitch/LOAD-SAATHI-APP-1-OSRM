@@ -30,6 +30,8 @@ import RouteMap from '@/components/RouteMap';
 import {
   notifyShipperOfRequestAccepted,
   notifyShipperOfRequestDeclined,
+  notifyShipperOfTripStarted,
+  notifyShipperOfTripDelivered,
   notifyShipperOfTripCompletion,
 } from '@/utils/notifications';
 import type { Trip, Request } from '@/types';
@@ -40,6 +42,8 @@ const StatusBadge = ({ status }: { status: string }) => {
     accepted: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
     declined: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
     active: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
+    in_transit: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
+    delivered: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800',
     completed: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
     cancelled: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700',
   };
@@ -97,6 +101,84 @@ const TruckerTripDetail = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const updateLinkedShipmentStatuses = async (supabase: any, newStatus: string) => {
+    const linked = bookingRequests.filter(r => r.status === 'accepted' && r.shipment_id);
+    if (linked.length === 0) return;
+    const shipmentIds = linked.map(r => r.shipment_id!);
+    await supabase
+      .from('shipments')
+      .update({ status: newStatus })
+      .in('id', shipmentIds);
+  };
+
+  const handleStartTrip = async () => {
+    if (!tripId || !trip) return;
+    setActionLoading('start');
+    try {
+      const supabase = await getAuthenticatedClient();
+      const { error } = await supabase
+        .from('trips')
+        .update({ status: 'in_transit' })
+        .eq('id', tripId);
+      if (error) throw error;
+
+      await updateLinkedShipmentStatuses(supabase, 'in_transit');
+
+      const acceptedShippers = bookingRequests.filter(r => r.status === 'accepted');
+      await Promise.all(acceptedShippers.map(request =>
+        notifyShipperOfTripStarted({
+          shipperId: request.shipper_id,
+          truckerName: userProfile?.full_name || 'The trucker',
+          originCity: trip.origin_city,
+          destinationCity: trip.destination_city,
+          tripId: trip.id,
+          getToken: () => getToken({ template: 'supabase' }),
+        })
+      ));
+
+      showSuccess('Trip started! Shippers have been notified.');
+      fetchData();
+    } catch (err) {
+      showError('Failed to start trip');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleMarkDelivered = async () => {
+    if (!tripId || !trip) return;
+    setActionLoading('delivered');
+    try {
+      const supabase = await getAuthenticatedClient();
+      const { error } = await supabase
+        .from('trips')
+        .update({ status: 'delivered' })
+        .eq('id', tripId);
+      if (error) throw error;
+
+      await updateLinkedShipmentStatuses(supabase, 'delivered');
+
+      const acceptedShippers = bookingRequests.filter(r => r.status === 'accepted');
+      await Promise.all(acceptedShippers.map(request =>
+        notifyShipperOfTripDelivered({
+          shipperId: request.shipper_id,
+          truckerName: userProfile?.full_name || 'The trucker',
+          originCity: trip.origin_city,
+          destinationCity: trip.destination_city,
+          tripId: trip.id,
+          getToken: () => getToken({ template: 'supabase' }),
+        })
+      ));
+
+      showSuccess('Marked as delivered! Shippers have been notified.');
+      fetchData();
+    } catch (err) {
+      showError('Failed to mark delivered');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleCompleteTrip = async () => {
     if (!tripId || !trip) return;
     setActionLoading('complete');
@@ -108,6 +190,8 @@ const TruckerTripDetail = () => {
         .eq('id', tripId);
 
       if (error) throw error;
+
+      await updateLinkedShipmentStatuses(supabase, 'completed');
 
       // Notify all shippers with accepted requests
       const acceptedRequests = bookingRequests.filter(r => r.status === 'accepted');
@@ -194,22 +278,22 @@ const TruckerTripDetail = () => {
             <>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950" disabled={actionLoading === 'complete'}>
-                    {actionLoading === 'complete' ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Flag className="h-4 w-4 mr-2" />}
-                    Complete Trip
+                  <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600" disabled={actionLoading === 'start'}>
+                    {actionLoading === 'start' ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Truck className="h-4 w-4 mr-2" />}
+                    Start Trip
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Mark trip as completed?</AlertDialogTitle>
+                    <AlertDialogTitle>Start this trip?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will mark the trip as finished. You won't be able to accept more bookings for this trip.
+                      Mark the trip as in transit. Shippers with accepted bookings will be notified that you are on the way.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleCompleteTrip} className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
-                      Mark Completed
+                    <AlertDialogAction onClick={handleStartTrip} className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
+                      Start Trip
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -221,6 +305,54 @@ const TruckerTripDetail = () => {
                 </Button>
               </Link>
             </>
+          )}
+          {trip.status === 'in_transit' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600" disabled={actionLoading === 'delivered'}>
+                  {actionLoading === 'delivered' ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Flag className="h-4 w-4 mr-2" />}
+                  Mark Delivered
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Mark as delivered?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Confirm that goods have been delivered. Shippers will be notified to confirm and leave a review.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleMarkDelivered} className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600">
+                    Mark Delivered
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          {trip.status === 'delivered' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600" disabled={actionLoading === 'complete'}>
+                  {actionLoading === 'complete' ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                  Complete Trip
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Mark trip as completed?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will finalize the trip. You won't be able to make further changes.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleCompleteTrip} className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
+                    Mark Completed
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </div>
       </div>

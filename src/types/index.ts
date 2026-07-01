@@ -20,7 +20,7 @@ export interface Trip {
   price_per_tonne: number;
   vehicle_type: string;
   vehicle_number: string;
-  status: 'active' | 'completed' | 'cancelled';
+  status: 'active' | 'in_transit' | 'delivered' | 'completed' | 'cancelled';
   created_at: string;
   updated_at?: string;
   origin_state?: string;
@@ -48,7 +48,7 @@ export interface Shipment {
   pickup_address: string;
   delivery_address: string;
   budget_per_tonne: number;
-  status: 'pending' | 'matched' | 'completed' | 'cancelled';
+  status: 'pending' | 'matched' | 'in_transit' | 'delivered' | 'completed' | 'cancelled';
   created_at: string;
   origin_lat?: number;
   origin_lng?: number;

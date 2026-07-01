@@ -23,6 +23,7 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { showError } from '@/utils/toast';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const TruckerDashboard = () => {
   const { userProfile } = useAuth();
@@ -35,6 +36,8 @@ const TruckerDashboard = () => {
     completedTrips: 0,
     totalEarnings: 0
   });
+  const [monthlyData, setMonthlyData] = useState<{ month: string; earnings: number }[]>([]);
+  const [recentActivity, setRecentActivity] = useState<{ route: string; earnings: number; date: string }[]>([]);
 
   const fetchDashboardData = useCallback(async () => {
     if (!userProfile?.id) return;
@@ -81,6 +84,35 @@ const TruckerDashboard = () => {
         ((bookingEarnings ?? []) as unknown as BookingEarning[]).reduce((sum, r) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0) +
         ((offerEarnings ?? []) as unknown as OfferEarning[]).reduce((sum, o) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.weight_tonnes || 0)), 0)
       );
+
+      const { data: monthlyEarnings } = await supabase
+        .from('price_history')
+        .select('price_per_tonne, weight_tonnes, created_at')
+        .eq('user_id', userProfile.id)
+        .eq('user_type', 'trucker')
+        .gte('created_at', new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString())
+        .order('created_at', { ascending: true });
+
+      const aggregated: Record<string, number> = {};
+      for (const entry of (monthlyEarnings ?? []) as { price_per_tonne: number; weight_tonnes: number; created_at: string }[]) {
+        const month = new Date(entry.created_at).toLocaleString('default', { month: 'short', year: '2-digit' });
+        aggregated[month] = (aggregated[month] || 0) + (entry.price_per_tonne * entry.weight_tonnes);
+      }
+      setMonthlyData(Object.entries(aggregated).map(([month, earnings]) => ({ month, earnings })));
+
+      const { data: recentTrips } = await supabase
+        .from('price_history')
+        .select('origin_city, destination_city, price_per_tonne, created_at')
+        .eq('user_id', userProfile.id)
+        .eq('user_type', 'trucker')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      setRecentActivity(((recentTrips ?? []) as { origin_city: string; destination_city: string; price_per_tonne: number; created_at: string }[]).map(t => ({
+        route: `${t.origin_city} → ${t.destination_city}`,
+        earnings: t.price_per_tonne,
+        date: new Date(t.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+      })));
 
       setStats({
         activeTrips: activeCount || 0,
@@ -262,6 +294,85 @@ const TruckerDashboard = () => {
                 <ArrowRight className="h-5 w-5 text-gray-200 dark:text-gray-700 group-hover:text-orange-600 dark:group-hover:text-orange-400 group-hover:translate-x-1 transition-all shrink-0" />
               </Link>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Monthly Earnings & Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mt-6 sm:mt-8">
+        <Card className="border-orange-200 dark:border-orange-800 shadow-md overflow-hidden animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+          <div className="h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
+          <CardHeader className="bg-orange-50/50 dark:bg-orange-900/10 px-4 sm:px-6">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-orange-600" />
+              <CardTitle className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Monthly Earnings</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="px-4 sm:px-6 pb-6">
+            {loading ? (
+              <Skeleton className="h-64 w-full rounded-xl" />
+            ) : monthlyData.length === 0 ? (
+              <div className="h-64 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600">
+                <IndianRupee className="h-10 w-10 mb-2 opacity-50" />
+                <p className="font-medium">No data yet</p>
+                <p className="text-sm">Complete trips to see earnings trends</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={monthlyData} margin={{ top: 12, right: 8, left: -8, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
+                  <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString('en-IN')}`} contentStyle={{ borderRadius: 12, border: '1px solid #fed7aa', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+                  <Bar dataKey="earnings" fill="url(#orangeGradient)" radius={[6, 6, 0, 0]} maxBarSize={48} />
+                  <defs>
+                    <linearGradient id="orangeGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f97316" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="#fb923c" stopOpacity={0.4} />
+                    </linearGradient>
+                  </defs>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-orange-200 dark:border-orange-800 shadow-md overflow-hidden animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+          <div className="h-1 bg-gradient-to-r from-orange-500 to-orange-400" />
+          <CardHeader className="bg-orange-50/50 dark:bg-orange-900/10 px-4 sm:px-6">
+            <div className="flex items-center gap-2">
+              <Package className="h-5 w-5 text-orange-600" />
+              <CardTitle className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Recent Activity</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="px-4 sm:px-6 pb-6">
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton key={i} className="h-16 w-full rounded-xl" />
+                ))}
+              </div>
+            ) : recentActivity.length === 0 ? (
+              <div className="h-64 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600">
+                <Calendar className="h-10 w-10 mb-2 opacity-50" />
+                <p className="font-medium">No activity yet</p>
+                <p className="text-sm">Your recent trips will appear here</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                {recentActivity.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-gray-800 dark:text-gray-200 text-sm truncate">{item.route}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">{item.date}</p>
+                    </div>
+                    <div className="text-green-600 font-black text-sm ml-4 shrink-0">
+                      ₹{item.earnings.toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

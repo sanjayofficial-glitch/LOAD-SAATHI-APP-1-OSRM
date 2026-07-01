@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Package, MapPin, Calendar, IndianRupee, ArrowLeft, Loader2,
-  Edit, Send, Star, Truck,
+  Clock, Edit, Send, Star, Truck, MapPin as MapPinIcon, CheckCircle2,
   CheckCircle
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
@@ -36,6 +36,7 @@ const ShipmentDetail = () => {
   const [offerCount, setOfferCount] = useState(0);
   const [hasReview, setHasReview] = useState(false);
   const [acceptedTrucker, setAcceptedTrucker] = useState<User | null>(null);
+  const [linkedTripStatus, setLinkedTripStatus] = useState<string | null>(null);
 
   // Offer dialog state (for truckers)
   const [offerOpen, setOfferOpen] = useState(false);
@@ -80,6 +81,26 @@ const ShipmentDetail = () => {
             .maybeSingle();
           if (acceptedReq?.trucker) {
             setAcceptedTrucker(acceptedReq.trucker);
+          }
+        }
+        
+        // Check for linked trip (booking flow via requests table)
+        if (shipmentData.status === 'matched' || shipmentData.status === 'in_transit' || shipmentData.status === 'delivered') {
+          const { data: linkedRequest } = await supabase
+            .from('requests')
+            .select('trip_id')
+            .eq('shipment_id', id)
+            .eq('status', 'accepted')
+            .maybeSingle();
+          if (linkedRequest?.trip_id) {
+            const { data: linkedTrip } = await supabase
+              .from('trips')
+              .select('status')
+              .eq('id', linkedRequest.trip_id)
+              .single();
+            if (linkedTrip) {
+              setLinkedTripStatus(linkedTrip.status);
+            }
           }
         }
         
@@ -219,6 +240,8 @@ const ShipmentDetail = () => {
                 <Badge className={
                   shipment.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' :
                   shipment.status === 'matched' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
+                  shipment.status === 'in_transit' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
+                  shipment.status === 'delivered' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' :
                   shipment.status === 'completed' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
                   'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200'
                 }>
@@ -381,6 +404,39 @@ const ShipmentDetail = () => {
                       </Button>
                     )}
                   </div>
+                ) : linkedTripStatus ? (
+                  <>
+                    {linkedTripStatus === 'in_transit' && (
+                      <div className="flex flex-col items-center text-center py-4 space-y-3">
+                        <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full">
+                          <Truck className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <p className="font-bold text-blue-700 dark:text-blue-300">In Transit</p>
+                        <div className="flex items-center gap-2 text-sm">
+                          <MapPinIcon className="h-4 w-4 text-orange-500" />
+                          <span>{acceptedTrucker ? `${acceptedTrucker.full_name} is on the way from ${shipment.origin_city} → ${shipment.destination_city}` : 'Trucker is en route'}</span>
+                        </div>
+                      </div>
+                    )}
+                    {linkedTripStatus === 'delivered' && (
+                      <div className="flex flex-col items-center text-center py-4 space-y-3">
+                        <div className="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-full">
+                          <CheckCircle2 className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <p className="font-bold text-orange-700 dark:text-orange-300">Delivered</p>
+                        <p className="text-sm">Your goods have been delivered. Trucker will complete the trip shortly.</p>
+                      </div>
+                    )}
+                    {linkedTripStatus === 'active' && (
+                      <div className="flex flex-col items-center text-center py-4 space-y-3">
+                        <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
+                          <Clock className="h-8 w-8 text-green-600 dark:text-green-400" />
+                        </div>
+                        <p className="font-bold text-green-700 dark:text-green-300">Awaiting Departure</p>
+                        <p className="text-sm">Trucker will start the trip shortly.</p>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <>
                     <div className="flex gap-3">

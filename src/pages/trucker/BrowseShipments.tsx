@@ -21,9 +21,10 @@ import {
    IndianRupee,
    Sparkles,
    User,
-   MapPin,
-   Clock
- } from 'lucide-react';
+    MapPin,
+    Clock,
+    ArrowUpDown
+  } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -74,6 +75,8 @@ const BrowseShipments = () => {
     maxPrice: '',
     departureDate: ''
   });
+
+  const [sortBy, setSortBy] = useState<'match' | 'budget_asc' | 'budget_desc' | 'date' | 'weight'>('match');
 
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
@@ -169,8 +172,16 @@ const BrowseShipments = () => {
           tripDate: myActiveTrip.departure_date,
         }) : 0
       }))
-      .sort((a, b) => b._matchScore - a._matchScore);
-  }, [shipments, searchTerm, filters, myActiveTrip]);
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'budget_asc': return a.budget_per_tonne - b.budget_per_tonne;
+          case 'budget_desc': return b.budget_per_tonne - a.budget_per_tonne;
+          case 'date': return new Date(a.departure_date).getTime() - new Date(b.departure_date).getTime();
+          case 'weight': return b.weight_tonnes - a.weight_tonnes;
+          default: return b._matchScore - a._matchScore;
+        }
+      });
+  }, [shipments, searchTerm, filters, sortBy, myActiveTrip]);
 
   const { scores: aiScores, loadingId: aiLoadingId } = useSmartMatch(
     filteredShipments,
@@ -323,6 +334,15 @@ const BrowseShipments = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Destination State</Label>
+                  <Select value={filters.destinationState} onValueChange={(val) => setFilters({...filters, destinationState: val})}>
+                    <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
+                    <SelectContent>
+                      {INDIAN_STATES.map(state => <SelectItem key={state} value={state}>{state}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
                   <Label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Min Weight (t)</Label>
                   <Input type="number" value={filters.minWeight} onChange={(e) => setFilters({...filters, minWeight: e.target.value})} />
                 </div>
@@ -336,14 +356,31 @@ const BrowseShipments = () => {
         </div>
 
         <div className="lg:col-span-3 space-y-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
-            <Input 
-              placeholder="Search by city or goods type..." 
-              className="pl-10 py-6 rounded-xl border-gray-200"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="flex gap-4 items-start">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+              <Input 
+                placeholder="Search by city or goods type..." 
+                className="pl-10 py-6 rounded-xl border-gray-200"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="w-48">
+              <Select value={sortBy} onValueChange={(val) => setSortBy(val as 'match' | 'budget_asc' | 'budget_desc' | 'date' | 'weight')}>
+                <SelectTrigger className="py-6 rounded-xl border-gray-200">
+                  <ArrowUpDown className="h-4 w-4 mr-2 text-gray-400" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="match">Best Match</SelectItem>
+                  <SelectItem value="budget_asc">Budget: Low to High</SelectItem>
+                  <SelectItem value="budget_desc">Budget: High to Low</SelectItem>
+                  <SelectItem value="date">Earliest Date</SelectItem>
+                  <SelectItem value="weight">Heaviest Load</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {isLoading ? (

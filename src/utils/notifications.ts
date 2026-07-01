@@ -90,6 +90,36 @@ export const notifyShipperOfTripCompletion = (params: {
     getToken: params.getToken,
   });
 
+export const notifyShipperOfTripStarted = (params: {
+  shipperId: string;
+  truckerName: string;
+  originCity: string;
+  destinationCity: string;
+  tripId: string;
+  getToken: () => Promise<string | null>;
+}) =>
+  sendNotification({
+    userId: params.shipperId,
+    message: `🚛 Trip Started! ${params.truckerName} is on the way from ${params.originCity} → ${params.destinationCity}. Track your shipment live.`,
+    relatedTripId: params.tripId,
+    getToken: params.getToken,
+  });
+
+export const notifyShipperOfTripDelivered = (params: {
+  shipperId: string;
+  truckerName: string;
+  originCity: string;
+  destinationCity: string;
+  tripId: string;
+  getToken: () => Promise<string | null>;
+}) =>
+  sendNotification({
+    userId: params.shipperId,
+    message: `📍 Package Delivered! ${params.truckerName} has delivered your goods from ${params.originCity} → ${params.destinationCity}. Please confirm and rate.`,
+    relatedTripId: params.tripId,
+    getToken: params.getToken,
+  });
+
 export const notifyTruckerOfOfferAccepted = (params: {
   truckerId: string;
   shipperName: string;

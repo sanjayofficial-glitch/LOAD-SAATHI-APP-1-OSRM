@@ -10,6 +10,13 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { 
   Search, 
   Calendar, 
@@ -23,7 +30,8 @@ import {
   Plus,
   Clock,
   Sparkles,
-  Loader2
+  Loader2,
+  ArrowUpDown
 } from 'lucide-react';
 
 import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
@@ -47,8 +55,11 @@ const TripList = () => {
     origin: '',
     destination: '',
     minCapacity: '',
-    maxPrice: ''
+    maxPrice: '',
+    vehicle_type: ''
   });
+
+  const [sortBy, setSortBy] = useState<'match' | 'price_asc' | 'price_desc' | 'date' | 'distance'>('match');
 
   // Fetch current shipper's pending shipment for match scoring
   const { data: myShipment } = useQuery({
@@ -74,7 +85,7 @@ const TripList = () => {
 
   // Fetch active trips with React Query caching
   const { data: trips = [], isLoading } = useQuery({
-    queryKey: ['activeTrips', filters.origin, filters.destination, filters.minCapacity, filters.maxPrice],
+    queryKey: ['activeTrips', filters.origin, filters.destination, filters.minCapacity, filters.maxPrice, filters.vehicle_type],
     queryFn: async () => {
       const token = await getToken({ template: 'supabase' });
       if (!token) throw new Error('Authentication required');
@@ -83,7 +94,7 @@ const TripList = () => {
       let query = supabase
         .from('trips')
         .select(`
-          id, origin_city, destination_city, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, available_capacity_tonnes, price_per_tonne, departure_date, created_at, trucker_id, status, estimated_distance_km, estimated_duration_min,
+          id, origin_city, destination_city, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, available_capacity_tonnes, price_per_tonne, departure_date, created_at, trucker_id, status, estimated_distance_km, estimated_duration_min, vehicle_type,
           trucker:users!trips_trucker_id_fkey(
             full_name,
             rating,
@@ -105,6 +116,9 @@ const TripList = () => {
       }
       if (filters.maxPrice) {
         query = query.lte('price_per_tonne', parseFloat(filters.maxPrice));
+      }
+      if (filters.vehicle_type) {
+        query = query.ilike('vehicle_type', `%${filters.vehicle_type}%`);
       }
 
       const { data, error } = await query;
@@ -157,8 +171,16 @@ const TripList = () => {
           truckerRating: t.trucker?.rating,
         }) : 0
       }))
-      .sort((a, b) => b._matchScore - a._matchScore);
-  }, [trips, searchTerm, myShipment]);
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'price_asc': return a.price_per_tonne - b.price_per_tonne;
+          case 'price_desc': return b.price_per_tonne - a.price_per_tonne;
+          case 'date': return new Date(a.departure_date).getTime() - new Date(b.departure_date).getTime();
+          case 'distance': return (a.estimated_distance_km || 0) - (b.estimated_distance_km || 0);
+          default: return b._matchScore - a._matchScore;
+        }
+      });
+  }, [trips, searchTerm, myShipment, sortBy]);
 
   const { scores: aiScores, loadingId: aiLoadingId } = useSmartMatch(
     filteredTrips,
@@ -215,7 +237,7 @@ const TripList = () => {
     );
   }
 
-  const hasActiveFilters = filters.origin || filters.destination || filters.minCapacity || filters.maxPrice;
+  const hasActiveFilters = filters.origin || filters.destination || filters.minCapacity || filters.maxPrice || filters.vehicle_type;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -234,11 +256,24 @@ const TripList = () => {
               />
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
+              <Select value={sortBy} onValueChange={(value: 'match' | 'price_asc' | 'price_desc' | 'date' | 'distance') => setSortBy(value)}>
+                <SelectTrigger className="w-[160px] border-gray-200 dark:border-gray-700">
+                  <ArrowUpDown className="h-4 w-4 mr-2 text-gray-400" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="match">Best Match</SelectItem>
+                  <SelectItem value="price_asc">Price: Low to High</SelectItem>
+                  <SelectItem value="price_desc">Price: High to Low</SelectItem>
+                  <SelectItem value="date">Departure Date</SelectItem>
+                  <SelectItem value="distance">Distance</SelectItem>
+                </SelectContent>
+              </Select>
               <Button 
                 variant="outline" 
                 onClick={() => {
-                  setFilters({ origin: '', destination: '', minCapacity: '', maxPrice: '' });
+                  setFilters({ origin: '', destination: '', minCapacity: '', maxPrice: '', vehicle_type: '' });
                   setSearchTerm('');
                 }}
                 className="border-gray-200 dark:border-gray-700"
@@ -256,7 +291,7 @@ const TripList = () => {
           </div>
 
           {/* Filter inputs collapsible */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mt-4">
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Origin</Label>
               <Input
@@ -295,6 +330,15 @@ const TripList = () => {
                 className="border-orange-100 dark:border-orange-800"
               />
             </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Vehicle Type</Label>
+              <Input
+                placeholder="e.g. Open Truck, Container"
+                value={filters.vehicle_type}
+                onChange={(e) => setFilters({ ...filters, vehicle_type: e.target.value })}
+                className="border-orange-100 dark:border-orange-800"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -312,7 +356,7 @@ const TripList = () => {
               <div className="flex gap-4 justify-center">
                 <Button 
                   variant="outline" 
-                  onClick={() => setFilters({ origin: '', destination: '', minCapacity: '', maxPrice: '' })}
+                  onClick={() => setFilters({ origin: '', destination: '', minCapacity: '', maxPrice: '', vehicle_type: '' })}
                   className="border-gray-200 dark:border-gray-700"
                 >
                   Clear All Filters
