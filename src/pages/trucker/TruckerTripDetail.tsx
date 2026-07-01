@@ -269,6 +269,8 @@ const TruckerTripDetail = () => {
   if (!trip) return null;
 
   const pendingCount = bookingRequests.filter(r => r.status === 'pending').length;
+  const hasAcceptedRequests = bookingRequests.some(r => r.status === 'accepted');
+  const canCompleteTrip = trip.status === 'in_transit' || trip.status === 'delivered' || (trip.status === 'active' && hasAcceptedRequests);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -333,7 +335,7 @@ const TruckerTripDetail = () => {
               </AlertDialogContent>
             </AlertDialog>
           )}
-          {trip.status === 'delivered' && (
+          {canCompleteTrip && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600" disabled={actionLoading === 'complete'}>
@@ -527,7 +529,7 @@ const TruckerTripDetail = () => {
                                 <div className="flex items-center gap-2 text-green-600 font-medium dark:text-green-400">
                                   <CheckCircle className="h-5 w-5" /> Accepted
                                 </div>
-                                {(trip.status === 'active' || trip.status === 'in_transit' || trip.status === 'delivered') && (
+                                {canCompleteTrip && (
                                   <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                       <Button size="sm" className="bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600" disabled={actionLoading === 'complete'}>
