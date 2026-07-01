@@ -15,6 +15,7 @@ import { geocodeCity } from "@/utils/geocode";
 import { getRoute } from "@/utils/osrm";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { showSuccess, showError } from "@/utils/toast";
+import { PricePredictor } from "@/components/PricePredictor";
 
 type LocationData = Record<string, Record<string, string[]>>;
 
@@ -189,21 +190,30 @@ const PostTrip = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="price">Price per Tonne (₹)</Label>
-              <div className="relative">
-                <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
-                <Input
-                  id="price"
-                  type="number"
-                  placeholder="e.g. 1500"
-                  className="pl-10"
-                  value={formData.price_per_tonne}
-                  onChange={(e) => setFormData({...formData, price_per_tonne: e.target.value})}
-                  required
+              <div className="space-y-2">
+                <Label htmlFor="price">Price per Tonne (₹)</Label>
+                <div className="relative">
+                  <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                  <Input
+                    id="price"
+                    type="number"
+                    placeholder="e.g. 1500"
+                    className="pl-10"
+                    value={formData.price_per_tonne}
+                    onChange={(e) => setFormData({...formData, price_per_tonne: e.target.value})}
+                    required
+                  />
+                </div>
+                <PricePredictor
+                  originCity={formData.origin_city}
+                  destinationCity={formData.destination_city}
+                  originState={formData.origin_state}
+                  destinationState={formData.destination_state}
+                  weightTonnes={parseFloat(formData.available_capacity_tonnes) || 0}
+                  vehicleType={formData.vehicle_type}
+                  onApplyPrice={(price) => setFormData(prev => ({ ...prev, price_per_tonne: String(price) }))}
                 />
               </div>
-            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
