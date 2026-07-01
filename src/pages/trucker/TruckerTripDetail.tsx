@@ -35,7 +35,7 @@ import {
   notifyShipperOfTripCompletion,
 } from '@/utils/notifications';
 import ReviewDialog from '@/components/ReviewDialog';
-import type { Trip, Request, Review } from '@/types';
+import type { Trip, Request } from '@/types';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const cfg: Record<string, string> = {

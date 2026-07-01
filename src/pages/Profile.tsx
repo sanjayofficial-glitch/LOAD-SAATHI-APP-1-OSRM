@@ -358,11 +358,12 @@ const Profile = () => {
               ) : (
                 <div className="space-y-4">
                   {reviews
-                    .filter((review) =>
-                      userProfile?.user_type === 'trucker'
+                    .filter((review) => {
+                      if (!userProfile) return false;
+                      return userProfile.user_type === 'trucker'
                         ? review.trucker_id === userProfile.id && review.reviewer_role === 'shipper'
-                        : review.shipper_id === userProfile.id && review.reviewer_role === 'trucker'
-                    )
+                        : review.shipper_id === userProfile.id && review.reviewer_role === 'trucker';
+                    })
                     .map((review) => (
                       <div key={review.id} className="p-4 border border-gray-100 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 shadow-sm">
                         <div className="flex justify-between items-start mb-2">
