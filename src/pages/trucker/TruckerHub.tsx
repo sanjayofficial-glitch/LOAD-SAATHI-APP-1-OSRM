@@ -291,7 +291,7 @@ const TruckerHub = () => {
                       <div className="flex flex-wrap items-center gap-2 border-t md:border-t-0 pt-4 md:pt-0 dark:border-gray-700">
                         <Link to={`/trucker/trips/${trip.id}`}><Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950"><Eye className="h-4 w-4 mr-2" />View</Button></Link>
                         
-                        {(trip.status === 'active' || trip.status === 'in_transit' || trip.status === 'delivered') && (
+                        {trip.status !== 'completed' && trip.status !== 'cancelled' && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="outline" size="sm" className="border-orange-300 text-orange-700 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950">
