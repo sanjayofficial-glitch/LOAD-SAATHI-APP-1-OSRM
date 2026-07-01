@@ -103,7 +103,7 @@ async function groqProvider(body: PricePredictRequest, prompt: string): Promise<
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "mixtral-8x7b-32768",
+        model: "llama-3.3-70b-versatile",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.3,
         response_format: { type: "json_object" },
@@ -132,9 +132,8 @@ async function openRouterProvider(body: PricePredictRequest, prompt: string): Pr
   if (!apiKey) return { success: false, rateLimited: false }
 
   const models = [
-    "google/gemini-2.0-flash-lite-preview-02-05:free",
-    "meta-llama/llama-3.2-3b-instruct:free",
-    "microsoft/phi-3.5-mini-3.24k:free",
+    "cognitivecomputations/dolphin3.0-mistral-24b:free",
+    "microsoft/phi-3-mini-4k-instruct:free",
   ]
 
   for (const model of models) {
