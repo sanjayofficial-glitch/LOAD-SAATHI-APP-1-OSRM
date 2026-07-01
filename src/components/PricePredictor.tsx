@@ -34,12 +34,7 @@ export function PricePredictor(props: PricePredictorProps) {
   }
 
   if (isError || !data) {
-    return (
-      <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
-        <Sparkles className="h-3 w-3" />
-        <span>AI price unavailable</span>
-      </div>
-    )
+    return null
   }
 
   const TrendIcon =

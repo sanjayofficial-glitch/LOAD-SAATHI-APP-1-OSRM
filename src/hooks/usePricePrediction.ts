@@ -54,22 +54,18 @@ export function usePricePrediction(input: PricePredictionInput) {
 
       if (!supabaseUrl) return null
 
-      try {
-        const response = await fetch(
-          `${supabaseUrl}/functions/v1/price-predict`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(debouncedInput),
-            signal: AbortSignal.timeout(8000),
-          },
-        )
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/price-predict`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(debouncedInput),
+          signal: AbortSignal.timeout(8000),
+        },
+      )
 
-        if (!response.ok) return null
-        return await response.json()
-      } catch {
-        return null
-      }
+      if (!response.ok) return null
+      return await response.json()
     },
     enabled:
       !!debouncedInput.originCity &&
