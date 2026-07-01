@@ -527,6 +527,26 @@ const TruckerTripDetail = () => {
                                 <div className="flex items-center gap-2 text-green-600 font-medium dark:text-green-400">
                                   <CheckCircle className="h-5 w-5" /> Accepted
                                 </div>
+                                {(trip.status === 'active' || trip.status === 'in_transit' || trip.status === 'delivered') && (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button size="sm" className="bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600" disabled={actionLoading === 'complete'}>
+                                        {actionLoading === 'complete' ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-1" />}
+                                        Trip Completed
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Mark trip as completed?</AlertDialogTitle>
+                                        <AlertDialogDescription>This will finalize the trip immediately. You won't be able to make further changes.</AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleCompleteTrip} className="bg-orange-600 hover:bg-orange-700">Trip Completed</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                )}
                                 {trip.status === 'active' && (
                                   <AlertDialog>
                                     <AlertDialogTrigger asChild>
