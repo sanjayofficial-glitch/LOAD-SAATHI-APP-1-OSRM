@@ -21,13 +21,21 @@ import {
   Package as PackageIcon,
   AlertCircle,
   Plus,
-  Clock
+  Clock,
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 
-
-import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
+import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
+import { useSmartMatch } from '@/hooks/useSmartMatch';
 import { formatDuration } from '@/utils/format';
 import type { Trip } from '@/types';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const TripList = () => {
   const { userProfile } = useAuth();
@@ -151,6 +159,36 @@ const TripList = () => {
       }))
       .sort((a, b) => b._matchScore - a._matchScore);
   }, [trips, searchTerm, myShipment]);
+
+  const { scores: aiScores, loadingId: aiLoadingId } = useSmartMatch(
+    filteredTrips,
+    (t) => myShipment ? {
+      shipmentOriginCity: myShipment.origin_city,
+      shipmentDestCity: myShipment.destination_city,
+      tripOriginCity: t.origin_city,
+      tripDestCity: t.destination_city,
+      shipmentWeightTonnes: myShipment.weight_tonnes,
+      tripCapacityTonnes: t.available_capacity_tonnes,
+      shipmentOriginState: myShipment.origin_state,
+      shipmentDestState: myShipment.destination_state,
+      tripOriginState: t.origin_state,
+      tripDestState: t.destination_state,
+      shipmentOriginLat: myShipment.origin_lat,
+      shipmentOriginLng: myShipment.origin_lng,
+      tripOriginLat: t.origin_lat,
+      tripOriginLng: t.origin_lng,
+      shipmentDestLat: myShipment.destination_lat,
+      shipmentDestLng: myShipment.destination_lng,
+      tripDestLat: t.destination_lat,
+      tripDestLng: t.destination_lng,
+      shipmentBudgetPerTonne: myShipment.budget_per_tonne,
+      tripPricePerTonne: t.price_per_tonne,
+      shipmentDate: myShipment.departure_date,
+      tripDate: t.departure_date,
+      truckerRating: t.trucker?.rating,
+    } : null,
+    10,
+  );
 
   if (!userProfile) {
     return (
@@ -317,6 +355,27 @@ const TripList = () => {
                           const { label, color } = getMatchLabel(trip._matchScore);
                           return <Badge className={`${color} text-[10px] font-bold`}>{label}</Badge>;
                         })()}
+                        {aiScores[trip.id] && (() => {
+                          const ai = getAIMatchBadge(aiScores[trip.id]);
+                          return (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge className={`${ai.color} text-[10px] font-bold cursor-help`}>
+                                    <Sparkles className="h-3 w-3 mr-0.5 inline" />
+                                    {ai.label}
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs max-w-[200px]">
+                                  {aiScores[trip.id].reasoning}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          );
+                        })()}
+                        {aiLoadingId === trip.id && (
+                          <Loader2 className="h-3 w-3 animate-spin text-purple-500" />
+                        )}
                       </div>
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">

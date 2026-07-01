@@ -32,7 +32,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { showSuccess, showError } from '@/utils/toast';
-import { calculateMatchScore, getMatchLabel } from '@/utils/matching';
+import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
+import { useSmartMatch } from '@/hooks/useSmartMatch';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { formatDuration } from '@/utils/format';
 import { parseNaturalLanguageSearch } from '@/lib/gemini';
 import {
@@ -164,6 +171,35 @@ const BrowseShipments = () => {
       }))
       .sort((a, b) => b._matchScore - a._matchScore);
   }, [shipments, searchTerm, filters, myActiveTrip]);
+
+  const { scores: aiScores, loadingId: aiLoadingId } = useSmartMatch(
+    filteredShipments,
+    (s) => myActiveTrip ? {
+      shipmentOriginCity: s.origin_city,
+      shipmentDestCity: s.destination_city,
+      tripOriginCity: myActiveTrip.origin_city,
+      tripDestCity: myActiveTrip.destination_city,
+      shipmentWeightTonnes: s.weight_tonnes,
+      tripCapacityTonnes: myActiveTrip.available_capacity_tonnes,
+      shipmentOriginState: s.origin_state,
+      shipmentDestState: s.destination_state,
+      tripOriginState: myActiveTrip.origin_state,
+      tripDestState: myActiveTrip.destination_state,
+      shipmentOriginLat: s.origin_lat,
+      shipmentOriginLng: s.origin_lng,
+      tripOriginLat: myActiveTrip.origin_lat,
+      tripOriginLng: myActiveTrip.origin_lng,
+      shipmentDestLat: s.destination_lat,
+      shipmentDestLng: s.destination_lng,
+      tripDestLat: myActiveTrip.destination_lat,
+      tripDestLng: myActiveTrip.destination_lng,
+      shipmentBudgetPerTonne: s.budget_per_tonne,
+      tripPricePerTonne: myActiveTrip.price_per_tonne,
+      shipmentDate: s.departure_date,
+      tripDate: myActiveTrip.departure_date,
+    } : null,
+    10,
+  );
 
   const handleAiSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -343,6 +379,27 @@ const BrowseShipments = () => {
                                 const { label, color } = getMatchLabel(shipment._matchScore);
                                 return <Badge className={`${color} text-xs font-semibold`}>{label}</Badge>;
                               })()}
+                              {aiScores[shipment.id] && (() => {
+                                const ai = getAIMatchBadge(aiScores[shipment.id]);
+                                return (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Badge className={`${ai.color} text-xs font-semibold cursor-help`}>
+                                          <Sparkles className="h-3 w-3 mr-0.5 inline" />
+                                          {ai.label}
+                                        </Badge>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="left" className="text-xs max-w-[200px]">
+                                        {aiScores[shipment.id].reasoning}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                );
+                              })()}
+                              {aiLoadingId === shipment.id && (
+                                <Loader2 className="h-3 w-3 animate-spin text-purple-500" />
+                              )}
                               <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
                                 {shipment.weight_tonnes} Tonnes
                               </Badge>
