@@ -46,6 +46,9 @@ const ShipmentDetail = () => {
   
   // Review dialog state
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewTripId, setReviewTripId] = useState<string | null>(null);
+  const [reviewTruckerId, setReviewTruckerId] = useState<string | null>(null);
+  const [reviewTruckerName, setReviewTruckerName] = useState<string>('');
 
   const fetchData = async () => {
     if (!id || !userProfile) return;
@@ -85,10 +88,10 @@ const ShipmentDetail = () => {
         }
         
         // Check for linked trip (booking flow via requests table)
-        if (shipmentData.status === 'matched' || shipmentData.status === 'in_transit' || shipmentData.status === 'delivered') {
+        if (shipmentData.status === 'matched' || shipmentData.status === 'in_transit' || shipmentData.status === 'delivered' || shipmentData.status === 'completed') {
           const { data: linkedRequest } = await supabase
             .from('requests')
-            .select('trip_id')
+            .select('trip_id, receiver_id')
             .eq('shipment_id', id)
             .eq('status', 'accepted')
             .maybeSingle();
@@ -101,17 +104,31 @@ const ShipmentDetail = () => {
             if (linkedTrip) {
               setLinkedTripStatus(linkedTrip.status);
             }
+
+            setReviewTripId(linkedRequest.trip_id);
+            if (linkedRequest.receiver_id) {
+              const { data: trucker } = await supabase
+                .from('users')
+                .select('id, full_name')
+                .eq('id', linkedRequest.receiver_id)
+                .maybeSingle();
+              if (trucker) {
+                setReviewTruckerId(trucker.id);
+                setReviewTruckerName(trucker.full_name || 'the trucker');
+              }
+            }
+
+            // Check if already reviewed when completed
+            if (shipmentData.status === 'completed') {
+              const { data: review } = await supabase
+                .from('reviews')
+                .select('id')
+                .eq('trip_id', linkedRequest.trip_id)
+                .eq('shipper_id', userProfile.id)
+                .limit(1);
+              setHasReview(!!review?.length);
+            }
           }
-        }
-        
-        // Check if already reviewed if completed
-        if (shipmentData.status === 'completed') {
-          const { data: review } = await supabase
-            .from('reviews')
-            .select('id')
-            .eq('shipper_id', userProfile.id)
-            .limit(1);
-          setHasReview(!!review?.length);
         }
       }
     } catch (error: unknown) {
@@ -194,7 +211,7 @@ const ShipmentDetail = () => {
               </Button>
             </Link>
           )}
-          {isOwner && isCompleted && !hasReview && (
+          {isOwner && isCompleted && !hasReview && reviewTripId && (
             <Button 
               className="bg-yellow-500 hover:bg-yellow-600 text-white"
               onClick={() => setReviewOpen(true)}
@@ -528,10 +545,11 @@ const ShipmentDetail = () => {
         <ReviewDialog
           isOpen={reviewOpen}
           onClose={() => setReviewOpen(false)}
-          tripId={shipment.id} // Using shipment ID as trip context for review
-          truckerId="" // This would need to be fetched from the accepted offer
+          tripId={reviewTripId || ''}
+          truckerId={reviewTruckerId || ''}
           shipperId={userProfile?.id || ''}
-          truckerName="the trucker"
+          truckerName={reviewTruckerName}
+          shipperName={userProfile?.full_name || 'A shipper'}
           onSuccess={fetchData}
         />
       )}

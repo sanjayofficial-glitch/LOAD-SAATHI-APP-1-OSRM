@@ -149,6 +149,19 @@ export const notifyTruckerOfOfferDeclined = (params: {
     getToken: params.getToken,
   });
 
+export const notifyTruckerOfNewReview = (params: {
+  truckerId: string;
+  shipperName: string;
+  tripId: string;
+  getToken: () => Promise<string | null>;
+}) =>
+  sendNotification({
+    userId: params.truckerId,
+    message: `⭐ ${params.shipperName} left you a new review! Check your profile to see your updated rating.`,
+    relatedTripId: params.tripId,
+    getToken: params.getToken,
+  });
+
 export const notifyShipperOfTruckerOffer = (params: {
   shipperId: string;
   truckerName: string;

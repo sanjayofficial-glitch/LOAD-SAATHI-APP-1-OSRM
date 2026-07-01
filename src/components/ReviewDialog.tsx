@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Star, Loader2 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { notifyTruckerOfNewReview } from '@/utils/notifications';
 
 interface ReviewDialogProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ interface ReviewDialogProps {
   truckerId: string;
   shipperId: string;
   truckerName: string;
+  shipperName?: string;
   onSuccess?: () => void;
 }
 
@@ -34,6 +36,7 @@ const ReviewDialog = ({
   truckerId, 
   shipperId, 
   truckerName,
+  shipperName,
   onSuccess 
 }: ReviewDialogProps) => {
   const { getToken } = useClerkAuth();
@@ -54,6 +57,20 @@ const ReviewDialog = ({
       if (!supabaseToken) throw new Error('No Supabase token');
       
       const supabase = createClerkSupabaseClient(supabaseToken);
+
+      // Check for existing review to prevent duplicate submission
+      const { data: existing, error: checkError } = await supabase
+        .from('reviews')
+        .select('id')
+        .eq('trip_id', tripId)
+        .eq('shipper_id', shipperId)
+        .limit(1);
+      if (checkError) throw checkError;
+      if (existing?.length) {
+        showError('You have already submitted a review for this trip.');
+        onClose();
+        return;
+      }
       
       const { error } = await supabase
         .from('reviews')
@@ -66,6 +83,13 @@ const ReviewDialog = ({
         });
 
       if (error) throw error;
+
+      notifyTruckerOfNewReview({
+        truckerId,
+        shipperName: shipperName || 'A shipper',
+        tripId,
+        getToken: () => getToken({ template: 'supabase' }),
+      });
 
       showSuccess('Review submitted! Thank you for your feedback.');
       if (onSuccess) onSuccess();
