@@ -527,6 +527,66 @@ const TruckerTripDetail = () => {
                                 <div className="flex items-center gap-2 text-green-600 font-medium dark:text-green-400">
                                   <CheckCircle className="h-5 w-5" /> Accepted
                                 </div>
+                                {trip.status === 'active' && (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600" disabled={actionLoading === 'start'}>
+                                        {actionLoading === 'start' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4 mr-1" />}
+                                        Start Trip
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Start this trip?</AlertDialogTitle>
+                                        <AlertDialogDescription>Mark the trip as in transit. Shippers with accepted bookings will be notified.</AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleStartTrip} className="bg-blue-600 hover:bg-blue-700">Start Trip</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                )}
+                                {trip.status === 'in_transit' && (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button size="sm" className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600" disabled={actionLoading === 'delivered'}>
+                                        {actionLoading === 'delivered' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Flag className="h-4 w-4 mr-1" />}
+                                        Mark Delivered
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Mark as delivered?</AlertDialogTitle>
+                                        <AlertDialogDescription>Confirm that goods have been delivered.</AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleMarkDelivered} className="bg-purple-600 hover:bg-purple-700">Mark Delivered</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                )}
+                                {trip.status === 'delivered' && (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button size="sm" className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600" disabled={actionLoading === 'complete'}>
+                                        {actionLoading === 'complete' ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-1" />}
+                                        Complete Trip
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Mark trip as completed?</AlertDialogTitle>
+                                        <AlertDialogDescription>This will finalize the trip. You won't be able to make further changes.</AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleCompleteTrip} className="bg-green-600 hover:bg-green-700">Mark Completed</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                )}
                                 {trip.status === 'completed' && (
                                   <Button
                                     variant="outline"
