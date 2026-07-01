@@ -44,7 +44,7 @@ const NotificationBell = () => {
       const supabaseClient = createClerkSupabaseClient(supabaseToken);
       const { data, error } = await supabaseClient
         .from('notifications')
-        .select('id, type, title, message, is_read, created_at, related_id')
+        .select('id, type, title, message, is_read, created_at, related_trip_id')
         .eq('user_id', userProfile.id)
         .order('created_at', { ascending: false })
         .limit(10);
