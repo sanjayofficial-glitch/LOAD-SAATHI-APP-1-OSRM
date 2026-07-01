@@ -291,58 +291,58 @@ const TruckerHub = () => {
                       <div className="flex flex-wrap items-center gap-2 border-t md:border-t-0 pt-4 md:pt-0 dark:border-gray-700">
                         <Link to={`/trucker/trips/${trip.id}`}><Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950"><Eye className="h-4 w-4 mr-2" />View</Button></Link>
                         
-                        {trip.status === 'active' && (
-                          <>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="outline" size="sm" className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950">
-                                  <CheckCircle className="h-4 w-4 mr-2" />
-                                  Complete
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Mark trip as completed?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    This will mark the trip as finished. You won't be able to accept more bookings for this trip.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleCompleteTrip(trip.id)} className="bg-green-600 hover:bg-green-700">
-                                    {actionLoading === trip.id ? (
-                                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    ) : (
-                                      'Mark Completed'
-                                    )}
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-
-                            <Link to={`/trucker/trips/${trip.id}/edit`}><Button variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950"><Edit className="h-4 w-4 mr-2" />Edit</Button></Link>
-                            
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950">
-                                  <Trash2 className="h-4 w-4 mr-2" />
+                        {(trip.status === 'active' || trip.status === 'in_transit' || trip.status === 'delivered') && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="border-orange-300 text-orange-700 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950">
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Trip Completed
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Mark trip as completed?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will mark the trip as finished. You won't be able to make further changes.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleCompleteTrip(trip.id)} className="bg-orange-600 hover:bg-orange-700">
+                                  {actionLoading === trip.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                  ) : (
+                                    'Trip Completed'
+                                  )}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                        {trip.status !== 'completed' && trip.status !== 'cancelled' && (
+                          <Link to={`/trucker/trips/${trip.id}/edit`}><Button variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950"><Edit className="h-4 w-4 mr-2" />Edit</Button></Link>
+                        )}
+                        {trip.status !== 'completed' && trip.status !== 'cancelled' && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>This will permanently delete your trip listing.</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteTrip(trip.id)} className="bg-red-600 hover:bg-red-700">
                                   Delete
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                  <AlertDialogDescription>This will permanently delete your trip listing.</AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDeleteTrip(trip.id)} className="bg-red-600 hover:bg-red-700">
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </>
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         )}
                       </div>
                     </div>
