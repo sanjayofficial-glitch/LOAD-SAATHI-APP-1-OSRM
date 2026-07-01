@@ -1,8 +1,6 @@
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? ""
-const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY") ?? ""
-const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? ""
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? ""
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+function getEnv(name: string): string {
+  return Deno.env.get(name) ?? ""
+}
 
 interface PricePredictRequest {
   originCity: string
@@ -62,17 +60,15 @@ function parseAIResponse(text: string): PriceResult | null {
 }
 
 async function geminiProvider(body: PricePredictRequest, prompt: string): Promise<ProviderResult> {
-  if (!GEMINI_API_KEY) return { success: false, rateLimited: false }
+  const apiKey = getEnv("GEMINI_API_KEY")
+  if (!apiKey) return { success: false, rateLimited: false }
 
   try {
     const res = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": GEMINI_API_KEY,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
         }),
@@ -80,7 +76,7 @@ async function geminiProvider(body: PricePredictRequest, prompt: string): Promis
     )
 
     if (res.status === 429) return { success: false, rateLimited: true }
-    if (!res.ok) return { success: false, rateLimited: false }
+    if (!res.ok) return { success: false, rateLimited: res.status >= 500 }
 
     const data = await res.json()
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
@@ -96,14 +92,15 @@ async function geminiProvider(body: PricePredictRequest, prompt: string): Promis
 }
 
 async function groqProvider(body: PricePredictRequest, prompt: string): Promise<ProviderResult> {
-  if (!GROQ_API_KEY) return { success: false, rateLimited: false }
+  const apiKey = getEnv("GROQ_API_KEY")
+  if (!apiKey) return { success: false, rateLimited: false }
 
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${GROQ_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: "mixtral-8x7b-32768",
@@ -131,7 +128,8 @@ async function groqProvider(body: PricePredictRequest, prompt: string): Promise<
 }
 
 async function openRouterProvider(body: PricePredictRequest, prompt: string): Promise<ProviderResult> {
-  if (!OPENROUTER_API_KEY) return { success: false, rateLimited: false }
+  const apiKey = getEnv("OPENROUTER_API_KEY")
+  if (!apiKey) return { success: false, rateLimited: false }
 
   const models = [
     "google/gemini-2.0-flash-lite-preview-02-05:free",
@@ -145,7 +143,7 @@ async function openRouterProvider(body: PricePredictRequest, prompt: string): Pr
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
           "HTTP-Referer": "https://loadsaathi.app",
         },
         body: JSON.stringify({
@@ -244,15 +242,17 @@ Deno.serve(async (req: Request) => {
     let historicalLoads: number | null = null
     let historicalAvgPrice: number | null = null
 
-    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+    const supabaseUrl = getEnv("SUPABASE_URL")
+    const supabaseKey = getEnv("SUPABASE_SERVICE_ROLE_KEY")
+    if (supabaseUrl && supabaseKey) {
       try {
-        const url = `${SUPABASE_URL}/rest/v1/rpc/get_route_history`
+        const url = `${supabaseUrl}/rest/v1/rpc/get_route_history`
         const res = await fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "apikey": SUPABASE_SERVICE_ROLE_KEY,
-            Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+            "apikey": supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
           },
           body: JSON.stringify({
             p_origin: body.originCity,
@@ -284,15 +284,15 @@ Deno.serve(async (req: Request) => {
       { name: "OpenRouter", fn: openRouterProvider },
     ]
 
-    for (const provider of providers) {
-      const result = await provider.fn(body, prompt)
+    for (const { name, fn } of providers) {
+      const result = await fn(body, prompt)
       if (result.success && result.data) {
         return new Response(
           JSON.stringify({
             ...result.data,
             historicalLoads,
             historicalAvgPrice,
-            provider: provider.name,
+            provider: name,
           }),
           { status: 200, headers },
         )
