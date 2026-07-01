@@ -1,4 +1,6 @@
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? ""
+const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY") ?? ""
+const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? ""
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? ""
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
 
@@ -13,6 +15,200 @@ interface PricePredictRequest {
 
 interface HistoryRow {
   price_per_tonne: number
+}
+
+interface PriceResult {
+  recommendedPrice: number
+  range: { min: number; max: number }
+  confidence: "high" | "medium" | "low"
+  trend: "rising" | "falling" | "stable"
+  reasoning: string
+}
+
+interface ProviderResult {
+  success: boolean
+  data?: PriceResult & { provider?: string }
+  rateLimited?: boolean
+}
+
+function buildPrompt(body: PricePredictRequest, historyInfo: string): string {
+  return `You are a logistics pricing expert for the Indian freight market.
+Given the following shipment details, suggest a fair price per tonne in INR.
+
+Route: ${body.originCity}${body.originState ? `, ${body.originState}` : ""} → ${body.destinationCity}${body.destinationState ? `, ${body.destinationState}` : ""}
+Weight: ${body.weightTonnes} tonnes
+Vehicle Type: ${body.vehicleType || "Not specified"}
+${historyInfo}
+
+Return ONLY a JSON object (no markdown, no explanation outside the JSON):
+{
+  "recommendedPrice": number,
+  "range": { "min": number, "max": number },
+  "confidence": "high" | "medium" | "low",
+  "trend": "rising" | "falling" | "stable",
+  "reasoning": "one-line explanation"
+}
+
+Consider: route distance, seasonal factors, typical Indian freight rates, fuel costs.`
+}
+
+function parseAIResponse(text: string): PriceResult | null {
+  try {
+    const cleaned = text.replace(/```json|```/g, "").trim()
+    return JSON.parse(cleaned)
+  } catch {
+    return null
+  }
+}
+
+async function geminiProvider(body: PricePredictRequest, prompt: string): Promise<ProviderResult> {
+  if (!GEMINI_API_KEY) return { success: false, rateLimited: false }
+
+  try {
+    const res = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+        }),
+      }
+    )
+
+    if (res.status === 429) return { success: false, rateLimited: true }
+    if (!res.ok) return { success: false, rateLimited: false }
+
+    const data = await res.json()
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
+    if (!text) return { success: false, rateLimited: false }
+
+    const parsed = parseAIResponse(text)
+    if (!parsed) return { success: false, rateLimited: false }
+
+    return { success: true, data: parsed }
+  } catch {
+    return { success: false, rateLimited: false }
+  }
+}
+
+async function groqProvider(body: PricePredictRequest, prompt: string): Promise<ProviderResult> {
+  if (!GROQ_API_KEY) return { success: false, rateLimited: false }
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "mixtral-8x7b-32768",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.3,
+        response_format: { type: "json_object" },
+        max_tokens: 500,
+      }),
+    })
+
+    if (res.status === 429) return { success: false, rateLimited: true }
+    if (!res.ok) return { success: false, rateLimited: false }
+
+    const data = await res.json()
+    const text = data?.choices?.[0]?.message?.content
+    if (!text) return { success: false, rateLimited: false }
+
+    const parsed = parseAIResponse(text)
+    if (!parsed) return { success: false, rateLimited: false }
+
+    return { success: true, data: parsed }
+  } catch {
+    return { success: false, rateLimited: false }
+  }
+}
+
+async function openRouterProvider(body: PricePredictRequest, prompt: string): Promise<ProviderResult> {
+  if (!OPENROUTER_API_KEY) return { success: false, rateLimited: false }
+
+  const models = [
+    "google/gemini-2.0-flash-lite-preview-02-05:free",
+    "meta-llama/llama-3.2-3b-instruct:free",
+    "microsoft/phi-3.5-mini-3.24k:free",
+  ]
+
+  for (const model of models) {
+    try {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          "HTTP-Referer": "https://loadsaathi.app",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            {
+              role: "user",
+              content: `${prompt}\n\nReturn ONLY valid JSON.`,
+            },
+          ],
+          temperature: 0.3,
+          max_tokens: 500,
+        }),
+      })
+
+      if (res.status === 429) continue
+      if (!res.ok) continue
+
+      const data = await res.json()
+      const text = data?.choices?.[0]?.message?.content
+      if (!text) continue
+
+      const parsed = parseAIResponse(text)
+      if (parsed) return { success: true, data: parsed }
+    } catch {
+      continue
+    }
+  }
+
+  return { success: false, rateLimited: false }
+}
+
+function localFallback(
+  body: PricePredictRequest,
+  historicalLoads: number | null,
+  historicalAvgPrice: number | null,
+): PriceResult & { provider: string } {
+  const weight = body.weightTonnes
+
+  if (historicalAvgPrice && historicalLoads && historicalLoads > 0) {
+    const base = historicalAvgPrice
+    const range = Math.round(base * 0.15)
+    return {
+      recommendedPrice: base,
+      range: { min: base - range, max: base + range },
+      confidence: "medium",
+      trend: "stable",
+      reasoning: `Based on ${historicalLoads} historical load(s) on this route.`,
+      provider: "data",
+    }
+  }
+
+  const baseRate = weight >= 20 ? 2500 : weight >= 10 ? 3000 : 4000
+  const price = baseRate
+  const spread = Math.round(price * 0.2)
+  return {
+    recommendedPrice: price,
+    range: { min: price - spread, max: price + spread },
+    confidence: "low",
+    trend: "stable",
+    reasoning: `Estimated at ₹${price}/t based on typical rates for ${weight}t load.`,
+    provider: "data",
+  }
 }
 
 Deno.serve(async (req: Request) => {
@@ -44,16 +240,10 @@ Deno.serve(async (req: Request) => {
       })
     }
 
-    if (!GEMINI_API_KEY) {
-      return new Response(JSON.stringify({ error: "Gemini API key not configured" }), {
-        status: 500,
-        headers,
-      })
-    }
-
     let historyInfo = ""
     let historicalLoads: number | null = null
     let historicalAvgPrice: number | null = null
+
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const url = `${SUPABASE_URL}/rest/v1/rpc/get_route_history`
@@ -62,7 +252,7 @@ Deno.serve(async (req: Request) => {
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_SERVICE_ROLE_KEY,
-            "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+            Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
           },
           body: JSON.stringify({
             p_origin: body.originCity,
@@ -72,7 +262,7 @@ Deno.serve(async (req: Request) => {
         if (res.ok) {
           const rows: HistoryRow[] = await res.json()
           if (rows.length > 0) {
-            const prices = rows.map(r => r.price_per_tonne)
+            const prices = rows.map((r) => r.price_per_tonne)
             const avg = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(0)
             const min = Math.min(...prices)
             const max = Math.max(...prices)
@@ -82,75 +272,42 @@ Deno.serve(async (req: Request) => {
           }
         }
       } catch {
-        // history is optional — silently continue
+        // history is optional
       }
     }
 
-    const prompt = `
-You are a logistics pricing expert for the Indian freight market.
-Given the following shipment details, suggest a fair price per tonne in INR.
+    const prompt = buildPrompt(body, historyInfo)
 
-Route: ${body.originCity}${body.originState ? `, ${body.originState}` : ""} → ${body.destinationCity}${body.destinationState ? `, ${body.destinationState}` : ""}
-Weight: ${body.weightTonnes} tonnes
-Vehicle Type: ${body.vehicleType || "Not specified"}
-${historyInfo}
+    const providers: { name: string; fn: (b: PricePredictRequest, p: string) => Promise<ProviderResult> }[] = [
+      { name: "Gemini", fn: geminiProvider },
+      { name: "Groq", fn: groqProvider },
+      { name: "OpenRouter", fn: openRouterProvider },
+    ]
 
-Return ONLY a JSON object (no markdown, no explanation outside the JSON):
-{
-  "recommendedPrice": number,
-  "range": { "min": number, "max": number },
-  "confidence": "high" | "medium" | "low",
-  "trend": "rising" | "falling" | "stable",
-  "reasoning": "one-line explanation"
-}
-
-Consider: route distance, seasonal factors, typical Indian freight rates, fuel costs.
-`
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
+    for (const provider of providers) {
+      const result = await provider.fn(body, prompt)
+      if (result.success && result.data) {
+        return new Response(
+          JSON.stringify({
+            ...result.data,
+            historicalLoads,
+            historicalAvgPrice,
+            provider: provider.name,
+          }),
+          { status: 200, headers },
+        )
       }
+    }
+
+    const fallback = localFallback(body, historicalLoads, historicalAvgPrice)
+    return new Response(
+      JSON.stringify({
+        ...fallback,
+        historicalLoads,
+        historicalAvgPrice,
+      }),
+      { status: 200, headers },
     )
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("Gemini API error:", response.status, errorText)
-      return new Response(JSON.stringify({ error: "Gemini API request failed" }), {
-        status: response.status,
-        headers,
-      })
-    }
-
-    const data = await response.json()
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
-
-    if (!text) {
-      return new Response(JSON.stringify({ error: "Empty response from Gemini" }), {
-        status: 500,
-        headers,
-      })
-    }
-
-    const jsonString = text.replace(/```json|```/g, "").trim()
-    const result = JSON.parse(jsonString)
-
-    return new Response(JSON.stringify({
-      ...result,
-      historicalLoads,
-      historicalAvgPrice,
-    }), {
-      status: 200,
-      headers,
-    })
   } catch (err) {
     console.error("Price predict error:", err)
     return new Response(JSON.stringify({ error: "Internal server error" }), {

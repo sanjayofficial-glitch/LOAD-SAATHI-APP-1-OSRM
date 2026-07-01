@@ -18,6 +18,7 @@ export interface PricePrediction {
   reasoning: string
   historicalLoads?: number | null
   historicalAvgPrice?: number | null
+  provider: string
 }
 
 function useDebounce<T>(value: T, delay: number): T {
