@@ -34,7 +34,8 @@ import {
   notifyShipperOfTripDelivered,
   notifyShipperOfTripCompletion,
 } from '@/utils/notifications';
-import type { Trip, Request } from '@/types';
+import ReviewDialog from '@/components/ReviewDialog';
+import type { Trip, Request, Review } from '@/types';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const cfg: Record<string, string> = {
@@ -65,6 +66,8 @@ const TruckerTripDetail = () => {
   const [bookingRequests, setBookingRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [selectedShipperForReview, setSelectedShipperForReview] = useState<{ id: string; name: string } | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!tripId || !userProfile?.id) return;
@@ -520,8 +523,26 @@ const TruckerTripDetail = () => {
                               </div>
                             )}
                             {tab === 'accepted' && (
-                              <div className="flex items-center gap-2 text-green-600 font-medium dark:text-green-400">
-                                <CheckCircle className="h-5 w-5" /> Accepted
+                              <div className="flex flex-col items-end gap-2">
+                                <div className="flex items-center gap-2 text-green-600 font-medium dark:text-green-400">
+                                  <CheckCircle className="h-5 w-5" /> Accepted
+                                </div>
+                                {trip.status === 'completed' && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-orange-600 border-orange-200 hover:bg-orange-50 dark:text-orange-400 dark:border-orange-800 dark:hover:bg-orange-950"
+                                    onClick={() => {
+                                      setSelectedShipperForReview({
+                                        id: request.shipper_id,
+                                        name: request.shipper?.full_name || 'Shipper',
+                                      });
+                                      setIsReviewOpen(true);
+                                    }}
+                                  >
+                                    <Star className="h-4 w-4 mr-1" /> Rate Shipper
+                                  </Button>
+                                )}
                               </div>
                             )}
                             {tab === 'declined' && (
@@ -540,6 +561,18 @@ const TruckerTripDetail = () => {
           })}
         </Tabs>
       </div>
+
+      <ReviewDialog
+        isOpen={isReviewOpen}
+        onClose={() => { setIsReviewOpen(false); setSelectedShipperForReview(null); }}
+        tripId={trip.id}
+        truckerId={userProfile?.id || ''}
+        shipperId={selectedShipperForReview?.id || ''}
+        truckerName={userProfile?.full_name || ''}
+        shipperName={selectedShipperForReview?.name}
+        reviewerRole="trucker"
+        onSuccess={fetchData}
+      />
     </div>
   );
 };

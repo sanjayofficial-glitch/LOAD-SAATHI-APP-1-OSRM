@@ -97,6 +97,7 @@ export interface Review {
   trip_id: string;
   trucker_id: string;
   shipper_id: string;
+  reviewer_role: 'shipper' | 'trucker';
   rating: number;
   comment?: string;
   created_at: string;

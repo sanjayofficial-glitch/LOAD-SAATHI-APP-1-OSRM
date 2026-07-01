@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Star, Loader2 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-import { notifyTruckerOfNewReview } from '@/utils/notifications';
+import { notifyTruckerOfNewReview, notifyShipperOfNewReview } from '@/utils/notifications';
 
 interface ReviewDialogProps {
   isOpen: boolean;
@@ -26,6 +26,7 @@ interface ReviewDialogProps {
   shipperId: string;
   truckerName: string;
   shipperName?: string;
+  reviewerRole?: 'shipper' | 'trucker';
   onSuccess?: () => void;
 }
 
@@ -37,6 +38,7 @@ const ReviewDialog = ({
   shipperId, 
   truckerName,
   shipperName,
+  reviewerRole = 'shipper',
   onSuccess 
 }: ReviewDialogProps) => {
   const { getToken } = useClerkAuth();
@@ -59,11 +61,14 @@ const ReviewDialog = ({
       const supabase = createClerkSupabaseClient(supabaseToken);
 
       // Check for existing review to prevent duplicate submission
+      const existingCheckField = reviewerRole === 'shipper' ? 'shipper_id' : 'trucker_id';
+      const existingCheckValue = reviewerRole === 'shipper' ? shipperId : truckerId;
       const { data: existing, error: checkError } = await supabase
         .from('reviews')
         .select('id')
         .eq('trip_id', tripId)
-        .eq('shipper_id', shipperId)
+        .eq('reviewer_role', reviewerRole)
+        .eq(existingCheckField, existingCheckValue)
         .limit(1);
       if (checkError) throw checkError;
       if (existing?.length) {
@@ -78,18 +83,28 @@ const ReviewDialog = ({
           trip_id: tripId,
           trucker_id: truckerId,
           shipper_id: shipperId,
+          reviewer_role: reviewerRole,
           rating,
           comment: comment.trim()
         });
 
       if (error) throw error;
 
-      notifyTruckerOfNewReview({
-        truckerId,
-        shipperName: shipperName || 'A shipper',
-        tripId,
-        getToken: () => getToken({ template: 'supabase' }),
-      });
+      if (reviewerRole === 'shipper') {
+        notifyTruckerOfNewReview({
+          truckerId,
+          shipperName: shipperName || 'A shipper',
+          tripId,
+          getToken: () => getToken({ template: 'supabase' }),
+        });
+      } else {
+        notifyShipperOfNewReview({
+          shipperId,
+          truckerName: truckerName || 'A trucker',
+          tripId,
+          getToken: () => getToken({ template: 'supabase' }),
+        });
+      }
 
       showSuccess('Review submitted! Thank you for your feedback.');
       if (onSuccess) onSuccess();
@@ -105,9 +120,14 @@ const ReviewDialog = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Rate your experience</DialogTitle>
+          <DialogTitle>
+            {reviewerRole === 'shipper' ? `Rate ${truckerName}` : `Rate ${shipperName || 'the shipper'}`}
+          </DialogTitle>
           <DialogDescription>
-            How was your trip with {truckerName}? Your feedback helps the community.
+            {reviewerRole === 'shipper'
+              ? `How was your trip with ${truckerName}? Your feedback helps the community.`
+              : `How was your experience with ${shipperName || 'the shipper'}? Your feedback helps the community.`
+            }
           </DialogDescription>
         </DialogHeader>
         

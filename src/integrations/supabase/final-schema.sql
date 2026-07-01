@@ -121,6 +121,7 @@ CREATE TABLE public.reviews (
   trip_id uuid NOT NULL,
   trucker_id text NOT NULL,  -- References users.id (text)
   shipper_id text NOT NULL,  -- References users.id (text)
+  reviewer_role text NOT NULL DEFAULT 'shipper' CHECK (reviewer_role IN ('shipper', 'trucker')),
   rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
   comment text,
   created_at timestamp with time zone DEFAULT now(),
@@ -128,10 +129,10 @@ CREATE TABLE public.reviews (
   CONSTRAINT reviews_shipper_id_fkey FOREIGN KEY (shipper_id) REFERENCES public.users(id),
   CONSTRAINT reviews_trip_id_fkey FOREIGN KEY (trip_id) REFERENCES public.trips(id),
   CONSTRAINT reviews_trucker_id_fkey FOREIGN KEY (trucker_id) REFERENCES public.users(id),
-  CONSTRAINT unique_trip_shipper_review UNIQUE (trip_id, shipper_id)
+  CONSTRAINT unique_trip_role_review UNIQUE (trip_id, reviewer_role, shipper_id)
 );
 
--- Function + trigger to auto-recalculate trucker rating on review changes
+-- Function + trigger to auto-recalculate trucker rating from shipper reviews
 CREATE OR REPLACE FUNCTION public.update_trucker_rating()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -144,7 +145,8 @@ BEGIN
   target_trucker_id := COALESCE(NEW.trucker_id, OLD.trucker_id);
   SELECT ROUND(AVG(rating)::numeric, 1) INTO avg_rating
   FROM public.reviews
-  WHERE trucker_id = target_trucker_id;
+  WHERE trucker_id = target_trucker_id
+    AND reviewer_role = 'shipper';
   UPDATE public.users
   SET rating = COALESCE(avg_rating, 0)
   WHERE id = target_trucker_id;
@@ -152,11 +154,43 @@ BEGIN
 END;
 $$;
 
+-- Function + trigger to auto-recalculate shipper rating from trucker reviews
+CREATE OR REPLACE FUNCTION public.update_shipper_rating()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  avg_rating numeric;
+  target_shipper_id text;
+BEGIN
+  target_shipper_id := COALESCE(NEW.shipper_id, OLD.shipper_id);
+  SELECT ROUND(AVG(rating)::numeric, 1) INTO avg_rating
+  FROM public.reviews
+  WHERE shipper_id = target_shipper_id
+    AND reviewer_role = 'trucker';
+  UPDATE public.users
+  SET rating = COALESCE(avg_rating, 0)
+  WHERE id = target_shipper_id;
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
 DROP TRIGGER IF EXISTS trg_reviews_update_rating ON public.reviews;
-CREATE TRIGGER trg_reviews_update_rating
+DROP TRIGGER IF EXISTS trg_reviews_update_trucker_rating ON public.reviews;
+DROP TRIGGER IF EXISTS trg_reviews_update_shipper_rating ON public.reviews;
+
+CREATE TRIGGER trg_reviews_update_trucker_rating
   AFTER INSERT OR UPDATE OR DELETE ON public.reviews
   FOR EACH ROW
+  WHEN (NEW.reviewer_role IS NOT DISTINCT FROM 'shipper' OR OLD.reviewer_role IS NOT DISTINCT FROM 'shipper')
   EXECUTE FUNCTION public.update_trucker_rating();
+
+CREATE TRIGGER trg_reviews_update_shipper_rating
+  AFTER INSERT OR UPDATE OR DELETE ON public.reviews
+  FOR EACH ROW
+  WHEN (NEW.reviewer_role IS NOT DISTINCT FROM 'trucker' OR OLD.reviewer_role IS NOT DISTINCT FROM 'trucker')
+  EXECUTE FUNCTION public.update_shipper_rating();
 
 -- Messages table
 CREATE TABLE public.messages (
@@ -340,8 +374,13 @@ CREATE POLICY "Anyone can see reviews" ON public.reviews
   FOR SELECT TO authenticated USING (true);
 
 DROP POLICY IF EXISTS "Shippers can create reviews" ON public.reviews;
-CREATE POLICY "Shippers can create reviews" ON public.reviews
-  FOR INSERT TO authenticated WITH CHECK (auth.jwt()->>'sub' = shipper_id);
+DROP POLICY IF EXISTS "Users can create reviews" ON public.reviews;
+CREATE POLICY "Users can create reviews" ON public.reviews
+  FOR INSERT TO authenticated WITH CHECK (
+    (reviewer_role = 'shipper' AND auth.jwt()->>'sub' = shipper_id)
+    OR
+    (reviewer_role = 'trucker' AND auth.jwt()->>'sub' = trucker_id)
+  );
 
 -- ===================== MESSAGES =====================
 DROP POLICY IF EXISTS "Users can see their messages" ON public.messages;

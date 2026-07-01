@@ -52,9 +52,7 @@ const Profile = () => {
       setFullName(userProfile.full_name || '');
       setPhone(userProfile.phone || '');
       fetchStats();
-      if (userProfile.user_type === 'trucker') {
-        fetchReviews();
-      }
+      fetchReviews();
     }
   }, [userProfile]);
 
@@ -75,11 +73,21 @@ const Profile = () => {
           .eq('trucker_id', userProfile.id);
         setStats({ count: count || 0, rating: userProfile.rating || 0 });
       } else if (userProfile.user_type === 'shipper') {
-        const { count } = await supabase
-          .from('requests')
-          .select('*', { count: 'exact', head: true })
-          .eq('shipper_id', userProfile.id);
-        setStats({ count: count || 0, rating: 0 });
+        const [countRes, ratingRes] = await Promise.all([
+          supabase
+            .from('requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('shipper_id', userProfile.id),
+          supabase
+            .from('reviews')
+            .select('rating')
+            .eq('shipper_id', userProfile.id)
+            .eq('reviewer_role', 'trucker')
+        ]);
+        const rating = ratingRes.data && ratingRes.data.length > 0
+          ? ratingRes.data.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) / ratingRes.data.length
+          : 0;
+        setStats({ count: countRes.count || 0, rating });
       }
     } catch (err) {
       console.error("Error fetching stats:", err);
@@ -99,8 +107,8 @@ const Profile = () => {
       
       const { data } = await supabase
         .from('reviews')
-        .select('*, shipper:users(full_name)')
-        .eq('trucker_id', userProfile.id)
+        .select('*, shipper:shipper_id(full_name), trucker:trucker_id(full_name)')
+        .or(`trucker_id.eq.${userProfile.id},shipper_id.eq.${userProfile.id}`)
         .order('created_at', { ascending: false });
       
       if (data) {
@@ -238,9 +246,9 @@ const Profile = () => {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className={`grid w-full ${userProfile?.user_type === 'trucker' ? 'grid-cols-4' : 'grid-cols-3'} lg:w-[500px]`}>
+        <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          {userProfile?.user_type === 'trucker' && <TabsTrigger value="reviews">Reviews</TabsTrigger>}
+          <TabsTrigger value="reviews">Reviews</TabsTrigger>
           <TabsTrigger value="personal">Personal Info</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
@@ -268,23 +276,23 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {userProfile?.user_type === 'trucker' && (
-              <Card className="border-yellow-100 dark:border-yellow-800 shadow-sm overflow-hidden">
-                <div className="h-1 bg-gradient-to-r from-yellow-500 to-yellow-400" />
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">Average Rating</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="text-3xl font-black flex items-center text-gray-900 dark:text-white">
-                      {userProfile.rating?.toFixed(1) || '0.0'}
-                      <StarIcon className="h-5 w-5 text-yellow-500 ml-2 fill-current" />
-                    </div>
-                    <StarIcon className="h-8 w-8 text-yellow-100 dark:text-yellow-900" />
+            <Card className="border-yellow-100 dark:border-yellow-800 shadow-sm overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-yellow-500 to-yellow-400" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  {userProfile?.user_type === 'trucker' ? 'Average Rating' : 'Shipper Rating'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-black flex items-center text-gray-900 dark:text-white">
+                    {stats.rating > 0 ? stats.rating.toFixed(1) : (userProfile?.rating?.toFixed(1) || '0.0')}
+                    <StarIcon className="h-5 w-5 text-yellow-500 ml-2 fill-current" />
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                  <StarIcon className="h-8 w-8 text-yellow-100 dark:text-yellow-900" />
+                </div>
+              </CardContent>
+            </Card>
 
             <Card className="md:col-span-2 border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
               <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
@@ -323,26 +331,39 @@ const Profile = () => {
           </div>
         </TabsContent>
 
-        {userProfile?.user_type === 'trucker' && (
-          <TabsContent value="reviews">
-            <Card className="border-orange-100 dark:border-orange-800 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-white">Customer Reviews</CardTitle>
-                <CardDescription className="dark:text-gray-400">What shippers are saying about your service</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {reviewsLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
-                  </div>
-                ) : reviews.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl border border-dashed dark:border-gray-700">
-                    <MessageSquare className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">No reviews yet. Complete trips to get feedback!</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {reviews.map((review) => (
+        <TabsContent value="reviews">
+          <Card className="border-orange-100 dark:border-orange-800 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-gray-900 dark:text-white">Reviews</CardTitle>
+              <CardDescription className="dark:text-gray-400">
+                {userProfile?.user_type === 'trucker'
+                  ? 'What shippers are saying about your service'
+                  : 'What truckers are saying about you'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {reviewsLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl border border-dashed dark:border-gray-700">
+                  <MessageSquare className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {userProfile?.user_type === 'trucker'
+                      ? 'No reviews yet. Complete trips to get feedback!'
+                      : 'No reviews yet. Complete shipments to get feedback!'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {reviews
+                    .filter((review) =>
+                      userProfile?.user_type === 'trucker'
+                        ? review.trucker_id === userProfile.id && review.reviewer_role === 'shipper'
+                        : review.shipper_id === userProfile.id && review.reviewer_role === 'trucker'
+                    )
+                    .map((review) => (
                       <div key={review.id} className="p-4 border border-gray-100 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 shadow-sm">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-2">
@@ -352,7 +373,9 @@ const Profile = () => {
                               ))}
                             </div>
                             <span className="text-sm font-bold text-gray-900 dark:text-white">
-                              {review.shipper?.full_name || 'Anonymous Shipper'}
+                              {review.reviewer_role === 'shipper'
+                                ? (review.shipper as { full_name?: string })?.full_name || 'Shipper'
+                                : (review.trucker as { full_name?: string })?.full_name || 'Trucker'}
                             </span>
                           </div>
                           <span className="text-xs text-gray-400 dark:text-gray-500">
@@ -364,12 +387,11 @@ const Profile = () => {
                         )}
                       </div>
                     ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="personal">
           <Card className="border-orange-100 dark:border-orange-800 shadow-sm overflow-hidden">
