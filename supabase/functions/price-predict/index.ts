@@ -1,5 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? ""
 
 interface PricePredictRequest {
@@ -15,7 +13,7 @@ interface PricePredictRequest {
   historicalCount?: number
 }
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -73,7 +71,7 @@ Consider: route distance, seasonal factors, typical Indian freight rates, fuel c
 `
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent`,
       {
         method: "POST",
         headers: {

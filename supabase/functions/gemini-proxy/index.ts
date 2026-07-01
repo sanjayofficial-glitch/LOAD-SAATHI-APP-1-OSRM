@@ -69,7 +69,7 @@ serve(async (req: Request) => {
   `
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent`,
       {
         method: "POST",
         headers: {
