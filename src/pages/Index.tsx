@@ -72,14 +72,21 @@ const Index = () => {
     const init = async () => {
       try {
         const THREE = await new Promise<any>((resolve) => {
+          // Check if already loaded
+          if ((window as any).THREE) {
+            resolve((window as any).THREE);
+            return;
+          }
           const script = document.createElement('script');
           script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+          script.integrity = 'sha256-BZoSyD7WzSm13Yl6VvN0VYmRv2DqS0X3aJl8Q3K0t3Y=';
+          script.crossOrigin = 'anonymous';
           script.onload = () => resolve((window as any).THREE);
           script.onerror = () => {
-            console.warn('Three.js CDN failed, using fallback');
+            console.warn('[LoadSaathi] Three.js CDN unavailable — globe disabled');
             resolve(null);
           };
-          document.body.appendChild(script);
+          document.head.appendChild(script);
         });
 
         if (!THREE) return;
@@ -164,10 +171,11 @@ const Index = () => {
 
         camera.position.z = 6;
 
-        window.addEventListener('mousemove', (e) => {
+        const handleMouseMove = (e: MouseEvent) => {
           mouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
           mouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-        });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
 
         // Pause globe when not visible (performance optimization)
         let isGlobeVisible = true;
@@ -213,7 +221,8 @@ const Index = () => {
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
       if (globeObserverRef.current) globeObserverRef.current.disconnect();
-      window.removeEventListener('mousemove', () => {});
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', resize);
       if (renderer) {
         renderer.dispose();
         if (renderer.domElement && renderer.domElement.parentNode) {

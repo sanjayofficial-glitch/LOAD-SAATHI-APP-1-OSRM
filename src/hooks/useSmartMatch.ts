@@ -9,6 +9,7 @@ export interface AIMatchResult {
 /**
  * Fetches AI match scores for the top items in a list.
  * Only processes the first `maxItems` items, staggers calls to avoid throttling.
+ * Resets fetched set when items change to handle filtering/reordering.
  */
 export function useSmartMatch<T extends { id: string }>(
   items: T[],
@@ -19,6 +20,7 @@ export function useSmartMatch<T extends { id: string }>(
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
   const fetchedRef = useRef<Set<string>>(new Set())
+  const prevItemsRef = useRef<string>('')
 
   const fetchScore = useCallback(async (item: T) => {
     const params = getParams(item)
@@ -37,7 +39,7 @@ export function useSmartMatch<T extends { id: string }>(
       fetchedRef.current.add(item.id)
       return data
     } catch {
-      fetchedRef.current.add(item.id) // Mark as attempted so we don't retry
+      fetchedRef.current.add(item.id)
       return null
     } finally {
       setLoadingId(null)
@@ -47,6 +49,13 @@ export function useSmartMatch<T extends { id: string }>(
   useEffect(() => {
     const top = items.slice(0, maxItems)
     if (top.length === 0 || !supabaseUrl) return
+
+    // Reset fetched set when the item list changes (filter, reorder, etc.)
+    const itemsKey = top.map(i => i.id).join(',')
+    if (itemsKey !== prevItemsRef.current) {
+      fetchedRef.current.clear()
+      prevItemsRef.current = itemsKey
+    }
 
     let cancelled = false
 

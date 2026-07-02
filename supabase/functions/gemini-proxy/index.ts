@@ -4,9 +4,20 @@
 // Deploy with: supabase functions deploy gemini-proxy --no-verify-jwt
 // Set env: supabase secrets set GEMINI_API_KEY=your_key_here
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? ""
+
+const ALLOWED_ORIGINS = ["https://loadsaathi.app", "https://www.loadsaathi.app", "http://localhost:8080", "http://localhost:5173"]
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? ""
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Content-Type": "application/json",
+  }
+}
 
 interface SearchFilters {
   origin?: string
@@ -15,14 +26,8 @@ interface SearchFilters {
   date?: string
 }
 
-serve(async (req: Request) => {
-  // CORS headers for browser access
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  }
+Deno.serve(async (req: Request) => {
+  const headers = getCorsHeaders(req)
 
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers })

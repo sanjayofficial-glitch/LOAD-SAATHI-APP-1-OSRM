@@ -2,6 +2,19 @@ function getEnv(name: string): string {
   return Deno.env.get(name) ?? ""
 }
 
+const ALLOWED_ORIGINS = ["https://loadsaathi.app", "https://www.loadsaathi.app", "http://localhost:8080", "http://localhost:5173"]
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? ""
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Content-Type": "application/json",
+  }
+}
+
 interface PricePredictRequest {
   originCity: string
   destinationCity: string
@@ -208,13 +221,25 @@ function localFallback(
   }
 }
 
-Deno.serve(async (req: Request) => {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
+// Simple in-memory rate limiter: max 10 requests per IP per 60 seconds
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT_MAX = 10
+const RATE_LIMIT_WINDOW_MS = 60_000
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    return true
   }
+  if (entry.count >= RATE_LIMIT_MAX) return false
+  entry.count++
+  return true
+}
+
+Deno.serve(async (req: Request) => {
+  const headers = getCorsHeaders(req)
 
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers })
@@ -223,6 +248,15 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
+      headers,
+    })
+  }
+
+  // Rate limit by IP
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
+  if (!checkRateLimit(ip)) {
+    return new Response(JSON.stringify({ error: "Rate limit exceeded. Try again in 1 minute." }), {
+      status: 429,
       headers,
     })
   }

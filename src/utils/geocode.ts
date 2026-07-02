@@ -7,6 +7,20 @@ interface CacheEntry extends Coords {
 const geocodeCache = new Map<string, CacheEntry | null>();
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
+// Nominatim rate limit: 1 request per second
+let lastRequestTime = 0;
+const NOMINATIM_MIN_INTERVAL_MS = 1100;
+
+async function throttledFetch(url: string, init?: RequestInit): Promise<Response> {
+  const now = Date.now();
+  const elapsed = now - lastRequestTime;
+  if (elapsed < NOMINATIM_MIN_INTERVAL_MS) {
+    await new Promise(r => setTimeout(r, NOMINATIM_MIN_INTERVAL_MS - elapsed));
+  }
+  lastRequestTime = Date.now();
+  return fetch(url, init);
+}
+
 export async function geocodeCity(
   city: string,
   country = 'India'
@@ -19,7 +33,7 @@ export async function geocodeCity(
 
   try {
     const query = encodeURIComponent(`${city}, ${country}`);
-    const res = await fetch(
+    const res = await throttledFetch(
       `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`,
       { headers: { 'Accept-Language': 'en' } }
     );

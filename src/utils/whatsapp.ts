@@ -10,7 +10,16 @@ export function generateWhatsAppLink(
   }
 ): string {
   const cargo = details.cargo_type || details.goods_description || 'Cargo';
-  const phone = truckerPhone.replace(/\D/g, '');
+  // Strip non-digits and ensure Indian country code prefix
+  let phone = truckerPhone.replace(/\D/g, '');
+  if (phone.length === 10) {
+    phone = '91' + phone;
+  } else if (phone.length === 12 && phone.startsWith('91')) {
+    // Already has country code
+  } else if (phone.length > 12) {
+    // International format, take last 12 digits
+    phone = phone.slice(-12);
+  }
   const msg = encodeURIComponent(
     `Hello,\n\nI found your trip on LoadSaathi.\n\n` +
     `Cargo: ${cargo}\n` +

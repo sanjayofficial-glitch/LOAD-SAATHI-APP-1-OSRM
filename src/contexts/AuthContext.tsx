@@ -27,14 +27,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async () => {
-    if (!user || !clerk.session) {
+    if (!user) {
       setUserProfile(null);
       setLoading(false);
       return null;
     }
 
     try {
-      const supabaseToken = await clerk.session.getToken({ template: 'supabase' });
+      const supabaseToken = await clerk.session?.getToken({ template: 'supabase' });
       if (!supabaseToken) {
         console.warn('[AuthContext] No Supabase token returned from Clerk');
         setUserProfile(null);
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
       return null;
     }
-  }, [user, clerk.session]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (!clerkLoaded) return;

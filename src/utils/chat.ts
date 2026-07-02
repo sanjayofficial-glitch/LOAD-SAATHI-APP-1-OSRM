@@ -1,7 +1,23 @@
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Message } from '@/types/chat';
+// The base supabase client (anon key, no auth header) is used ONLY for Realtime
+// subscriptions. Realtime uses RLS policies to filter events — no auth header needed.
+// All mutations use the Clerk-authenticated client below.
 import { supabase } from '@/integrations/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+
+const MAX_MESSAGE_LENGTH = 2000;
+
+/**
+ * Sanitize message content — strip HTML tags and trim whitespace.
+ * Prevents XSS if messages are ever rendered as HTML.
+ */
+function sanitizeContent(raw: string): string {
+  return raw
+    .replace(/<[^>]*>/g, '')
+    .trim()
+    .slice(0, MAX_MESSAGE_LENGTH);
+}
 
 /**
  * Send a new message in a chat conversation.
@@ -19,6 +35,11 @@ export const sendMessage = async (payload: {
     throw new Error('Recipient ID and message content are required');
   }
 
+  const sanitized = sanitizeContent(content);
+  if (!sanitized) {
+    throw new Error('Message content is empty after sanitization');
+  }
+
   try {
     const supabaseToken = await getToken();
     if (!supabaseToken) {
@@ -32,7 +53,7 @@ export const sendMessage = async (payload: {
       .insert({
         sender_id: userId,
         recipient_id: recipientId,
-        content: content.trim(),
+        content: sanitized,
         request_id: requestId,
         is_read: false,
       })

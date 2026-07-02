@@ -2,6 +2,19 @@ function getEnv(name: string): string {
   return Deno.env.get(name) ?? ""
 }
 
+const ALLOWED_ORIGINS = ["https://loadsaathi.app", "https://www.loadsaathi.app", "http://localhost:8080", "http://localhost:5173"]
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? ""
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Content-Type": "application/json",
+  }
+}
+
 interface CreditScoreRow {
   score: number
   factors: Record<string, unknown>
@@ -9,12 +22,7 @@ interface CreditScoreRow {
 }
 
 Deno.serve(async (req: Request) => {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  }
+  const headers = getCorsHeaders(req)
 
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers })
@@ -23,6 +31,15 @@ Deno.serve(async (req: Request) => {
   try {
     const url = new URL(req.url)
     const userId = url.searchParams.get("userId")
+
+    // Require valid auth — users can only query their own score
+    const authHeader = req.headers.get("Authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers,
+      })
+    }
 
     if (!userId) {
       return new Response(JSON.stringify({ error: "Missing required query param: userId" }), {

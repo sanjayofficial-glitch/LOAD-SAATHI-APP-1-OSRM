@@ -16,8 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { showSuccess } from '@/utils/toast';
-// Use the authenticated client for Realtime subscription
-// Falls back to the base supabase client if no token is available
+// Base supabase client (anon key) for Realtime subscriptions only.
+// Realtime uses RLS policies to filter events per user_id — no auth header needed.
 import { supabase as baseSupabase } from '@/integrations/supabase/client';
 
 interface Notification {
