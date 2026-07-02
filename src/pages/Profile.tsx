@@ -11,7 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { showSuccess, showError } from '@/utils/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useCreditScore } from '@/hooks/useCreditScore';
+import CreditScoreBadge from '@/components/CreditScoreBadge';
 import { 
   User, 
   Phone, 
@@ -46,6 +48,7 @@ const Profile = () => {
   const [statsLoading, setStatsLoading] = useState(true);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
+  const { data: creditData } = useCreditScore();
 
   useEffect(() => {
     if (userProfile) {
@@ -293,6 +296,29 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <Link to="/credit-score" className="block">
+              <Card className="border-emerald-100 dark:border-emerald-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
+                <div className="h-1 bg-gradient-to-r from-emerald-500 to-emerald-400" />
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Credit Score
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {creditData ? (
+                        <CreditScoreBadge score={creditData.score} size="lg" />
+                      ) : (
+                        <div className="text-sm text-gray-400">View your score</div>
+                      )}
+                    </div>
+                    <Shield className="h-8 w-8 text-emerald-200 dark:text-emerald-800" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
 
             <Card className="md:col-span-2 border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
               <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-400" />

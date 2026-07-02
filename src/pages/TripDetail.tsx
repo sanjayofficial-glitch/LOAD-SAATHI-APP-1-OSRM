@@ -17,6 +17,8 @@ import { MapPin, Calendar, Truck, IndianRupee, ArrowLeft, CheckCircle, AlertCirc
 import Star from '@/components/Star';
 import RouteMap from '@/components/RouteMap';
 import { notifyTruckerOfBookingRequest } from '@/utils/notifications';
+import { useCreditScore } from '@/hooks/useCreditScore';
+import CreditScoreBadge from '@/components/CreditScoreBadge';
 
 const TripDetail = () => {
   const { tripId } = useParams();
@@ -31,6 +33,8 @@ const TripDetail = () => {
   const [pickupAddress, setPickupAddress] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const { data: truckerCreditData } = useCreditScore(trip?.trucker_id);
+  const truckerCreditScore = truckerCreditData?.score ?? null;
 
   useEffect(() => {
     const fetchTripAndReviews = async () => {
@@ -255,6 +259,7 @@ const TripDetail = () => {
                       <Star filled className="h-3 w-3 text-yellow-500 mr-1" />
                       {trip.trucker?.rating?.toFixed(1) || '0.0'} Rating • {trip.trucker?.total_trips || 0} Trips
                     </div>
+                    {truckerCreditScore && <CreditScoreBadge score={truckerCreditScore} size="sm" className="mt-1" />}
                   </div>
                 </div>
               </div>

@@ -23,6 +23,7 @@ import {
   History,
   PlusCircle,
   ShieldCheck,
+  Shield,
   Users,
   Home,
   LayoutDashboard,
@@ -210,6 +211,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
                       <User className="h-4 w-4" />
                       Profile Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/credit-score" className="flex items-center gap-2 cursor-pointer">
+                      <Shield className="h-4 w-4" />
+                      Credit Score
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

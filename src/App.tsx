@@ -40,6 +40,7 @@ const MonitoringDashboard = lazy(() => import("./pages/admin/MonitoringDashboard
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const Moderation = lazy(() => import("./pages/admin/Moderation"));
+const CreditScore = lazy(() => import("./pages/CreditScore"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -186,6 +187,7 @@ function App() {
                     <Route path="/chat/:requestId" element={<Chat />} />
                     <Route path="/messages" element={<ChatList />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/credit-score" element={<CreditScore />} />
 
                     {/* Catch-all */}
                     <Route path="*" element={<NotFound />} />

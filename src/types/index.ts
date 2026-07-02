@@ -119,6 +119,32 @@ export interface Message {
   recipient?: User;
 }
 
+export interface CreditScoreFactors {
+  completion: { score: number; max: number; rate: number; completed: number; cancelled: number }
+  reliability: { score: number; max: number; delivered: number; terminated: number }
+  communication: { score: number; max: number; messagesSent: number; acceptedRequests: number; totalRequests: number }
+  reviews: { score: number; max: number; averageRating: number; reviewCount: number }
+  tenure: { score: number; max: number; daysActive: number; completedTrips: number }
+  tier: 'excellent' | 'good' | 'fair' | 'needs_improvement' | 'poor'
+}
+
+export interface CreditScore {
+  score: number
+  factors: CreditScoreFactors
+  history: { date: string; score: number }[]
+  calculated_at: string
+}
+
+export interface CreditInsights {
+  summary: string
+  overallTrend: 'up' | 'down' | 'stable'
+  strengths: string[]
+  improvements: string[]
+  tips: string[]
+  projection: string
+  provider: string
+}
+
 export interface Notification {
   id: string;
   user_id: string;
