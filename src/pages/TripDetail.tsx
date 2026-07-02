@@ -259,7 +259,7 @@ const TripDetail = () => {
                       <Star filled className="h-3 w-3 text-yellow-500 mr-1" />
                       {trip.trucker?.rating?.toFixed(1) || '0.0'} Rating • {trip.trucker?.total_trips || 0} Trips
                     </div>
-                    {truckerCreditScore && <CreditScoreBadge score={truckerCreditScore} size="sm" className="mt-1" />}
+                    {truckerCreditScore && <CreditScoreBadge score={truckerCreditScore} size="sm" />}
                   </div>
                 </div>
               </div>

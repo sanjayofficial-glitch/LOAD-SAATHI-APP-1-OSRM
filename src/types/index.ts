@@ -131,7 +131,7 @@ export interface CreditScoreFactors {
 export interface CreditScore {
   score: number
   factors: CreditScoreFactors
-  history: { date: string; score: number }[]
+  history?: { score: number; changed_at: string }[]
   calculated_at: string
 }
 

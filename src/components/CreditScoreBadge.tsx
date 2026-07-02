@@ -13,13 +13,13 @@ const tierConfig: Record<string, { label: string; color: string; variant: 'defau
 interface CreditScoreBadgeProps {
   score: number
   factors?: CreditScoreFactors
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
 }
 
 export default function CreditScoreBadge({ score, factors, size = 'sm' }: CreditScoreBadgeProps) {
   const tier = factors?.tier || 'fair'
   const config = tierConfig[tier] || tierConfig.fair
-  const textSize = size === 'sm' ? 'text-xs' : 'text-sm'
+  const textSize = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base' : 'text-sm'
 
   return (
     <TooltipProvider>

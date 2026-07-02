@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,7 +13,6 @@ import { ArrowLeft, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function CreditScorePage() {
-  const { userProfile } = useAuth();
   const navigate = useNavigate();
   const { data: creditScore, isLoading } = useCreditScore();
   const { data: insights, isLoading: insightsLoading } = useCreditInsights(creditScore);
