@@ -31,6 +31,7 @@ const Index = () => {
   const arcMatsRef = useRef<any[]>([]);
   const ambientRef = useRef<any>(null);
   const globeObserverRef = useRef<IntersectionObserver | null>(null);
+  const cleanupFnsRef = useRef<(() => void)[]>([]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -176,6 +177,7 @@ const Index = () => {
           mouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
         };
         window.addEventListener('mousemove', handleMouseMove);
+        cleanupFnsRef.current.push(() => window.removeEventListener('mousemove', handleMouseMove));
 
         // Pause globe when not visible (performance optimization)
         let isGlobeVisible = true;
@@ -211,6 +213,7 @@ const Index = () => {
           }
         };
         window.addEventListener('resize', resize);
+        cleanupFnsRef.current.push(() => window.removeEventListener('resize', resize));
       } catch (e) {
         console.error('Globe init failed:', e);
       }
@@ -221,8 +224,8 @@ const Index = () => {
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
       if (globeObserverRef.current) globeObserverRef.current.disconnect();
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', resize);
+      cleanupFnsRef.current.forEach(fn => fn());
+      cleanupFnsRef.current = [];
       if (renderer) {
         renderer.dispose();
         if (renderer.domElement && renderer.domElement.parentNode) {
