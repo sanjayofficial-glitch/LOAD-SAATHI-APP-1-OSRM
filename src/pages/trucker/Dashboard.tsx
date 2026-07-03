@@ -93,24 +93,31 @@ const TruckerDashboard = () => {
         .gte('created_at', new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString())
         .order('created_at', { ascending: true });
 
-      const aggregated: Record<string, number> = {};
+      const aggregated: Record<string, { display: string; total: number }> = {};
       for (const entry of (monthlyEarnings ?? []) as { price_per_tonne: number; weight_tonnes: number; created_at: string }[]) {
-        const month = new Date(entry.created_at).toLocaleString('default', { month: 'short', year: '2-digit' });
-        aggregated[month] = (aggregated[month] || 0) + (entry.price_per_tonne * entry.weight_tonnes);
+        const d = new Date(entry.created_at);
+        const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+        const display = d.toLocaleString('default', { month: 'short', year: '2-digit' });
+        if (!aggregated[key]) aggregated[key] = { display, total: 0 };
+        aggregated[key].total += (entry.price_per_tonne * entry.weight_tonnes);
       }
-      setMonthlyData(Object.entries(aggregated).map(([month, earnings]) => ({ month, earnings })));
+      setMonthlyData(
+        Object.entries(aggregated)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([, v]) => ({ month: v.display, earnings: v.total }))
+      );
 
       const { data: recentTrips } = await supabase
         .from('price_history')
-        .select('origin_city, destination_city, price_per_tonne, created_at')
+        .select('origin_city, destination_city, price_per_tonne, weight_tonnes, created_at')
         .eq('user_id', userProfile.id)
         .eq('user_type', 'trucker')
         .order('created_at', { ascending: false })
         .limit(5);
 
-      setRecentActivity(((recentTrips ?? []) as { origin_city: string; destination_city: string; price_per_tonne: number; created_at: string }[]).map(t => ({
+      setRecentActivity(((recentTrips ?? []) as { origin_city: string; destination_city: string; price_per_tonne: number; weight_tonnes: number; created_at: string }[]).map(t => ({
         route: `${t.origin_city} → ${t.destination_city}`,
-        earnings: t.price_per_tonne,
+        earnings: (t.price_per_tonne || 0) * (t.weight_tonnes || 0),
         date: new Date(t.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       })));
 
@@ -160,7 +167,7 @@ const TruckerDashboard = () => {
     },
     {
       title: 'Total Earnings',
-      value: `₹${stats.totalEarnings.toLocaleString()}`,
+      value: `₹${stats.totalEarnings.toLocaleString('en-IN')}`,
       icon: IndianRupee,
       color: 'text-green-600',
       bg: 'bg-green-50 dark:bg-green-900/20',

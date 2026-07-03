@@ -121,13 +121,20 @@ const ShipperDashboard = () => {
         .order('created_at', { ascending: true });
 
       if (monthlySpending && monthlySpending.length > 0) {
-        const monthMap: Record<string, number> = {};
+        const monthMap: Record<string, { display: string; total: number }> = {};
         for (const entry of monthlySpending) {
-          const month = new Date(entry.created_at).toLocaleString('default', { month: 'short', year: '2-digit' });
+          const d = new Date(entry.created_at);
+          const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+          const display = d.toLocaleString('default', { month: 'short', year: '2-digit' });
           const cost = (entry.price_per_tonne || 0) * (entry.weight_tonnes || 0);
-          monthMap[month] = (monthMap[month] || 0) + cost;
+          if (!monthMap[key]) monthMap[key] = { display, total: 0 };
+          monthMap[key].total += cost;
         }
-        setMonthlyData(Object.entries(monthMap).map(([month, spending]) => ({ month, spending })));
+        setMonthlyData(
+          Object.entries(monthMap)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([, v]) => ({ month: v.display, spending: v.total }))
+        );
 
         const last5 = monthlySpending.slice(-5).reverse().map((entry: any) => ({
           route: `${entry.origin_city} → ${entry.destination_city}`,
@@ -207,7 +214,7 @@ const ShipperDashboard = () => {
     },
     {
       title: 'Total Spent',
-      value: `₹${stats.totalSpent.toLocaleString()}`,
+      value: `₹${stats.totalSpent.toLocaleString('en-IN')}`,
       icon: DollarSign,
       color: 'text-green-600',
       bg: 'bg-green-50 dark:bg-green-900/20',
@@ -398,19 +405,19 @@ const ShipperDashboard = () => {
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-6">
             {monthlyData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={monthlyData}>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={monthlyData} margin={{ top: 12, right: 8, left: -8, bottom: 0 }}>
                   <defs>
                     <linearGradient id="spendingGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8} />
-                      <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.2} />
+                      <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.3} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${v}`} />
-                  <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Spending']} />
-                  <Bar dataKey="spending" fill="url(#spendingGradient)" radius={[4, 4, 0, 0]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(v >= 100000 ? 1 : 0)}k` : v}`} />
+                  <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Spending']} contentStyle={{ borderRadius: 12, border: '1px solid #bfdbfe', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+                  <Bar dataKey="spending" fill="url(#spendingGradient)" radius={[6, 6, 0, 0]} maxBarSize={48} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -436,7 +443,7 @@ const ShipperDashboard = () => {
                       <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{route.route}</p>
                       <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{route.date}</p>
                     </div>
-                    <span className="text-sm font-bold text-green-600 dark:text-green-400 shrink-0 ml-4">₹{route.cost.toLocaleString()}</span>
+                    <span className="text-sm font-bold text-green-600 dark:text-green-400 shrink-0 ml-4">₹{route.cost.toLocaleString('en-IN')}</span>
                   </div>
                 ))}
               </div>
