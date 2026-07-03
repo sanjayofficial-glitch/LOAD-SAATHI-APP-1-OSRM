@@ -409,7 +409,7 @@ const ShipperDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${v}`} />
-                  <Tooltip formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Spending']} />
+                  <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Spending']} />
                   <Bar dataKey="spending" fill="url(#spendingGradient)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

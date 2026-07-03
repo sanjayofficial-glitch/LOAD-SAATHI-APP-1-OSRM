@@ -99,7 +99,7 @@ const PostTrip = () => {
           vehicle_type: formData.vehicle_type || null,
           user_id: userProfile.id,
           user_type: 'trucker',
-        }).then().catch(() => {});
+        }).then(() => {}, () => {});
 
         try {
           const [originCoords, destCoords] = await Promise.all([

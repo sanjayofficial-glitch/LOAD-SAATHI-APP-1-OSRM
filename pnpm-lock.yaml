@@ -108,7 +108,7 @@ importers:
         specifier: ^1.9.21
         version: 1.9.21
       '@types/three':
-        specifier: ^0.184.1
+        specifier: ^0.184.0
         version: 0.184.1
       '@vercel/analytics':
         specifier: ^2.0.1

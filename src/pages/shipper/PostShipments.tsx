@@ -111,7 +111,7 @@ const PostShipments = () => {
           price_per_tonne: budget,
           user_id: userProfile.id,
           user_type: 'shipper',
-        }).then().catch(() => {});
+        }).then(() => {}, () => {});
 
         try {
           const [originCoords, destCoords] = await Promise.all([
