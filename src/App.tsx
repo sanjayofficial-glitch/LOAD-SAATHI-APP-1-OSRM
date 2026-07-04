@@ -18,6 +18,26 @@ const Register = lazy(() => import("./pages/Register"));
 const AuthSync = lazy(() => import("./components/AuthSync"));
 const ChooseRole = lazy(() => import("./pages/ChooseRole"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const PublicLayout = lazy(() => import("./components/PublicLayout"));
+const Features = lazy(() => import("./pages/public/Features"));
+const HowItWorks = lazy(() => import("./pages/public/HowItWorks"));
+const About = lazy(() => import("./pages/public/About"));
+const Pricing = lazy(() => import("./pages/public/Pricing"));
+const Faq = lazy(() => import("./pages/public/FAQ"));
+const Contact = lazy(() => import("./pages/public/Contact"));
+const SafetyTrust = lazy(() => import("./pages/public/SafetyTrust"));
+const Privacy = lazy(() => import("./pages/public/Privacy"));
+const Terms = lazy(() => import("./pages/public/Terms"));
+const ShipperSolution = lazy(() => import("./pages/public/ShipperSolution"));
+const TruckerSolution = lazy(() => import("./pages/public/TruckerSolution"));
+const DashboardPreview = lazy(() => import("./pages/screens/DashboardPreview"));
+const MatchingPreview = lazy(() => import("./pages/screens/MatchingPreview"));
+const ChatPreview = lazy(() => import("./pages/screens/ChatPreview"));
+const CreditScorePreview = lazy(() => import("./pages/screens/CreditScorePreview"));
+const ReviewsPreview = lazy(() => import("./pages/screens/ReviewsPreview"));
+const AdminPreview = lazy(() => import("./pages/screens/AdminPreview"));
+const BlogList = lazy(() => import("./pages/blog/BlogList"));
+const BlogArticle = lazy(() => import("./pages/blog/BlogArticle"));
 const TruckerDashboard = lazy(() => import("./pages/trucker/Dashboard"));
 const PostTrip = lazy(() => import("./pages/trucker/PostTrip"));
 const TruckerHub = lazy(() => import("./pages/trucker/TruckerHub"));
@@ -80,6 +100,33 @@ function App() {
                   <Route path="/auth-sync" element={<ErrorBoundary><AuthSync /></ErrorBoundary>} />
                   <Route path="/choose-role" element={<ErrorBoundary><ChooseRole /></ErrorBoundary>} />
                   <Route path="/forgot-password" element={<ErrorBoundary><ForgotPassword /></ErrorBoundary>} />
+
+                  {/* Public info pages wrapped in PublicLayout */}
+                  <Route element={<PublicLayout><Outlet /></PublicLayout>}>
+                    <Route path="/features" element={<Features />} />
+                    <Route path="/how-it-works" element={<HowItWorks />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/faq" element={<Faq />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/safety-trust" element={<SafetyTrust />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/solutions/shippers" element={<ShipperSolution />} />
+                    <Route path="/solutions/truckers" element={<TruckerSolution />} />
+
+                    {/* App Screen Previews */}
+                    <Route path="/screens/dashboard" element={<DashboardPreview />} />
+                    <Route path="/screens/matching" element={<MatchingPreview />} />
+                    <Route path="/screens/chat" element={<ChatPreview />} />
+                    <Route path="/screens/credit-score" element={<CreditScorePreview />} />
+                    <Route path="/screens/reviews" element={<ReviewsPreview />} />
+                    <Route path="/screens/admin" element={<AdminPreview />} />
+
+                    {/* Blog */}
+                    <Route path="/blog" element={<BlogList />} />
+                    <Route path="/blog/:slug" element={<BlogArticle />} />
+                  </Route>
 
                   {/* Authenticated routes wrapped with Layout */}
                   <Route

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Truck, ArrowRight, Route, Handshake, EyeOff, CircuitBoard, Search, Bell, Map, Package, ChevronRight } from 'lucide-react';
+import { Truck, ArrowRight, Route, Handshake, EyeOff, CircuitBoard, Search, Bell, Map, Package, ChevronRight, LayoutDashboard, Brain, MessageSquare, Shield, Star, Activity, UserCheck } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -269,11 +269,12 @@ const Index = () => {
             <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            {['Platform', 'Solutions', 'Network', 'Vision'].map(item => (
-              <a key={item} href="#" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">
-                {item}
-              </a>
-            ))}
+            <Link to="/features" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Features</Link>
+            <Link to="/how-it-works" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">How It Works</Link>
+            <Link to="/pricing" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Pricing</Link>
+            <Link to="/about" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">About</Link>
+            <Link to="/faq" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">FAQ</Link>
+            <Link to="/contact" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Contact</Link>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
             <ThemeToggle />
@@ -409,6 +410,75 @@ const Index = () => {
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* HOW IT WORKS */}
+        <section className="fade-section py-24 relative">
+          <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full opacity-[0.06] dark:opacity-[0.10] pointer-events-none"
+            style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)", filter: "blur(60px)" }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">How LoadSaathi Works</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Two sides, one platform. Whether you're shipping goods or hauling loads, the process is simple.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+              <div className="glass-card p-8 rounded-xl border border-blue-500/20">
+                <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-3">
+                  <Package className="h-5 w-5 text-blue-400" /> For Shippers
+                </h3>
+                <div className="space-y-6">
+                  {[
+                    { step: "01", title: "Post Your Shipment", desc: "Enter load details — origin, destination, weight, timeline. AI suggests optimal pricing instantly." },
+                    { step: "02", title: "Get AI-Matched", desc: "Our engine finds the best truckers for your route. Review profiles, credit scores, and past ratings." },
+                    { step: "03", title: "Track in Real-Time", desc: "GPS tracking from pickup to delivery. No more 'kahan pahuncha?' calls." },
+                    { step: "04", title: "Rate & Review", desc: "Build your shipper reputation. Leave reviews that help the next trucker choose wisely." },
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-4">
+                      <span className="text-2xl font-black text-blue-400 dark:text-blue-500 shrink-0">{item.step}</span>
+                      <div>
+                        <h4 className="font-bold text-foreground">{item.title}</h4>
+                        <p className="text-sm text-muted-foreground">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link to="/solutions/shippers" className="inline-flex items-center gap-1 text-sm font-semibold text-orange-500 hover:text-orange-400 mt-6">
+                  Learn More <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="glass-card p-8 rounded-xl border border-orange-500/20">
+                <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-3">
+                  <Truck className="h-5 w-5 text-orange-400" /> For Truckers
+                </h3>
+                <div className="space-y-6">
+                  {[
+                    { step: "01", title: "Register Your Fleet", desc: "Set up your profile, vehicle details, and service areas. Your digital identity in freight." },
+                    { step: "02", title: "Find Loads Instantly", desc: "Browse available shipments matched to your route. AI recommends the best paying loads." },
+                    { step: "03", title: "Haul with Confidence", desc: "Share live location. Get paid faster. Build your credit score with every completed trip." },
+                    { step: "04", title: "Grow Your Business", desc: "Higher credit scores unlock better loads. Direct relationships replace broker dependency." },
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-4">
+                      <span className="text-2xl font-black text-orange-400 dark:text-orange-500 shrink-0">{item.step}</span>
+                      <div>
+                        <h4 className="font-bold text-foreground">{item.title}</h4>
+                        <p className="text-sm text-muted-foreground">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link to="/solutions/truckers" className="inline-flex items-center gap-1 text-sm font-semibold text-orange-500 hover:text-orange-400 mt-6">
+                  Learn More <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+            <div className="text-center">
+              <Link to="/how-it-works">
+                <Button variant="outline" className="text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg border-border hover:border-orange-400 text-foreground">
+                  See Full Walkthrough <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
@@ -568,6 +638,77 @@ const Index = () => {
           </div>
         </section>
 
+        {/* APP PREVIEW */}
+        <section className="fade-section py-24 relative">
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full opacity-[0.08] dark:opacity-[0.12] pointer-events-none"
+            style={{ background: "radial-gradient(circle, #f97316 0%, transparent 70%)", filter: "blur(60px)" }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">See LoadSaathi in Action</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Explore the screens that power India's intelligent freight network.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { title: "Dashboard", desc: "Real-time stats, earnings, and activity at a glance.", icon: LayoutDashboard, link: "/screens/dashboard" },
+                { title: "AI Matching", desc: "Smart load-to-truck matching with confidence scores.", icon: Brain, link: "/screens/matching" },
+                { title: "Chat", desc: "Direct communication between shippers and truckers.", icon: MessageSquare, link: "/screens/chat" },
+                { title: "Credit Score", desc: "Digital reputation system for trust and transparency.", icon: Shield, link: "/screens/credit-score" },
+                { title: "Reviews", desc: "Bidirectional ratings that build accountability.", icon: Star, link: "/screens/reviews" },
+                { title: "Admin Center", desc: "Command and control for platform operators.", icon: Activity, link: "/screens/admin" },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={i} to={item.link} className="glass-card p-6 rounded-xl border border-border hover:border-orange-500/30 transition-all duration-300 group">
+                    <div className="bg-orange-100 dark:bg-orange-900/20 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Icon className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    <div className="flex items-center gap-1 text-xs font-semibold text-orange-500 mt-4">
+                      Preview <ArrowRight className="h-3 w-3" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* SAFETY & TRUST */}
+        <section className="fade-section py-24 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full opacity-[0.06] dark:opacity-[0.10] pointer-events-none"
+            style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)", filter: "blur(60px)" }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">Built on Trust</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Every transaction is backed by a digital reputation system that rewards reliability.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              {[
+                { icon: Shield, title: "Credit Score (300-900)", desc: "Every user has a digital freight credit score based on completion rate, reliability, reviews, and tenure." },
+                { icon: Star, title: "Bidirectional Reviews", desc: "Both shippers and truckers rate each other after every completed trip. Transparency builds accountability." },
+                { icon: UserCheck, title: "Verified Profiles", desc: "Phone-verified accounts and detailed fleet documentation ensure you know who you're dealing with." },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <div key={i} className="glass-card p-8 rounded-xl border border-border hover:border-blue-500/30 transition-all duration-300">
+                    <Icon className="text-blue-500 text-3xl mb-4" />
+                    <h3 className="text-lg font-bold text-foreground mb-2">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="text-center">
+              <Link to="/safety-trust">
+                <Button variant="outline" className="text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg border-border hover:border-blue-400 text-foreground">
+                  Learn About Safety & Trust <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="fade-section py-32 relative overflow-hidden flex items-center justify-center">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-900/5 to-transparent dark:bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.12),transparent_70%)]" />
@@ -599,7 +740,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full py-12">
+      <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
           <div className="col-span-2 md:col-span-1 mb-4 md:mb-0">
             <div className="flex items-center gap-2 mb-4">
@@ -608,25 +749,35 @@ const Index = () => {
               </div>
               <span className="text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
             </div>
-            <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} LoadSaathi. Precision Freight Intelligence.</p>
+            <p className="text-sm text-muted-foreground mb-4">Precision Freight Intelligence — matching every load to its perfect space using AI.</p>
+            <Link to="/register">
+              <Button className="bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold tracking-wider uppercase px-4 py-2 h-auto rounded-lg">
+                Join Now <ArrowRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
           </div>
           <div className="flex flex-col gap-3">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Platform</span>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Overview</a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Features</a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Network</a>
+            <Link to="/features" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Features</Link>
+            <Link to="/how-it-works" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">How It Works</Link>
+            <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Pricing</Link>
+            <Link to="/safety-trust" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Safety & Trust</Link>
           </div>
           <div className="flex flex-col gap-3">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Company</span>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">About</a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Blog</a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Contact</a>
+            <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">About</Link>
+            <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Blog</Link>
+            <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Contact</Link>
+            <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">FAQ</Link>
           </div>
           <div className="flex flex-col gap-3">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Legal</span>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Privacy</a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Terms</a>
+            <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Privacy</Link>
+            <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Terms</Link>
           </div>
+        </div>
+        <div className="border-t border-border dark:border-white/5 mt-12 pt-8 text-center">
+          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} LoadSaathi. All rights reserved.</p>
         </div>
       </footer>
     </div>

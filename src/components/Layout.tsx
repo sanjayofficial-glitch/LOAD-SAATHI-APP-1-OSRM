@@ -46,6 +46,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         { label: "Command Center", path: "/admin/monitoring", icon: <ShieldCheck className="h-4 w-4" /> },
         { label: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
         { label: "Users", path: "/admin/users", icon: <Users className="h-4 w-4" /> },
+        { label: "Moderation", path: "/admin/moderation", icon: <Shield className="h-4 w-4" /> },
         { label: "Messages", path: "/messages", icon: <MessageSquare className="h-4 w-4" /> },
       ];
     }
