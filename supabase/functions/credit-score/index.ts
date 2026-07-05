@@ -1,18 +1,16 @@
+import {
+  getCorsHeaders,
+  checkRateLimit,
+  getRequestIp,
+  extractBearerToken,
+  verifyJwt,
+  errorResponse,
+  optionsResponse,
+  generateRequestId,
+} from "../_shared/edgeHelpers.ts";
+
 function getEnv(name: string): string {
-  return Deno.env.get(name) ?? ""
-}
-
-const ALLOWED_ORIGINS = ["https://loadsaathi.app", "https://www.loadsaathi.app", "http://localhost:8080", "http://localhost:5173"]
-
-function getCorsHeaders(req: Request): Record<string, string> {
-  const origin = req.headers.get("origin") ?? ""
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
-  return {
-    "Access-Control-Allow-Origin": allowed,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  }
+  return Deno.env.get(name) ?? "";
 }
 
 interface CreditScoreRow {
@@ -21,44 +19,55 @@ interface CreditScoreRow {
   calculated_at: string
 }
 
+const RATE_LIMIT_MAX = 10
+const RATE_LIMIT_WINDOW_MS = 60_000
+
 Deno.serve(async (req: Request) => {
   const headers = getCorsHeaders(req)
+  const requestId = generateRequestId()
 
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers })
+    return optionsResponse(headers)
   }
 
   try {
     const url = new URL(req.url)
     const userId = url.searchParams.get("userId")
 
-    // Require valid auth — users can only query their own score
-    const authHeader = req.headers.get("Authorization")
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers,
-      })
+    // Require valid JWT
+    const token = extractBearerToken(req)
+    if (!token) {
+      return errorResponse("Unauthorized", 401, headers, requestId)
+    }
+    const authUser = await verifyJwt(token)
+    if (!authUser) {
+      return errorResponse("Invalid or expired token", 401, headers, requestId)
+    }
+
+    // Ownership check: users can only query their own score (admins can query any)
+    // For now, restrict to own score only
+    if (authUser.userId !== userId) {
+      return errorResponse("You can only query your own credit score", 403, headers, requestId)
     }
 
     if (!userId) {
-      return new Response(JSON.stringify({ error: "Missing required query param: userId" }), {
-        status: 400,
-        headers,
-      })
+      return errorResponse("Missing required query param: userId", 400, headers, requestId)
+    }
+
+    // Rate limit by IP
+    const ip = getRequestIp(req)
+    if (!checkRateLimit(ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+      return errorResponse("Rate limit exceeded. Try again in 1 minute.", 429, headers, requestId)
     }
 
     const supabaseUrl = getEnv("SUPABASE_URL")
     const supabaseKey = getEnv("SUPABASE_SERVICE_ROLE_KEY")
 
     if (!supabaseUrl || !supabaseKey) {
-      return new Response(JSON.stringify({ error: "Server configuration error" }), {
-        status: 500,
-        headers,
-      })
+      return errorResponse("Server configuration error", 500, headers, requestId)
     }
 
-    const authHeader = `Bearer ${supabaseKey}`
+    const serviceAuthHeader = `Bearer ${supabaseKey}`
 
     let score: CreditScoreRow | null = null
 
@@ -66,7 +75,7 @@ Deno.serve(async (req: Request) => {
       headers: {
         "Content-Type": "application/json",
         apikey: supabaseKey,
-        Authorization: authHeader,
+        Authorization: serviceAuthHeader,
       },
     })
 
@@ -83,7 +92,7 @@ Deno.serve(async (req: Request) => {
         headers: {
           "Content-Type": "application/json",
           apikey: supabaseKey,
-          Authorization: authHeader,
+          Authorization: serviceAuthHeader,
         },
         body: JSON.stringify({ p_user_id: userId }),
       })
@@ -110,10 +119,7 @@ Deno.serve(async (req: Request) => {
 
     return new Response(JSON.stringify(score), { status: 200, headers })
   } catch (err) {
-    console.error("Credit score error:", err)
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers,
-    })
+    console.error(`[${requestId}] Credit score error:`, err)
+    return errorResponse("Internal server error", 500, headers, requestId)
   }
 })

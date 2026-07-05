@@ -1,23 +1,21 @@
 // Supabase Edge Function: gemini-proxy
 // Protects the Gemini API key from client-side exposure.
 // The client sends the search query here instead of calling Gemini directly.
-// Deploy with: supabase functions deploy gemini-proxy --no-verify-jwt
+// Deploy with: supabase functions deploy gemini-proxy
 // Set env: supabase secrets set GEMINI_API_KEY=your_key_here
 
+import {
+  getCorsHeaders,
+  checkRateLimit,
+  getRequestIp,
+  extractBearerToken,
+  verifyJwt,
+  errorResponse,
+  optionsResponse,
+  generateRequestId,
+} from "../_shared/edgeHelpers.ts";
+
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? ""
-
-const ALLOWED_ORIGINS = ["https://loadsaathi.app", "https://www.loadsaathi.app", "http://localhost:8080", "http://localhost:5173"]
-
-function getCorsHeaders(req: Request): Record<string, string> {
-  const origin = req.headers.get("origin") ?? ""
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
-  return {
-    "Access-Control-Allow-Origin": allowed,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  }
-}
 
 interface SearchFilters {
   origin?: string
@@ -26,35 +24,46 @@ interface SearchFilters {
   date?: string
 }
 
+const RATE_LIMIT_MAX = 5
+const RATE_LIMIT_WINDOW_MS = 60_000
+
 Deno.serve(async (req: Request) => {
   const headers = getCorsHeaders(req)
+  const requestId = generateRequestId()
 
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers })
+    return optionsResponse(headers)
   }
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers,
-    })
+    return errorResponse("Method not allowed", 405, headers, requestId)
+  }
+
+  // Require valid JWT
+  const token = extractBearerToken(req)
+  if (!token) {
+    return errorResponse("Unauthorized", 401, headers, requestId)
+  }
+  const authUser = await verifyJwt(token)
+  if (!authUser) {
+    return errorResponse("Invalid or expired token", 401, headers, requestId)
+  }
+
+  // Rate limit by IP
+  const ip = getRequestIp(req)
+  if (!checkRateLimit(ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+    return errorResponse("Rate limit exceeded. Try again in 1 minute.", 429, headers, requestId)
   }
 
   try {
     const { query } = await req.json()
 
     if (!query || typeof query !== "string") {
-      return new Response(JSON.stringify({ error: "Missing or invalid query" }), {
-        status: 400,
-        headers,
-      })
+      return errorResponse("Missing or invalid query", 400, headers, requestId)
     }
 
     if (!GEMINI_API_KEY) {
-      return new Response(JSON.stringify({ error: "Gemini API key not configured" }), {
-        status: 500,
-        headers,
-      })
+      return errorResponse("Gemini API key not configured", 500, headers, requestId)
     }
 
     const today = new Date().toISOString().split("T")[0]
@@ -89,11 +98,8 @@ Deno.serve(async (req: Request) => {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error("Gemini API error:", response.status, errorText)
-      return new Response(JSON.stringify({ error: "Gemini API request failed" }), {
-        status: response.status,
-        headers,
-      })
+      console.error(`[${requestId}] Gemini API error:`, response.status, errorText)
+      return errorResponse("Gemini API request failed", response.status, headers, requestId)
     }
 
     const data = await response.json()
@@ -111,10 +117,7 @@ Deno.serve(async (req: Request) => {
       headers,
     })
   } catch (err) {
-    console.error("Gemini proxy error:", err)
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers,
-    })
+    console.error(`[${requestId}] Gemini proxy error:`, err)
+    return errorResponse("Internal server error", 500, headers, requestId)
   }
 })

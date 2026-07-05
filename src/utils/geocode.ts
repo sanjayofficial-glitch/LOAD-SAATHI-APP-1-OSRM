@@ -43,7 +43,7 @@ export async function geocodeCity(
       geocodeCache.set(cacheKey, result);
       return result;
     }
-    geocodeCache.set(cacheKey, null);
+    // Don't cache null/miss results — allow retries for misspelled cities
     return null;
   } catch {
     return null;

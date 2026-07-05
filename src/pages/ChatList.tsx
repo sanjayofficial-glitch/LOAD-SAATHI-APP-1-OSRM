@@ -8,7 +8,8 @@ import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, ArrowRight, Loader2, Mail } from 'lucide-react';
+import { MessageSquare, ArrowRight, Mail } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { showError } from '@/utils/toast';
 
 interface ChatConversation {
@@ -119,10 +120,26 @@ const ChatList = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-orange-600 mx-auto mb-3" />
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading messages...</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8 space-y-2">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="grid gap-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="border border-orange-100 dark:border-orange-800 rounded-lg p-4">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-12 w-12 rounded-full shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

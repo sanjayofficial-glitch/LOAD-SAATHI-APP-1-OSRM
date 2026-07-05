@@ -1,22 +1,15 @@
+import {
+  getCorsHeaders,
+  checkRateLimit,
+  getRequestIp,
+  extractBearerToken,
+  verifyJwt,
+  errorResponse,
+  optionsResponse,
+  generateRequestId,
+} from "../_shared/edgeHelpers.ts";
+
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? ""
-const ALLOWED_ORIGINS = ["https://loadsaathi.app", "https://www.loadsaathi.app", "http://localhost:8080", "http://localhost:5173"]
-
-function getCorsHeaders(req: Request): Record<string, string> {
-  const origin = req.headers.get("origin") ?? ""
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
-  return {
-    "Access-Control-Allow-Origin": allowed,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  }
-}
-
-function verifyAuth(req: Request): string | null {
-  const auth = req.headers.get("Authorization")
-  if (!auth?.startsWith("Bearer ")) return null
-  return auth.slice(7)
-}
 
 interface MatchRequest {
   shipmentOriginCity: string
@@ -32,53 +25,35 @@ interface MatchRequest {
   truckerRating?: number
 }
 
-// Simple in-memory rate limiter: max 20 requests per IP per 60 seconds
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 const RATE_LIMIT_MAX = 20
 const RATE_LIMIT_WINDOW_MS = 60_000
 
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(ip)
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return true
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false
-  entry.count++
-  return true
-}
-
 Deno.serve(async (req: Request) => {
   const headers = getCorsHeaders(req)
+  const requestId = generateRequestId()
 
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers })
+    return optionsResponse(headers)
   }
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers,
-    })
+    return errorResponse("Method not allowed", 405, headers, requestId)
   }
 
   // Require valid Supabase JWT
-  const token = verifyAuth(req)
+  const token = extractBearerToken(req)
   if (!token) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers,
-    })
+    return errorResponse("Unauthorized", 401, headers, requestId)
+  }
+  const authUser = await verifyJwt(token)
+  if (!authUser) {
+    return errorResponse("Invalid or expired token", 401, headers, requestId)
   }
 
   // Rate limit by IP
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
-  if (!checkRateLimit(ip)) {
-    return new Response(JSON.stringify({ error: "Rate limit exceeded. Try again in 1 minute." }), {
-      status: 429,
-      headers,
-    })
+  const ip = getRequestIp(req)
+  if (!checkRateLimit(ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+    return errorResponse("Rate limit exceeded. Try again in 1 minute.", 429, headers, requestId)
   }
 
   try {
@@ -86,17 +61,11 @@ Deno.serve(async (req: Request) => {
 
     if (!body.shipmentOriginCity || !body.shipmentDestCity ||
         !body.tripOriginCity || !body.tripDestCity) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields: origin/destination cities" }),
-        { status: 400, headers },
-      )
+      return errorResponse("Missing required fields: origin/destination cities", 400, headers, requestId)
     }
 
     if (!GEMINI_API_KEY) {
-      return new Response(JSON.stringify({ error: "Gemini API key not configured" }), {
-        status: 500,
-        headers,
-      })
+      return errorResponse("Gemini API key not configured", 500, headers, requestId)
     }
 
     const prompt = `
@@ -141,21 +110,15 @@ Return ONLY valid JSON (no markdown):
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error("Gemini API error:", response.status, errorText)
-      return new Response(JSON.stringify({ error: "Gemini API request failed" }), {
-        status: response.status,
-        headers,
-      })
+      console.error(`[${requestId}] Gemini API error:`, response.status, errorText)
+      return errorResponse("Gemini API request failed", response.status, headers, requestId)
     }
 
     const data = await response.json()
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
 
     if (!text) {
-      return new Response(JSON.stringify({ error: "Empty response from Gemini" }), {
-        status: 500,
-        headers,
-      })
+      return errorResponse("Empty response from Gemini", 500, headers, requestId)
     }
 
     const jsonString = text.replace(/```json|```/g, "").trim()
@@ -166,10 +129,7 @@ Return ONLY valid JSON (no markdown):
       headers,
     })
   } catch (err) {
-    console.error("Match-ML error:", err)
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers,
-    })
+    console.error(`[${requestId}] Match-ML error:`, err)
+    return errorResponse("Internal server error", 500, headers, requestId)
   }
 })

@@ -1,18 +1,16 @@
+import {
+  getCorsHeaders,
+  checkRateLimit,
+  getRequestIp,
+  extractBearerToken,
+  verifyJwt,
+  errorResponse,
+  optionsResponse,
+  generateRequestId,
+} from "../_shared/edgeHelpers.ts";
+
 function getEnv(name: string): string {
-  return Deno.env.get(name) ?? ""
-}
-
-const ALLOWED_ORIGINS = ["https://loadsaathi.app", "https://www.loadsaathi.app", "http://localhost:8080", "http://localhost:5173"]
-
-function getCorsHeaders(req: Request): Record<string, string> {
-  const origin = req.headers.get("origin") ?? ""
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
-  return {
-    "Access-Control-Allow-Origin": allowed,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  }
+  return Deno.env.get(name) ?? "";
 }
 
 interface CreditProfile {
@@ -234,54 +232,42 @@ function localFallback(profile: CreditProfile): InsightResult & { provider: stri
   }
 }
 
-// Simple in-memory rate limiter: max 5 requests per IP per 60 seconds
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 const RATE_LIMIT_MAX = 5
 const RATE_LIMIT_WINDOW_MS = 60_000
 
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(ip)
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return true
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false
-  entry.count++
-  return true
-}
-
 Deno.serve(async (req: Request) => {
   const headers = getCorsHeaders(req)
+  const requestId = generateRequestId()
 
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers })
+    return optionsResponse(headers)
   }
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers,
-    })
+    return errorResponse("Method not allowed", 405, headers, requestId)
+  }
+
+  // Require valid JWT
+  const token = extractBearerToken(req)
+  if (!token) {
+    return errorResponse("Unauthorized", 401, headers, requestId)
+  }
+  const authUser = await verifyJwt(token)
+  if (!authUser) {
+    return errorResponse("Invalid or expired token", 401, headers, requestId)
   }
 
   // Rate limit by IP
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
-  if (!checkRateLimit(ip)) {
-    return new Response(JSON.stringify({ error: "Rate limit exceeded. Try again in 1 minute." }), {
-      status: 429,
-      headers,
-    })
+  const ip = getRequestIp(req)
+  if (!checkRateLimit(ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+    return errorResponse("Rate limit exceeded. Try again in 1 minute.", 429, headers, requestId)
   }
 
   try {
     const profile: CreditProfile = await req.json()
 
     if (!profile.userId && !profile.userName) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), {
-        status: 400,
-        headers,
-      })
+      return errorResponse("Missing required fields", 400, headers, requestId)
     }
 
     const providers: { name: string; fn: (p: CreditProfile) => Promise<ProviderResult> }[] = [
@@ -306,10 +292,7 @@ Deno.serve(async (req: Request) => {
     const fallback = localFallback(profile)
     return new Response(JSON.stringify(fallback), { status: 200, headers })
   } catch (err) {
-    console.error("Credit insights error:", err)
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers,
-    })
+    console.error(`[${requestId}] Credit insights error:`, err)
+    return errorResponse("Internal server error", 500, headers, requestId)
   }
 })
