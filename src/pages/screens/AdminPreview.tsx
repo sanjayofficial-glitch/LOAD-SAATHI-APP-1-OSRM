@@ -151,7 +151,7 @@ export default function AdminPreview() {
                             <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <XAxis dataKey="time" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="time" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
                         <YAxis hide />
                         <Tooltip
                           contentStyle={{
@@ -179,7 +179,7 @@ export default function AdminPreview() {
                   <div className="h-48">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={dailyRevenue}>
-                        <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
                         <YAxis hide />
                         <Tooltip
                           contentStyle={{

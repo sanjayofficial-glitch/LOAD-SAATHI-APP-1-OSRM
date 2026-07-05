@@ -105,7 +105,7 @@ export default function DashboardPreview() {
                   <div className="h-48">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={weeklyData}>
-                        <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
                         <YAxis hide />
                         <Bar dataKey="shipments" fill="#f97316" radius={[4, 4, 0, 0]} />
                       </BarChart>
@@ -170,7 +170,7 @@ export default function DashboardPreview() {
                   <div className="h-48">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={weeklyData}>
-                        <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
                         <YAxis hide />
                         <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                       </BarChart>

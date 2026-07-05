@@ -327,10 +327,10 @@ const TruckerDashboard = () => {
             ) : (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={monthlyData} margin={{ top: 12, right: 8, left: -8, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
-                  <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString('en-IN')}`} contentStyle={{ borderRadius: 12, border: '1px solid #fed7aa', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
+                  <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString('en-IN')}`} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 12 }} />
                   <Bar dataKey="earnings" fill="url(#orangeGradient)" radius={[6, 6, 0, 0]} maxBarSize={48} />
                   <defs>
                     <linearGradient id="orangeGradient" x1="0" y1="0" x2="0" y2="1">

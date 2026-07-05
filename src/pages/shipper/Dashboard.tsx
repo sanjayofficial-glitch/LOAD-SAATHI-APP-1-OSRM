@@ -413,10 +413,10 @@ const ShipperDashboard = () => {
                       <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.3} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(v >= 100000 ? 1 : 0)}k` : v}`} />
-                  <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Spending']} contentStyle={{ borderRadius: 12, border: '1px solid #bfdbfe', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(v >= 100000 ? 1 : 0)}k` : v}`} />
+                  <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Spending']} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 12 }} />
                   <Bar dataKey="spending" fill="url(#spendingGradient)" radius={[6, 6, 0, 0]} maxBarSize={48} />
                 </BarChart>
               </ResponsiveContainer>

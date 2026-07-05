@@ -75,10 +75,10 @@ function ThemedToaster() {
 function App() {
   if (!CLERK_PUBLISHABLE_KEY) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md">
-          <h1 className="text-xl font-bold text-red-600 mb-2">Configuration Error</h1>
-          <p className="text-gray-600">Clerk Publishable Key is missing. Please check your environment variables.</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 p-4">
+        <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg text-center max-w-md">
+          <h1 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Configuration Error</h1>
+          <p className="text-gray-600 dark:text-gray-400">Clerk Publishable Key is missing. Please check your environment variables.</p>
         </div>
       </div>
     );

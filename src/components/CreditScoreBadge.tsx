@@ -14,15 +14,15 @@ interface CreditScoreBadgeProps {
 }
 
 const sizeConfig = {
-  sm: { variant: "outline" as const, color: "border-orange-300", textSize: "text-xs" },
-  lg: { variant: "default" as const, color: "bg-orange-100 text-orange-800 border-orange-300", textSize: "text-sm" },
+  sm: { variant: "outline" as const, color: "border-orange-300 dark:border-orange-700", textSize: "text-xs" },
+  lg: { variant: "default" as const, color: "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-700", textSize: "text-sm" },
 };
 
 const getConfig = (score: number) => {
-  if (score >= 800) return { label: "Elite", color: "bg-orange-100 text-orange-800 border-orange-300" };
-  if (score >= 650) return { label: "Trusted", color: "bg-green-100 text-green-800 border-green-300" };
-  if (score >= 500) return { label: "Standard", color: "bg-yellow-100 text-yellow-800 border-yellow-300" };
-  return { label: "Building", color: "bg-red-100 text-red-800 border-red-300" };
+  if (score >= 800) return { label: "Elite", color: "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-700" };
+  if (score >= 650) return { label: "Trusted", color: "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700" };
+  if (score >= 500) return { label: "Standard", color: "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700" };
+  return { label: "Building", color: "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700" };
 };
 
 const CreditScoreBadge: React.FC<CreditScoreBadgeProps> = ({ score, size = "sm", factors }) => {

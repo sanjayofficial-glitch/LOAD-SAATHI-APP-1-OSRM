@@ -41,7 +41,7 @@ export default function CreditScoreHistory({ history }: CreditScoreHistoryProps)
             <XAxis dataKey="date" tick={{ fontSize: 11 }} />
             <YAxis domain={[300, 900]} tick={{ fontSize: 11 }} />
             <Tooltip
-              contentStyle={{ fontSize: 12 }}
+              contentStyle={{ fontSize: 12, background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
               labelStyle={{ fontWeight: 600 }}
             />
             <Line

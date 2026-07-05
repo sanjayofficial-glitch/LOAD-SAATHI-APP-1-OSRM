@@ -143,11 +143,11 @@ const TripDetail = () => {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
-      <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+      <Loader2 className="h-8 w-8 animate-spin text-orange-600 dark:text-orange-400" />
     </div>
   );
   
-  if (!trip) return <div className="p-8 text-center">Trip not found</div>;
+  if (!trip) return <div className="p-8 text-center text-gray-900 dark:text-gray-100">Trip not found</div>;
 
   const isCompleted = trip.status === 'completed';
 
@@ -173,12 +173,12 @@ const TripDetail = () => {
 
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <Card className="border-orange-100">
+          <Card className="border-orange-100 dark:border-orange-800">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-2xl font-bold text-gray-900">Trip Information</CardTitle>
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">Trip Information</CardTitle>
                 {isCompleted && (
-                  <Badge className="bg-blue-100 text-blue-700 border-blue-200">
+                  <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700">
                     <Flag className="h-3 w-3 mr-1" /> COMPLETED
                   </Badge>
                 )}
@@ -200,15 +200,15 @@ const TripDetail = () => {
                   className="block"
                 >
                   <Button className="bg-green-600 hover:bg-green-700 w-full mb-4">
-                    💬 Chat on WhatsApp
+                    Chat on WhatsApp
                   </Button>
                 </a>
               )}
               <div className="space-y-2">
-                <div className="flex items-center text-xl font-bold text-gray-900">
-                  <MapPin className="mr-2 text-orange-600" /> {trip.origin_city} → {trip.destination_city}
+                <div className="flex items-center text-xl font-bold text-gray-900 dark:text-white">
+                  <MapPin className="mr-2 text-orange-600 dark:text-orange-400" /> {trip.origin_city} → {trip.destination_city}
                 </div>
-                <div className="flex items-center text-gray-600">
+                <div className="flex items-center text-gray-600 dark:text-gray-400">
                   <Calendar className="mr-2 h-4 w-4" /> 
                   {new Date(trip.departure_date).toLocaleDateString('en-IN', { 
                     weekday: 'long', 
@@ -219,43 +219,43 @@ const TripDetail = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 py-4 border-y border-gray-100">
+              <div className="grid grid-cols-2 gap-4 py-4 border-y border-gray-100 dark:border-gray-800">
                 <div>
-                  <p className="text-xs text-gray-500 uppercase font-bold mb-1">Vehicle</p>
-                  <div className="flex items-center font-medium">
-                    <Truck className="mr-2 h-4 w-4 text-gray-400" /> {trip.vehicle_type}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Vehicle</p>
+                  <div className="flex items-center font-medium text-gray-900 dark:text-gray-100">
+                    <Truck className="mr-2 h-4 w-4 text-gray-400 dark:text-gray-500" /> {trip.vehicle_type}
                   </div>
-                  <p className="text-xs text-gray-400 ml-6">{trip.vehicle_number}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 ml-6">{trip.vehicle_number}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 uppercase font-bold mb-1">Price</p>
-                  <div className="flex items-center font-bold text-orange-600 text-lg">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Price</p>
+                  <div className="flex items-center font-bold text-orange-600 dark:text-orange-400 text-lg">
                     <IndianRupee className="mr-1 h-4 w-4" /> {trip.price_per_tonne.toLocaleString()}
-                    <span className="text-xs text-gray-400 font-normal ml-1">/tonne</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 font-normal ml-1">/tonne</span>
                   </div>
                 </div>
               </div>
 
-              <div className={`p-4 rounded-lg flex items-center justify-between ${isCompleted ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-blue-700'}`}>
+              <div className={`p-4 rounded-lg flex items-center justify-between ${isCompleted ? 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'}`}>
                 <div className="flex items-center">
                   <CheckCircle className="mr-2 h-5 w-5" /> {isCompleted ? 'Final Capacity' : 'Available Capacity'}
                 </div>
-                <Badge className={`${isCompleted ? 'bg-gray-400' : 'bg-blue-600'} text-white text-lg px-3 py-1`}>
+                <Badge className={`${isCompleted ? 'bg-gray-400 dark:bg-gray-600' : 'bg-blue-600'} text-white text-lg px-3 py-1`}>
                   {trip.available_capacity_tonnes} Tonnes
                 </Badge>
               </div>
 
               <div className="pt-4">
-                <p className="text-xs text-gray-500 uppercase font-bold mb-3">Trucker Details</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-3">Trucker Details</p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-lg font-bold text-orange-600">
+                  <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mr-4">
+                    <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
                       {trip.trucker?.full_name?.charAt(0) || 'T'}
                     </span>
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900">{trip.trucker?.full_name}</p>
-                    <div className="flex items-center text-sm text-gray-500">
+                    <p className="font-bold text-gray-900 dark:text-white">{trip.trucker?.full_name}</p>
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                       <Star filled className="h-3 w-3 text-yellow-500 mr-1" />
                       {trip.trucker?.rating?.toFixed(1) || '0.0'} Rating • {trip.trucker?.total_trips || 0} Trips
                     </div>
@@ -267,25 +267,25 @@ const TripDetail = () => {
           </Card>
 
           {reviews.length > 0 && (
-            <Card className="border-gray-100">
+            <Card className="border-gray-100 dark:border-gray-800">
               <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <MessageSquare className="h-5 w-5 mr-2 text-orange-600" />
+                <CardTitle className="text-lg flex items-center text-gray-900 dark:text-white">
+                  <MessageSquare className="h-5 w-5 mr-2 text-orange-600 dark:text-orange-400" />
                   Recent Reviews
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {reviews.map((review) => (
-                  <div key={review.id} className="border-b last:border-0 pb-3 last:pb-0">
+                  <div key={review.id} className="border-b dark:border-gray-800 last:border-0 pb-3 last:pb-0">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-bold">{review.shipper?.full_name}</span>
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">{review.shipper?.full_name}</span>
                       <div className="flex">
                         {[1, 2, 3, 4, 5].map((s) => (
                           <Star key={s} filled={review.rating >= s} className="h-3 w-3" />
                         ))}
                       </div>
                     </div>
-                    <p className="text-xs text-gray-600 italic">"{review.comment}"</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 italic">"{review.comment}"</p>
                   </div>
                 ))}
               </CardContent>
@@ -294,17 +294,17 @@ const TripDetail = () => {
         </div>
 
         {userProfile?.user_type === 'shipper' && (
-          <Card className={`border-orange-200 shadow-md h-fit sticky top-24 ${isCompleted ? 'opacity-75 grayscale-[0.5]' : ''}`}>
-            <CardHeader className="bg-orange-50/50">
-              <CardTitle>{isCompleted ? 'Trip Finished' : 'Book Space'}</CardTitle>
+          <Card className={`border-orange-200 dark:border-orange-800 shadow-md h-fit sticky top-24 ${isCompleted ? 'opacity-75 grayscale-[0.5]' : ''}`}>
+            <CardHeader className="bg-orange-50/50 dark:bg-orange-900/10">
+              <CardTitle className="text-gray-900 dark:text-white">{isCompleted ? 'Trip Finished' : 'Book Space'}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               {isCompleted ? (
                 <div className="text-center py-8 space-y-4">
-                  <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                    <Flag className="h-8 w-8 text-blue-600" />
+                  <div className="bg-blue-100 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                    <Flag className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <p className="text-gray-600 font-medium">
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">
                     This trip has been marked as completed by the trucker and is no longer accepting bookings.
                   </p>
                   <Button variant="outline" className="w-full" onClick={() => navigate('/browse-trucks')}>
@@ -314,7 +314,7 @@ const TripDetail = () => {
               ) : (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="weight">Weight to Book (Tonnes)</Label>
+                    <Label htmlFor="weight" className="text-gray-700 dark:text-gray-200">Weight to Book (Tonnes)</Label>
                     <div className="relative">
                       <Input 
                         id="weight"
@@ -325,19 +325,19 @@ const TripDetail = () => {
                         value={weight}
                         onChange={(e) => setWeight(e.target.value)}
                       />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-gray-500 font-medium">
                         Tonnes
                       </div>
                     </div>
                     {parseFloat(weight) > trip.available_capacity_tonnes && (
-                      <p className="text-xs text-red-500 flex items-center mt-1">
+                      <p className="text-xs text-red-500 dark:text-red-400 flex items-center mt-1">
                         <AlertCircle className="h-3 w-3 mr-1" /> Exceeds available capacity
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">Goods Description</Label>
+                    <Label htmlFor="description" className="text-gray-700 dark:text-gray-200">Goods Description</Label>
                     <Input 
                       id="description"
                       value={description} 
@@ -347,7 +347,7 @@ const TripDetail = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="pickup">Pickup Address</Label>
+                    <Label htmlFor="pickup" className="text-gray-700 dark:text-gray-200">Pickup Address</Label>
                     <Input 
                       id="pickup"
                       value={pickupAddress} 
@@ -357,7 +357,7 @@ const TripDetail = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="delivery">Delivery Address</Label>
+                    <Label htmlFor="delivery" className="text-gray-700 dark:text-gray-200">Delivery Address</Label>
                     <Input 
                       id="delivery"
                       value={deliveryAddress} 
