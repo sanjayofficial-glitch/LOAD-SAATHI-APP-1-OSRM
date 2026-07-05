@@ -26,7 +26,7 @@ const getConfig = (score: number) => {
 };
 
 const CreditScoreBadge: React.FC<CreditScoreBadgeProps> = ({ score, size = "sm", factors }) => {
-  const sizeCfg = sizeConfig[size] || sizeConfig.sm;
+  const sizeCfg = sizeConfig[size] ?? sizeConfig.sm;
   const config = getConfig(score);
 
   return (
