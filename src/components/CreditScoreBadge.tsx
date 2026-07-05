@@ -1,16 +1,64 @@
-<TooltipTrigger asChild>
-  <Badge variant={config?.variant || 'default'} className={`${config?.color || 'default-color'} ${textSize} cursor-help`}>
-    Credit: {score}
-  </Badge>
-</TooltipTrigger>
+import React from "react";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
-<div className="space-y-1 text-xs">
-  <p className="font-semibold">{config?.label || 'Credit Score'} — {score}/900</p>
-  {factors && (
-    <div className="space-y-2">
-      {factors.map((factor, i) => (
-        <div key={i}>{factor}</div>
-      ))}
-    </div>
-  )}
-</div>
+interface CreditScoreBadgeProps {
+  score: number;
+  size?: "sm" | "lg";
+  factors?: string[];
+}
+
+const sizeConfig: Record<string, { variant: string; color: string; textSize: string }> = {
+  sm: { variant: "outline", color: "border-orange-300", textSize: "text-xs" },
+  lg: { variant: "default", color: "bg-orange-100 text-orange-800 border-orange-300", textSize: "text-sm" },
+};
+
+const getConfig = (score: number) => {
+  if (score >= 800) return { label: "Elite", color: "bg-orange-100 text-orange-800 border-orange-300" };
+  if (score >= 650) return { label: "Trusted", color: "bg-green-100 text-green-800 border-green-300" };
+  if (score >= 500) return { label: "Standard", color: "bg-yellow-100 text-yellow-800 border-yellow-300" };
+  return { label: "Building", color: "bg-red-100 text-red-800 border-red-300" };
+};
+
+const CreditScoreBadge: React.FC<CreditScoreBadgeProps> = ({ score, size = "sm", factors }) => {
+  const sizeCfg = sizeConfig[size] || sizeConfig.sm;
+  const config = getConfig(score);
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge
+            variant={sizeCfg.variant as "outline" | "default"}
+            className={`${config.color} ${sizeCfg.textSize} cursor-help`}
+          >
+            Credit: {score}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-[200px]">
+          <div className="space-y-1 text-xs">
+            <p className="font-semibold">
+              {config.label} &mdash; {score}/900
+            </p>
+            {factors && factors.length > 0 && (
+              <div className="space-y-0.5">
+                {factors.map((factor, i) => (
+                  <div key={i} className="text-muted-foreground">
+                    &bull; {factor}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+export default CreditScoreBadge;

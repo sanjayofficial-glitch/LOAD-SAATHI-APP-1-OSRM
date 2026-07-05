@@ -14,7 +14,7 @@ const colorMap: Record<"orange" | "blue" | "green" | "purple" | "teal" | "red", 
   red: { border: "border-red-500/20 hover:border-red-500/40", bg: "bg-red-600/10 dark:bg-red-500/10", icon: "text-red-600 dark:text-red-400" },
 };
 
-const ColorKey = keyof typeof colorMap;
+type ColorKey = keyof typeof colorMap;
 
 const trustComponents = [
   {
