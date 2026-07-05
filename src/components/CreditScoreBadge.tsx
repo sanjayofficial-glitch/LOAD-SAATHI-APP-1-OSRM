@@ -26,8 +26,6 @@ export default function CreditScoreBadge({ score, factors, size = 'sm' }: Credit
       <Tooltip>
         <TooltipTrigger asChild>
           <Badge variant={config.variant} className={`${config.color} ${textSize} cursor-help`}>
-            >
-            >
             Credit: {score}
           </Badge>
         </TooltipTrigger>
