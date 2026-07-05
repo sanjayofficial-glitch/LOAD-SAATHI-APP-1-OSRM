@@ -13,9 +13,9 @@ interface CreditScoreBadgeProps {
   factors?: string[];
 }
 
-const sizeConfig: Record<string, { variant: string; color: string; textSize: string }> = {
-  sm: { variant: "outline", color: "border-orange-300", textSize: "text-xs" },
-  lg: { variant: "default", color: "bg-orange-100 text-orange-800 border-orange-300", textSize: "text-sm" },
+const sizeConfig = {
+  sm: { variant: "outline" as const, color: "border-orange-300", textSize: "text-xs" },
+  lg: { variant: "default" as const, color: "bg-orange-100 text-orange-800 border-orange-300", textSize: "text-sm" },
 };
 
 const getConfig = (score: number) => {
@@ -34,7 +34,7 @@ const CreditScoreBadge: React.FC<CreditScoreBadgeProps> = ({ score, size = "sm",
       <Tooltip>
         <TooltipTrigger asChild>
           <Badge
-            variant={sizeCfg.variant as "outline" | "default"}
+            variant={sizeCfg.variant}
             className={`${config.color} ${sizeCfg.textSize} cursor-help`}
           >
             Credit: {score}
