@@ -37,7 +37,7 @@ export default function CreditScoreDetail({ factors }: CreditScoreDetailProps) {
           return (
             <div key={key}>
               <div className="mb-1 flex items-center justify-between text-sm">
-                <span className="font-medium">{meta.label}</span>
+                <span className="font-medium">{meta?.label ?? key}</span>
                 <span className="text-muted-foreground">
                   {f.score}/{f.max}
                 </span>
@@ -46,9 +46,8 @@ export default function CreditScoreDetail({ factors }: CreditScoreDetailProps) {
               <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                 {pct >= 70
                   ? <CheckCircle2 className="h-3 w-3 text-green-500" />
-                  : <AlertTriangle className="h-3 w-3 text-yellow-500" />
-                }
-                {meta.desc}
+                  : <AlertTriangle className="h-3 w-3 text-yellow-500" />}
+                {meta?.desc}
               </p>
             </div>
           )

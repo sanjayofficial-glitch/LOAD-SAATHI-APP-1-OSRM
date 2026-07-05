@@ -18,7 +18,7 @@ interface CreditScoreBadgeProps {
 
 export default function CreditScoreBadge({ score, factors, size = 'sm' }: CreditScoreBadgeProps) {
   const tier = factors?.tier || 'fair'
-  const config = tierConfig[tier] || tierConfig.fair
+  const config = tierConfig[tier] ?? tierConfig.fair
   const textSize = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base' : 'text-sm'
 
   return (
@@ -26,6 +26,8 @@ export default function CreditScoreBadge({ score, factors, size = 'sm' }: Credit
       <Tooltip>
         <TooltipTrigger asChild>
           <Badge variant={config.variant} className={`${config.color} ${textSize} cursor-help`}>
+            >
+            >
             Credit: {score}
           </Badge>
         </TooltipTrigger>

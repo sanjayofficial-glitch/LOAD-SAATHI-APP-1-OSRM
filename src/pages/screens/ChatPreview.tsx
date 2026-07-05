@@ -74,14 +74,16 @@ const conversations: Conversation[] = [
 ];
 
 export default function ChatPreview() {
-  const [activeChat, setActiveChat] = useState<Conversation>(conversations[0]);
+  const [activeChat, setActiveChat] = useState<Conversation>(conversations[0] ?? {
+    id: 0, name: '', role: '', avatar: '', lastMessage: '', time: '', unread: 0, online: false, messages: []
+  });
   const [messageText, setMessageText] = useState('');
 
   return (
     <div className="min-h-screen bg-background">
       <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-green-500/5 via-transparent to-transparent">
         <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #22c55e 0%, transparent 70%)', filter: 'blur(60px)' }} />
+          style={{ background: "radial-gradient(circle, #22c55e 0%, transparent 70%)", filter: "blur(60px)" }} />
         <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
           <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Chat</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
@@ -200,7 +202,7 @@ export default function ChatPreview() {
                             </div>
                           ) : msg.status === 'delivered' ? (
                             <div className="flex">
-                              <Check className="h-2.5 w-2.5 text-muted-foreground" />
+                              <Check className="h-2.5 w-2.2.5 text-muted-foreground" />
                               <Check className="h-2.5 w-2.5 text-muted-foreground -ml-1" />
                             </div>
                           ) : (

@@ -388,7 +388,7 @@ const BrowseShipments = () => {
               {[1, 2, 3].map((i) => <Skeleton key={i} className="h-48 w-full rounded-xl" />)}
             </div>
           ) : filteredShipments.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+            <div className="text-center py-16 bg-white dark:bg-white dark:bg-gray-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
               <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">No shipments found</h3>
               <p className="text-gray-500 dark:text-gray-400">Try adjusting your filters or check back later.</p>
@@ -399,48 +399,49 @@ const BrowseShipments = () => {
                 <Card key={shipment.id} className="overflow-hidden border-orange-100 dark:border-orange-800 hover:shadow-lg transition-all">
                   <CardContent className="p-0">
                     <div className="flex flex-col md:flex-row">
-                      <div className="flex-1 p-6 space-y-4">                          <div className="flex items-start justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-full">
-                                <Package className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-                              </div>
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                                  {shipment.origin_city} <ArrowRight className="h-4 w-4 inline mx-1 text-gray-400 dark:text-gray-500" /> {shipment.destination_city}
-                                </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-300">{shipment.goods_description}</p>
-                              </div>
+                      <div className="flex-1 p-6 space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-full">
+                              <Package className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                             </div>
-                            <div className="flex flex-col items-end gap-1">
-                              {shipment._matchScore > 0 && (() => {
-                                const { label, color } = getMatchLabel(shipment._matchScore);
-                                return <Badge className={`${color} text-xs font-semibold`}>{label}</Badge>;
-                              })()}
-                              {aiScores[shipment.id] && (() => {
-                                const ai = getAIMatchBadge(aiScores[shipment.id]);
-                                return (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Badge className={`${ai.color} text-xs font-semibold cursor-help`}>
-                                          <Sparkles className="h-3 w-3 mr-0.5 inline" />
-                                          {ai.label}
-                                        </Badge>
-                                      </TooltipTrigger>
-                                      <TooltipContent side="left" className="text-xs max-w-[200px]">
-                                        {aiScores[shipment.id].reasoning}
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                );
-                              })()}
-                              {aiLoadingId === shipment.id && (
-                                <Loader2 className="h-3 w-3 animate-spin text-purple-500" />
-                              )}
-                              <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-                                {shipment.weight_tonnes} Tonnes
-                              </Badge>
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                                {shipment.origin_city} <ArrowRight className="h-4 w-4 inline mx-1 text-gray-400 dark:text-gray-500" /> {shipment.destination_city}
+                              </h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">{shipment.goods_description}</p>
                             </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            {shipment._matchScore > 0 && (() => {
+                              const { label, color } = getMatchLabel(shipment._matchScore);
+                              return <Badge className={`${color} text-xs font-semibold`}>{label}</Badge>;
+                            })()}
+                            {aiScores[shipment.id] && (() => {
+                              const ai = getAIMatchBadge(aiScores[shipment.id]!);
+                              return (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Badge className={`${ai.color} text-xs font-semibold cursor-help`}>
+                                        <Sparkles className="h-3 w-3 mr-0.5 inline" />
+                                        {ai.label}
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="left" className="text-xs max-w-[200px]">
+                                      {aiScores[shipment.id]!.reasoning}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              );
+                            })()}
+                            {aiLoadingId === shipment.id && (
+                              <Loader2 className="h-3 w-3 animate-spin text-purple-500" />
+                            )}
+                            <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                              {shipment.weight_tonnes} Tonnes
+                            </Badge>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">

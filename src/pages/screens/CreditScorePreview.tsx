@@ -35,7 +35,6 @@ function ThumbsUp({ className }: { className?: string }) {
 export default function CreditScorePreview() {
   const score = 832;
   const tier = 'Platinum';
-  const tierColor = 'text-blue-400';
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,18 +83,21 @@ export default function CreditScorePreview() {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-5xl font-black text-foreground">{score}</span>
-                      <span className={`text-sm font-bold ${tierColor}`}>{tier}</span>
+                      <span className="text-sm font-bold text-blue-400">{tier}</span>
                     </div>
                   </div>
 
                   {/* Tier Range */}
                   <div className="flex justify-center gap-2 mb-6">
-                    {tiers.map((t) => (
-                      <div key={t.label} className="text-center">
-                        <div className={`h-1.5 w-10 rounded-full ${score >= parseInt(t.range.split('-')[0]) ? t.bar : 'bg-border'} mb-1`} />
-                        <div className={`text-[9px] font-semibold ${t.color}`}>{t.label}</div>
-                      </div>
-                    ))}
+                    {tiers.map((t) => {
+                      const rangeStart = parseInt(t.range.split('-')[0] ?? '0');
+                      return (
+                        <div key={t.label} className="text-center">
+                          <div className={`h-1.5 w-10 rounded-full ${score >= rangeStart ? t.bar : 'bg-border'} mb-1`} />
+                          <div className={`text-[9px] font-semibold ${t.color}`}>{t.label}</div>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="border-t border-border pt-4 space-y-3">

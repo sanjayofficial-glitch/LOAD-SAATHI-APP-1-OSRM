@@ -400,7 +400,7 @@ const TripList = () => {
                           return <Badge className={`${color} text-[10px] font-bold`}>{label}</Badge>;
                         })()}
                         {aiScores[trip.id] && (() => {
-                          const ai = getAIMatchBadge(aiScores[trip.id]);
+                          const ai = getAIMatchBadge(aiScores[trip.id]!);
                           return (
                             <TooltipProvider>
                               <Tooltip>
@@ -411,7 +411,7 @@ const TripList = () => {
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent side="top" className="text-xs max-w-[200px]">
-                                  {aiScores[trip.id].reasoning}
+                                  {aiScores[trip.id]!.reasoning}
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
