@@ -26,6 +26,11 @@ export const createClerkSupabaseClient = (clerkToken: string) => {
           Authorization: `Bearer ${clerkToken}`,
         },
       },
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
     }
   );
 };
