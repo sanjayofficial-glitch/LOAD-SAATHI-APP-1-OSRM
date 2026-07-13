@@ -46,8 +46,8 @@ const TruckerDashboard = () => {
   const [recentActivity, setRecentActivity] = useState<{ route: string; earnings: number; date: string }[]>([]);
   const [activeTrucks, setActiveTrucks] = useState<TruckLocation[]>([]);
 
-  const { creditScore } = useCreditScore(userProfile?.id);
-  const { insights } = useCreditInsights(userProfile?.id);
+  const { data: creditScore } = useCreditScore(userProfile?.id);
+  const { data: insights } = useCreditInsights(creditScore);
 
   const fetchDashboardData = useCallback(async () => {
     if (!userProfile?.id) return;
@@ -358,20 +358,20 @@ const TruckerDashboard = () => {
               </div>
             </CardHeader>
             <CardContent className="px-4 sm:px-6 pb-4">
-              <CreditScoreGauge score={creditScore.score} factors={creditScore.factors} />
-              {insights && insights.length > 0 && (
+              <CreditScoreGauge score={creditScore.score} />
+              {insights && insights.tips && insights.tips.length > 0 && (
                 <div className="mt-3 text-xs text-muted-foreground">
-                  {insights.slice(0, 2).map((insight, i) => (
+                  {insights.tips.slice(0, 2).map((tip: string, i: number) => (
                     <p key={i} className="flex items-start gap-1 mt-1">
                       <span className="text-orange-500 mt-0.5">•</span>
-                      {insight}
+                      {tip}
                     </p>
                   ))}
                 </div>
               )}
             </CardContent>
           </Card>
-          <CreditScoreBadge score={creditScore.score} className="self-stretch" />
+          <CreditScoreBadge score={creditScore.score} />
         </div>
       )}
 

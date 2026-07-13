@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { Trip } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,6 +108,44 @@ const TripDetail = () => {
     };
     fetchTripAndReviews();
   }, [tripId, getToken]);
+
+  // Real-time subscription for trucker's live location
+  useEffect(() => {
+    if (!trip || trip.status !== 'in_transit' || !trip.trucker_id) return;
+
+    const channel = supabase
+      .channel(`driver-loc-${trip.trucker_id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'driver_locations',
+          filter: `driver_id=eq.${trip.trucker_id}`,
+        },
+        (payload) => {
+          const loc = payload.new as { lat: number; lng: number; heading: number | null; speed: number | null; updated_at: string };
+          setTruckerLocation({
+            id: `track-${trip.trucker_id}`,
+            driverId: trip.trucker_id,
+            driverName: trip.trucker?.full_name || 'Trucker',
+            lat: loc.lat,
+            lng: loc.lng,
+            heading: loc.heading,
+            speed: loc.speed,
+            tripId: trip.id,
+            originCity: trip.origin_city,
+            destinationCity: trip.destination_city,
+            lastUpdated: loc.updated_at,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [trip?.status, trip?.trucker_id]);
 
   const handleRequest = async () => {
     if (!userProfile) return navigate('/login');

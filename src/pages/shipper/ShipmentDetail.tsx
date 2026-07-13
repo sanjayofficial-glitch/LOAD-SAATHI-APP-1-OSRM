@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import RouteMap from '@/components/RouteMap';
 import EmissionsCard from '@/components/EmissionsCard';
 import LiveMap from '@/components/LiveMap';
@@ -172,6 +173,48 @@ const ShipmentDetail = () => {
   };
 
   useEffect(() => { fetchData(); }, [id, userProfile?.id]);
+
+  // Real-time subscription for trucker's live location
+  const trackedDriverRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!reviewTruckerId || !shipment || (shipment.status !== 'in_transit' && linkedTripStatus !== 'in_transit')) return;
+
+    trackedDriverRef.current = reviewTruckerId;
+
+    const channel = supabase
+      .channel(`driver-loc-${reviewTruckerId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'driver_locations',
+          filter: `driver_id=eq.${reviewTruckerId}`,
+        },
+        (payload) => {
+          const loc = payload.new as { lat: number; lng: number; heading: number | null; speed: number | null; updated_at: string };
+          setTruckerLocation({
+            id: `track-${reviewTruckerId}`,
+            driverId: reviewTruckerId,
+            driverName: acceptedTrucker?.full_name || 'Trucker',
+            lat: loc.lat,
+            lng: loc.lng,
+            heading: loc.heading,
+            speed: loc.speed,
+            tripId: reviewTripId,
+            originCity: shipment.origin_city,
+            destinationCity: shipment.destination_city,
+            lastUpdated: loc.updated_at,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+      trackedDriverRef.current = null;
+    };
+  }, [reviewTruckerId, shipment?.status, linkedTripStatus]);
 
   const handleSendOffer = async () => {
     if (!userProfile || !shipment) return;
