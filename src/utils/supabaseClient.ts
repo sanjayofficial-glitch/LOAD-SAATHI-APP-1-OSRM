@@ -30,6 +30,7 @@ export const createClerkSupabaseClient = (clerkToken: string) => {
         persistSession: false,
         autoRefreshToken: false,
         detectSessionInUrl: false,
+        storageKey: `sb-clerk-${clerkToken.slice(0, 8)}`,
       },
     }
   );
