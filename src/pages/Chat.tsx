@@ -31,14 +31,19 @@ const Chat = () => {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Memoize getToken to prevent unnecessary re-renders of the effect
+  const getTokenRef = useRef(getToken);
+  getTokenRef.current = getToken;
+
   useEffect(() => {
     if (!requestId || !userProfile) return;
 
     let channel: ReturnType<typeof supabase.channel> | undefined;
+    let cancelled = false;
 
     const initChat = async () => {
       try {
-        const supabaseToken = await getToken({ template: 'supabase' });
+        const supabaseToken = await getTokenRef.current({ template: 'supabase' });
         if (!supabaseToken) throw new Error('Authentication failed');
         
         const supabaseClient = createClerkSupabaseClient(supabaseToken);
@@ -47,6 +52,8 @@ const Chat = () => {
           supabaseClient.from('requests').select('*, trip:trips(*, trucker:users!trips_trucker_id_fkey(*)), shipper:users!requests_shipper_id_fkey(*)').eq('id', requestId).maybeSingle(),
           supabaseClient.from('shipment_requests').select('*, shipment:shipments(*, shipper:users!shipments_shipper_id_fkey(*)), trucker:users!shipment_requests_trucker_id_fkey(*)').eq('id', requestId).maybeSingle()
         ]);
+
+        if (cancelled) return;
 
         let otherUser = null;
         if (reqRes.data) {
@@ -58,25 +65,42 @@ const Chat = () => {
         if (!otherUser) throw new Error('Chat partner not found');
         setRecipient(otherUser);
 
-        const initialMessages = await fetchMessages(requestId, () => getToken({ template: 'supabase' }));
+        const initialMessages = await fetchMessages(requestId, () => getTokenRef.current({ template: 'supabase' }));
+        if (cancelled) return;
         setMessages(initialMessages);
-        markMessagesAsRead(requestId, userProfile.id, () => getToken({ template: 'supabase' }));
+        markMessagesAsRead(requestId, userProfile.id, () => getTokenRef.current({ template: 'supabase' }));
+
+        // Remove any existing channel with this name before creating a new one
+        const channelName = `chat:${requestId}`;
+        const existingChannels = supabase.getChannels();
+        for (const ch of existingChannels) {
+          if (ch.topic === channelName) {
+            await supabase.removeChannel(ch);
+          }
+        }
+
+        if (cancelled) return;
 
         channel = subscribeToMessages(requestId, (msg) => {
           setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
-          if (msg.recipient_id === userProfile.id) markMessagesAsRead(requestId, userProfile.id, () => getToken({ template: 'supabase' }));
+          if (msg.recipient_id === userProfile.id) markMessagesAsRead(requestId, userProfile.id, () => getTokenRef.current({ template: 'supabase' }));
         });
 
         setLoading(false);
       } catch (err: unknown) {
-        showError(err instanceof Error ? err.message : 'Failed to load chat');
-        navigate(-1);
+        if (!cancelled) {
+          showError(err instanceof Error ? err.message : 'Failed to load chat');
+          navigate(-1);
+        }
       }
     };
 
     initChat();
-    return () => { if (channel) supabase.removeChannel(channel); };
-  }, [requestId, userProfile, navigate, getToken]);
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [requestId, userProfile, navigate]);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 

@@ -124,8 +124,19 @@ export const subscribeToMessages = (
   requestId: string,
   onNewMessage: (message: Message) => void
 ): RealtimeChannel => {
+  const channelName = `chat:${requestId}`;
+
+  // Remove any existing channel with this name to prevent the
+  // "cannot add postgres_changes callbacks after subscribe" error
+  const existingChannels = supabase.getChannels();
+  for (const ch of existingChannels) {
+    if (ch.topic === channelName) {
+      supabase.removeChannel(ch);
+    }
+  }
+
   const channel = supabase
-    .channel(`chat:${requestId}`)
+    .channel(channelName)
     .on(
       'postgres_changes',
       {
