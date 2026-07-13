@@ -27,6 +27,8 @@ import { showError } from '@/utils/toast';
 import { useCreditScore, useCreditInsights } from '@/hooks/useCreditScore';
 import CreditScoreBadge from '@/components/CreditScoreBadge';
 import CreditScoreGauge from '@/components/CreditScoreGauge';
+import LiveMap from '@/components/LiveMap';
+import type { TruckLocation } from '@/components/LiveMap';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const TruckerDashboard = () => {
@@ -42,6 +44,7 @@ const TruckerDashboard = () => {
   });
   const [monthlyData, setMonthlyData] = useState<{ month: string; earnings: number }[]>([]);
   const [recentActivity, setRecentActivity] = useState<{ route: string; earnings: number; date: string }[]>([]);
+  const [activeTrucks, setActiveTrucks] = useState<TruckLocation[]>([]);
 
   const { creditScore } = useCreditScore(userProfile?.id);
   const { insights } = useCreditInsights(userProfile?.id);
@@ -134,6 +137,37 @@ const TruckerDashboard = () => {
         completedTrips: completedCount || 0,
         totalEarnings
       });
+
+      // Fetch active truck locations for LiveMap
+      const { data: locations } = await supabase
+        .from('driver_locations')
+        .select('driver_id, lat, lng, heading, speed, updated_at, trip_id')
+        .gte('updated_at', new Date(Date.now() - 30 * 60 * 1000).toISOString());
+
+      if (locations && locations.length > 0) {
+        const driverIds = [...new Set(locations.map(l => l.driver_id))];
+        const { data: drivers } = await supabase
+          .from('users')
+          .select('id, full_name')
+          .in('id', driverIds);
+
+        const driverMap = new Map(drivers?.map(d => [d.id, d.full_name]) || []);
+
+        const truckLocations: TruckLocation[] = locations.map((loc, i) => ({
+          id: `loc-${i}`,
+          driverId: loc.driver_id,
+          driverName: driverMap.get(loc.driver_id) || 'Unknown',
+          lat: loc.lat,
+          lng: loc.lng,
+          heading: loc.heading,
+          speed: loc.speed,
+          tripId: loc.trip_id,
+          originCity: null,
+          destinationCity: null,
+          lastUpdated: loc.updated_at,
+        }));
+        setActiveTrucks(truckLocations);
+      }
     } catch (err) {
       console.error('[TruckerDashboard] Error:', err);
       showError('Failed to load dashboard statistics');
@@ -338,6 +372,27 @@ const TruckerDashboard = () => {
             </CardContent>
           </Card>
           <CreditScoreBadge score={creditScore.score} className="self-stretch" />
+        </div>
+      )}
+
+      {/* Live Fleet Map */}
+      {activeTrucks.length > 0 && (
+        <div className="mb-6 sm:mb-8">
+          <Card className="border-orange-200 dark:border-orange-800 shadow-md overflow-hidden animate-fade-in-up">
+            <div className="h-1 bg-gradient-to-r from-green-500 to-emerald-400" />
+            <CardHeader className="bg-green-50/50 dark:bg-green-900/10 px-4 sm:px-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-green-600" />
+                  <CardTitle className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Live Fleet</CardTitle>
+                </div>
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">{activeTrucks.length} truck{activeTrucks.length !== 1 ? 's' : ''} active</span>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <LiveMap trucks={activeTrucks} className="rounded-none border-0" />
+            </CardContent>
+          </Card>
         </div>
       )}
 

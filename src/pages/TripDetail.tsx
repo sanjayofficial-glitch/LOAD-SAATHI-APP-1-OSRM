@@ -16,6 +16,7 @@ import { generateWhatsAppLink } from '@/utils/whatsapp';
 import { MapPin, Calendar, Truck, IndianRupee, ArrowLeft, CheckCircle, AlertCircle, MessageSquare, Loader2, Flag } from 'lucide-react';
 import Star from '@/components/Star';
 import RouteMap from '@/components/RouteMap';
+import EmissionsCard from '@/components/EmissionsCard';
 import { notifyTruckerOfBookingRequest } from '@/utils/notifications';
 import { useCreditScore } from '@/hooks/useCreditScore';
 import CreditScoreBadge from '@/components/CreditScoreBadge';
@@ -170,6 +171,17 @@ const TripDetail = () => {
           height="280px"
         />
       </div>
+
+      {trip.estimated_distance_km && (
+        <div className="mb-8">
+          <EmissionsCard
+            distanceKm={trip.estimated_distance_km}
+            vehicleType={trip.vehicle_type}
+            loadTonnes={trip.available_capacity_tonnes}
+            compact
+          />
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-6">

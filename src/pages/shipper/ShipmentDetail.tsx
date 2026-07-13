@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import RouteMap from '@/components/RouteMap';
+import EmissionsCard from '@/components/EmissionsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -244,6 +245,17 @@ const ShipmentDetail = () => {
           height="260px"
         />
       </div>
+
+      {shipment.estimated_distance_km && (
+        <div className="mb-8">
+          <EmissionsCard
+            distanceKm={shipment.estimated_distance_km}
+            vehicleType={null}
+            loadTonnes={shipment.weight_tonnes}
+            compact
+          />
+        </div>
+      )}
 
       <div className="grid md:grid-cols-3 gap-8">
         {/* Main Details */}

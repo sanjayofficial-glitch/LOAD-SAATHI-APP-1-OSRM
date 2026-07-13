@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { showSuccess, showError } from '@/utils/toast';
 import RouteMap from '@/components/RouteMap';
+import EmissionsCard from '@/components/EmissionsCard';
+import GpsTracker from '@/components/GpsTracker';
 import {
   notifyShipperOfRequestAccepted,
   notifyShipperOfRequestDeclined,
@@ -375,6 +377,26 @@ const TruckerTripDetail = () => {
           height="240px"
         />
       </div>
+
+      {(trip.status === 'in_transit' || trip.status === 'active') && (
+        <div className="mb-8">
+          <GpsTracker
+            tripId={trip.id}
+            driverId={userProfile?.id}
+          />
+        </div>
+      )}
+
+      {trip.estimated_distance_km && (
+        <div className="mb-8">
+          <EmissionsCard
+            distanceKm={trip.estimated_distance_km}
+            vehicleType={trip.vehicle_type}
+            loadTonnes={trip.available_capacity_tonnes}
+            compact
+          />
+        </div>
+      )}
 
       <Card className="mb-8 border-orange-100 shadow-sm dark:border-orange-900/30">
         <CardHeader className="bg-orange-50/60 border-b border-orange-100 dark:bg-orange-950/30 dark:border-orange-900/30">
