@@ -7,6 +7,8 @@ import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import RouteMap from '@/components/RouteMap';
 import EmissionsCard from '@/components/EmissionsCard';
+import LiveMap from '@/components/LiveMap';
+import type { TruckLocation } from '@/components/LiveMap';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -50,6 +52,7 @@ const ShipmentDetail = () => {
   const [reviewTripId, setReviewTripId] = useState<string | null>(null);
   const [reviewTruckerId, setReviewTruckerId] = useState<string | null>(null);
   const [reviewTruckerName, setReviewTruckerName] = useState<string>('');
+  const [truckerLocation, setTruckerLocation] = useState<TruckLocation | null>(null);
 
   const fetchData = async () => {
     if (!id || !userProfile) return;
@@ -128,6 +131,33 @@ const ShipmentDetail = () => {
                 .eq('shipper_id', userProfile.id)
                 .limit(1);
               setHasReview(!!review?.length);
+            }
+          }
+
+          // Fetch trucker's live location when in transit
+          if (reviewTruckerId && shipmentData && (shipmentData.status === 'in_transit' || linkedTripStatus === 'in_transit')) {
+            const { data: loc } = await supabase
+              .from('driver_locations')
+              .select('lat, lng, heading, speed, updated_at')
+              .eq('driver_id', reviewTruckerId)
+              .order('updated_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+
+            if (loc) {
+              setTruckerLocation({
+                id: `track-${reviewTruckerId}`,
+                driverId: reviewTruckerId,
+                driverName: acceptedTrucker?.full_name || 'Trucker',
+                lat: loc.lat,
+                lng: loc.lng,
+                heading: loc.heading,
+                speed: loc.speed,
+                tripId: reviewTripId,
+                originCity: shipmentData.origin_city,
+                destinationCity: shipmentData.destination_city,
+                lastUpdated: loc.updated_at,
+              });
             }
           }
         }
@@ -444,6 +474,14 @@ const ShipmentDetail = () => {
                         <div className="flex items-center gap-2 text-sm">
                           <MapPinIcon className="h-4 w-4 text-orange-500" />
                           <span>{acceptedTrucker ? `${acceptedTrucker.full_name} is on the way from ${shipment.origin_city} → ${shipment.destination_city}` : 'Trucker is en route'}</span>
+                        </div>
+                      </div>
+                    )}
+                    {truckerLocation && (
+                      <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <LiveMap trucks={[truckerLocation]} className="!h-[200px] rounded-none border-0" />
+                        <div className="p-2 bg-blue-50 dark:bg-blue-900/20 text-xs text-blue-700 dark:text-blue-300 text-center">
+                          Live tracking updated {new Date(truckerLocation.lastUpdated).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
                     )}

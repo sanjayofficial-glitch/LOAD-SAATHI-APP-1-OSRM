@@ -17,6 +17,8 @@ import { MapPin, Calendar, Truck, IndianRupee, ArrowLeft, CheckCircle, AlertCirc
 import Star from '@/components/Star';
 import RouteMap from '@/components/RouteMap';
 import EmissionsCard from '@/components/EmissionsCard';
+import LiveMap from '@/components/LiveMap';
+import type { TruckLocation } from '@/components/LiveMap';
 import { notifyTruckerOfBookingRequest } from '@/utils/notifications';
 import { useCreditScore } from '@/hooks/useCreditScore';
 import CreditScoreBadge from '@/components/CreditScoreBadge';
@@ -34,6 +36,7 @@ const TripDetail = () => {
   const [pickupAddress, setPickupAddress] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [truckerLocation, setTruckerLocation] = useState<TruckLocation | null>(null);
   const { data: truckerCreditData } = useCreditScore(trip?.trucker_id);
   const truckerCreditScore = truckerCreditData?.score ?? null;
 
@@ -68,6 +71,33 @@ const TripDetail = () => {
           .limit(5);
         
         if (reviewData) setReviews(reviewData);
+
+        // Fetch trucker's live location when trip is in transit
+        if (tripData.status === 'in_transit' && tripData.trucker_id) {
+          const { data: loc } = await supabase
+            .from('driver_locations')
+            .select('lat, lng, heading, speed, updated_at')
+            .eq('driver_id', tripData.trucker_id)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (loc) {
+            setTruckerLocation({
+              id: `track-${tripData.trucker_id}`,
+              driverId: tripData.trucker_id,
+              driverName: truckerInfo?.full_name || 'Trucker',
+              lat: loc.lat,
+              lng: loc.lng,
+              heading: loc.heading,
+              speed: loc.speed,
+              tripId: tripData.id,
+              originCity: tripData.origin_city,
+              destinationCity: tripData.destination_city,
+              lastUpdated: loc.updated_at,
+            });
+          }
+        }
 
       } catch (err: unknown) {
         showError(err instanceof Error ? err.message : 'Failed to load trip');
@@ -171,6 +201,24 @@ const TripDetail = () => {
           height="280px"
         />
       </div>
+
+      {truckerLocation && (
+        <div className="mb-8">
+          <Card className="border-blue-200 dark:border-blue-800 overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-400" />
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 flex items-center justify-between">
+              <p className="text-sm font-bold text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                Live Trucker Location
+              </p>
+              <span className="text-[10px] text-blue-500 dark:text-blue-400 font-mono">
+                Updated {new Date(truckerLocation.lastUpdated).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+            <LiveMap trucks={[truckerLocation]} className="!h-[250px] rounded-none border-0" />
+          </Card>
+        </div>
+      )}
 
       {trip.estimated_distance_km && (
         <div className="mb-8">
