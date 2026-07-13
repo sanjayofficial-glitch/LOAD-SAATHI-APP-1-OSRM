@@ -21,8 +21,12 @@ import {
   Calendar,
   Star as StarIcon,
   WifiOff,
+  Shield,
 } from 'lucide-react';
 import { showError } from '@/utils/toast';
+import { useCreditScore, useCreditInsights } from '@/hooks/useCreditScore';
+import CreditScoreBadge from '@/components/CreditScoreBadge';
+import CreditScoreGauge from '@/components/CreditScoreGauge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const TruckerDashboard = () => {
@@ -38,6 +42,9 @@ const TruckerDashboard = () => {
   });
   const [monthlyData, setMonthlyData] = useState<{ month: string; earnings: number }[]>([]);
   const [recentActivity, setRecentActivity] = useState<{ route: string; earnings: number; date: string }[]>([]);
+
+  const { creditScore } = useCreditScore(userProfile?.id);
+  const { insights } = useCreditInsights(userProfile?.id);
 
   const fetchDashboardData = useCallback(async () => {
     if (!userProfile?.id) return;
@@ -304,6 +311,35 @@ const TruckerDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Driver Risk & Credit Score */}
+      {creditScore && (
+        <div className="mb-6 sm:mb-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <Card className="border-orange-200 dark:border-orange-800 shadow-md overflow-hidden animate-fade-in-up" style={{ animationDelay: '350ms' }}>
+            <div className="h-1 bg-gradient-to-r from-red-500 to-orange-400" />
+            <CardHeader className="px-4 sm:px-6 pb-2">
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-red-500" />
+                <CardTitle className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Driver Risk Score</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6 pb-4">
+              <CreditScoreGauge score={creditScore.score} factors={creditScore.factors} />
+              {insights && insights.length > 0 && (
+                <div className="mt-3 text-xs text-muted-foreground">
+                  {insights.slice(0, 2).map((insight, i) => (
+                    <p key={i} className="flex items-start gap-1 mt-1">
+                      <span className="text-orange-500 mt-0.5">•</span>
+                      {insight}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          <CreditScoreBadge score={creditScore.score} className="self-stretch" />
+        </div>
+      )}
 
       {/* Monthly Earnings & Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mt-6 sm:mt-8">
