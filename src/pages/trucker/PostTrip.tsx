@@ -16,6 +16,8 @@ import { getRoute } from "@/utils/osrm";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { showSuccess, showError } from "@/utils/toast";
 import { PricePredictor } from "@/components/PricePredictor";
+import TemplateSelector from "@/components/TemplateSelector";
+import SaveAsTemplate from "@/components/SaveAsTemplate";
 
 type LocationData = Record<string, Record<string, string[]>>;
 
@@ -164,6 +166,24 @@ const PostTrip = () => {
         </CardHeader>
         <CardContent className="pt-6 px-4 sm:px-6">
           <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+            {userProfile?.id && (
+              <TemplateSelector
+                userId={userProfile.id}
+                type="trip"
+                onSelect={(data) => setFormData(prev => ({
+                  ...prev,
+                  origin_city: (data.origin_city as string) || prev.origin_city,
+                  origin_state: (data.origin_state as string) || prev.origin_state,
+                  destination_city: (data.destination_city as string) || prev.destination_city,
+                  destination_state: (data.destination_state as string) || prev.destination_state,
+                  departure_date: (data.departure_date as string) || prev.departure_date,
+                  available_capacity_tonnes: (data.available_capacity_tonnes as string) || prev.available_capacity_tonnes,
+                  price_per_tonne: (data.price_per_tonne as string) || prev.price_per_tonne,
+                  vehicle_type: (data.vehicle_type as string) || prev.vehicle_type,
+                  vehicle_number: (data.vehicle_number as string) || prev.vehicle_number,
+                }))}
+              />
+            )}
             <div className="space-y-2">
               <Label className="text-gray-700 dark:text-gray-200 font-medium">Origin Location</Label>
                 <LocationSelector
@@ -266,19 +286,29 @@ const PostTrip = () => {
               </div>
             )}
 
-            <Button
-              type="submit"
-              className="w-full bg-orange-600 hover:bg-orange-700 h-12 text-base sm:text-lg font-bold"
-              disabled={loading || !isOnline}
-            >
-              {loading ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              ) : !isOnline ? (
-                <><WifiOff className="mr-2 h-5 w-5" /> Offline</>
-              ) : (
-                'Post Trip'
+            <div className="flex items-center justify-between gap-3">
+              {userProfile?.id && (
+                <SaveAsTemplate
+                  userId={userProfile.id}
+                  type="trip"
+                  data={formData}
+                  disabled={loading}
+                />
               )}
-            </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-orange-600 hover:bg-orange-700 h-12 text-base sm:text-lg font-bold"
+                disabled={loading || !isOnline}
+              >
+                {loading ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : !isOnline ? (
+                  <><WifiOff className="mr-2 h-5 w-5" /> Offline</>
+                ) : (
+                  'Post Trip'
+                )}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

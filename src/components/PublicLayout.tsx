@@ -17,6 +17,7 @@ const footerLinks = {
     { label: "For Shippers", path: "/solutions/shippers" },
     { label: "For Truckers", path: "/solutions/truckers" },
     { label: "Safety & Trust", path: "/safety-trust" },
+    { label: "Fare Calculator", path: "/fare-calculator" },
   ],
   Company: [
     { label: "About", path: "/about" },
@@ -44,6 +45,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link to="/features" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Features</Link>
+            <Link to="/fare-calculator" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Fare Calculator</Link>
             <Link to="/how-it-works" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">How It Works</Link>
             <Link to="/pricing" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Pricing</Link>
             <Link to="/about" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">About</Link>

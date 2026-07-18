@@ -10,6 +10,7 @@ import { Skeleton } from "./components/ui/skeleton";
 import Layout from "./components/Layout";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { ThemeProvider, useTheme } from "@/theme/theme";
+import { PostHogProvider } from "./components/PostHogProvider";
 import { lazy, Suspense } from "react";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -24,6 +25,9 @@ const HowItWorks = lazy(() => import("./pages/public/HowItWorks"));
 const About = lazy(() => import("./pages/public/About"));
 const Pricing = lazy(() => import("./pages/public/Pricing"));
 const Faq = lazy(() => import("./pages/public/FAQ"));
+const FareCalculator = lazy(() => import("./pages/public/FareCalculator"));
+const SharedTrip = lazy(() => import("./pages/public/SharedTrip"));
+const SharedShipment = lazy(() => import("./pages/public/SharedShipment"));
 const Contact = lazy(() => import("./pages/public/Contact"));
 const SafetyTrust = lazy(() => import("./pages/public/SafetyTrust"));
 const Privacy = lazy(() => import("./pages/public/Privacy"));
@@ -60,6 +64,7 @@ const MonitoringDashboard = lazy(() => import("./pages/admin/MonitoringDashboard
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const Moderation = lazy(() => import("./pages/admin/Moderation"));
+const Favorites = lazy(() => import("./pages/Favorites"));
 const CreditScore = lazy(() => import("./pages/CreditScore"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -86,6 +91,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <PostHogProvider>
       <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
@@ -108,6 +114,9 @@ function App() {
                     <Route path="/about" element={<About />} />
                     <Route path="/pricing" element={<Pricing />} />
                     <Route path="/faq" element={<Faq />} />
+                    <Route path="/fare-calculator" element={<FareCalculator />} />
+                    <Route path="/share/trip/:id" element={<SharedTrip />} />
+                    <Route path="/share/shipment/:id" element={<SharedShipment />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/safety-trust" element={<SafetyTrust />} />
                     <Route path="/privacy" element={<Privacy />} />
@@ -234,6 +243,7 @@ function App() {
                     <Route path="/chat/:requestId" element={<Chat />} />
                     <Route path="/messages" element={<ChatList />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/favorites" element={<Favorites />} />
                     <Route path="/credit-score" element={<CreditScore />} />
 
                     {/* Catch-all */}
@@ -247,6 +257,7 @@ function App() {
         </ThemeProvider>
         </QueryClientProvider>
       </ClerkProvider>
+      </PostHogProvider>
     </ErrorBoundary>
   );
 }

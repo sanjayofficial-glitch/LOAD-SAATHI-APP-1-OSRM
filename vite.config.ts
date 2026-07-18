@@ -9,6 +9,9 @@ export default defineConfig(() => ({
     port: 8080,
   },
   plugins: [dyadComponentTagger(), react()],
+  optimizeDeps: {
+    exclude: ["posthog-js"],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -34,6 +34,8 @@ import {
   ArrowUpDown
 } from 'lucide-react';
 
+import VerificationBadge from '@/components/VerificationBadge';
+import FavoriteButton from '@/components/FavoriteButton';
 import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
 import { useSmartMatch } from '@/hooks/useSmartMatch';
 import { formatDuration } from '@/utils/format';
@@ -98,7 +100,8 @@ const TripList = () => {
           trucker:users!trips_trucker_id_fkey(
             full_name,
             rating,
-            total_trips
+            total_trips,
+            is_verified
           )
         `)
         .eq('status', 'active')
@@ -456,14 +459,16 @@ const TripList = () => {
                         <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                           {trip.trucker?.full_name || 'Verified Trucker'}
                         </span>
+                        <VerificationBadge isVerified={trip.trucker?.is_verified} />
                         <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
                           {trip.trucker?.rating ? `⭐ ${trip.trucker.rating.toFixed(1)}` : 'New'}
                         </span>
                       </div>
                     </div>
 
-                    <div className="md:w-44 flex flex-row md:flex-col gap-2">
-                      <Button 
+                    <div className="md:w-44 flex flex-row md:flex-col gap-2 items-center">
+                      <FavoriteButton entityType="trip" entityId={trip.id} userId={userProfile!.id} className="md:mb-1" />
+                      <Button
                         className="flex-1 md:w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-sm"
                         onClick={(e) => {
                           e.stopPropagation();

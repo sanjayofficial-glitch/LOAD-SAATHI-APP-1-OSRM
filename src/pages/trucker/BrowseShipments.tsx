@@ -32,6 +32,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import VerificationBadge from '@/components/VerificationBadge';
+import FavoriteButton from '@/components/FavoriteButton';
 import { showSuccess, showError } from '@/utils/toast';
 import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
 import { useSmartMatch } from '@/hooks/useSmartMatch';
@@ -115,7 +117,7 @@ const BrowseShipments = () => {
       const supabase = createClerkSupabaseClient(token);
       const { data, error } = await supabase
         .from('shipments')
-        .select('id, origin_city, destination_city, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, goods_description, weight_tonnes, budget_per_tonne, departure_date, status, created_at, shipper_id, pickup_address, delivery_address, estimated_distance_km, estimated_duration_min, shipper:users(full_name, rating, phone, total_trips)')
+        .select('id, origin_city, destination_city, origin_state, destination_state, origin_lat, origin_lng, destination_lat, destination_lng, goods_description, weight_tonnes, budget_per_tonne, departure_date, status, created_at, shipper_id, pickup_address, delivery_address, estimated_distance_km, estimated_duration_min, shipper:users(full_name, rating, phone, total_trips, is_verified)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -463,7 +465,8 @@ const BrowseShipments = () => {
                             <User className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
                             <div>
                               <p className="text-gray-500 dark:text-gray-400 text-xs">Shipper</p>
-                              <p className="font-medium">{shipment.shipper?.full_name || 'Verified Shipper'}</p>
+                              <span className="font-medium">{shipment.shipper?.full_name || 'Verified Shipper'}</span>
+                              <VerificationBadge isVerified={shipment.shipper?.is_verified} className="ml-1" />
                             </div>
                           </div>
                           {shipment.estimated_distance_km && (
@@ -490,6 +493,9 @@ const BrowseShipments = () => {
                       </div>
 
                       <div className="md:w-48 bg-gray-50 dark:bg-gray-800 p-6 border-t md:border-t-0 md:border-l border-gray-100 dark:border-gray-700 flex flex-col justify-center gap-2">
+                        <div className="flex justify-center mb-1">
+                          <FavoriteButton entityType="shipment" entityId={shipment.id} userId={userProfile!.id} />
+                        </div>
                         <Button className="w-full bg-orange-600" onClick={() => openOfferDialog(shipment)}>
                           Send Offer
                         </Button>

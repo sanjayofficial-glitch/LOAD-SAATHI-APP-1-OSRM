@@ -16,6 +16,8 @@ import LocationSelector from "@/components/LocationSelector";
 import { geocodeCity } from "@/utils/geocode";
 import { getRoute } from "@/utils/osrm";
 import { PricePredictor } from "@/components/PricePredictor";
+import TemplateSelector from "@/components/TemplateSelector";
+import SaveAsTemplate from "@/components/SaveAsTemplate";
 
 type LocationData = Record<string, Record<string, string[]>>;
 
@@ -168,6 +170,25 @@ const PostShipments = () => {
         </CardHeader>
         <CardContent className="pt-6 px-4 sm:px-6">
           <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+            {userProfile?.id && (
+              <TemplateSelector
+                userId={userProfile.id}
+                type="shipment"
+                onSelect={(data) => setFormData(prev => ({
+                  ...prev,
+                  origin_city: (data.origin_city as string) || prev.origin_city,
+                  origin_state: (data.origin_state as string) || prev.origin_state,
+                  destination_city: (data.destination_city as string) || prev.destination_city,
+                  destination_state: (data.destination_state as string) || prev.destination_state,
+                  departure_date: (data.departure_date as string) || prev.departure_date,
+                  goods_description: (data.goods_description as string) || prev.goods_description,
+                  weight_tonnes: (data.weight_tonnes as string) || prev.weight_tonnes,
+                  pickup_address: (data.pickup_address as string) || prev.pickup_address,
+                  delivery_address: (data.delivery_address as string) || prev.delivery_address,
+                  budget_per_tonne: (data.budget_per_tonne as string) || prev.budget_per_tonne,
+                }))}
+              />
+            )}
             <div className="space-y-2">
               <Label className="text-gray-700 dark:text-gray-200 font-medium">Origin Location</Label>
                 <LocationSelector
@@ -280,20 +301,30 @@ const PostShipments = () => {
               </div>
             )}
 
-            <Button 
-              type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-base sm:text-lg font-bold shadow-md transition-all hover:shadow-lg" 
-              disabled={loading || !isOnline}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Posting Shipment...
-                </>
-              ) : !isOnline ? (
-                <><WifiOff className="mr-2 h-5 w-5" /> Offline</>
-              ) : 'Post Shipment'}
-            </Button>
+            <div className="flex items-center justify-between gap-3">
+              {userProfile?.id && (
+                <SaveAsTemplate
+                  userId={userProfile.id}
+                  type="shipment"
+                  data={formData}
+                  disabled={loading}
+                />
+              )}
+              <Button
+                type="submit"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 h-12 text-base sm:text-lg font-bold shadow-md transition-all hover:shadow-lg"
+                disabled={loading || !isOnline}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Posting Shipment...
+                  </>
+                ) : !isOnline ? (
+                  <><WifiOff className="mr-2 h-5 w-5" /> Offline</>
+                ) : 'Post Shipment'}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

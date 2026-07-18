@@ -27,11 +27,13 @@ import {
   Users,
   Home,
   LayoutDashboard,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./NotificationBell";
 import OfflineBanner from "./OfflineBanner";
 import ThemeToggle from "./ThemeToggle";
+import VerificationBadge from "./VerificationBadge";
 import { cn } from "@/lib/utils";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -56,12 +58,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       { label: "Post Trip", path: "/trucker/post-trip", icon: <PlusCircle className="h-4 w-4" /> },
       { label: "Find Goods", path: "/trucker/browse-shipments", icon: <Search className="h-4 w-4" /> },
       { label: "My Trips", path: "/trucker/my-trips", icon: <Truck className="h-4 w-4" /> },
+      { label: "Favorites", path: "/favorites", icon: <Heart className="h-4 w-4" /> },
       { label: "History", path: "/trucker/history", icon: <History className="h-4 w-4" /> },
     ] : [
       { label: "Dashboard", path: "/shipper/dashboard", icon: <Clock className="h-4 w-4" /> },
       { label: "Post Load", path: "/shipper/post-shipment", icon: <PlusCircle className="h-4 w-4" /> },
       { label: "Find Trucks", path: "/browse-trucks", icon: <Truck className="h-4 w-4" /> },
       { label: "My Loads", path: "/shipper/my-shipments", icon: <Search className="h-4 w-4" /> },
+      { label: "Favorites", path: "/favorites", icon: <Heart className="h-4 w-4" /> },
       { label: "History", path: "/shipper/history", icon: <History className="h-4 w-4" /> },
     ];
   };
@@ -203,7 +207,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>
                     <div className="flex flex-col">
-                      <span className="truncate">{userProfile?.full_name || "My Account"}</span>
+                      <span className="truncate flex items-center gap-1">
+                        {userProfile?.full_name || "My Account"}
+                        <VerificationBadge isVerified={userProfile?.is_verified} size="md" />
+                      </span>
                       <span className="text-xs font-normal text-gray-500 dark:text-gray-400 capitalize">{userProfile?.user_type}</span>
                     </div>
                   </DropdownMenuLabel>

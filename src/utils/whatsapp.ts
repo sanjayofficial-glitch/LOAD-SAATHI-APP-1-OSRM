@@ -1,3 +1,24 @@
+export function getShareUrl(type: "trip" | "shipment", id: string): string {
+  const base = window.location.origin;
+  return `${base}/share/${type}/${id}`;
+}
+
+export function generateShareWhatsAppLink(type: "trip" | "shipment", id: string, details: {
+  origin_city: string;
+  destination_city: string;
+  weight?: number;
+}): string {
+  const shareUrl = getShareUrl(type, id);
+  const label = type === "trip" ? "trip" : "load";
+  const msg = encodeURIComponent(
+    `Check out this ${label} on LoadSaathi:\n\n` +
+    `📍 ${details.origin_city} → ${details.destination_city}\n` +
+    (details.weight ? `⚖️ ${details.weight}t\n` : "") +
+    `\n${shareUrl}`
+  );
+  return `https://wa.me/?text=${msg}`;
+}
+
 export function generateWhatsAppLink(
   truckerPhone: string,
   details: {
