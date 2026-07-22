@@ -1,14 +1,11 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+
+# Block auth and private routes from indexing
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /settings
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://loadsaathi.in/sitemap.xml
