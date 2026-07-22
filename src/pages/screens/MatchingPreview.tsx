@@ -158,7 +158,7 @@ export default function MatchingPreview() {
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <div className="text-base font-black text-foreground">{tab === 'shipments' ? item.price : item.price}</div>
+                      <div className="text-base font-black text-foreground">{item.price}</div>
                       <div className="text-[10px] text-muted-foreground">{item.date}</div>
                       {tab === 'shipments' && 'driver' in item && (
                         <div className="flex items-center justify-end gap-1 mt-1">

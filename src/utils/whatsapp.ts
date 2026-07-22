@@ -46,7 +46,7 @@ export function generateWhatsAppLink(
     `Cargo: ${cargo}\n` +
     `Pickup: ${details.pickup_city}\n` +
     `Drop: ${details.drop_city}\n` +
-    `Weight: ${details.weight} kg\n` +
+    `Weight: ${details.weight}t\n` +
     `ID: LS-${details.id.slice(0, 8).toUpperCase()}\n\n` +
     `Can we discuss availability?`
   );

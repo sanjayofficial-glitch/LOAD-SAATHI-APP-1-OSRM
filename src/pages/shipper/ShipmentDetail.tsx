@@ -100,6 +100,8 @@ const ShipmentDetail = () => {
             .eq('shipment_id', id)
             .eq('status', 'accepted')
             .maybeSingle();
+          let localTruckerId: string | null = null;
+          let localTruckerName: string | null = null;
           if (linkedRequest?.trip_id) {
             const { data: linkedTrip } = await supabase
               .from('trips')
@@ -118,6 +120,8 @@ const ShipmentDetail = () => {
                 .eq('id', linkedRequest.receiver_id)
                 .maybeSingle();
               if (trucker) {
+                localTruckerId = trucker.id;
+                localTruckerName = trucker.full_name || 'the trucker';
                 setReviewTruckerId(trucker.id);
                 setReviewTruckerName(trucker.full_name || 'the trucker');
               }
@@ -136,20 +140,20 @@ const ShipmentDetail = () => {
           }
 
           // Fetch trucker's live location when in transit
-          if (reviewTruckerId && shipmentData && (shipmentData.status === 'in_transit' || linkedTripStatus === 'in_transit')) {
+          if (localTruckerId && shipmentData && (shipmentData.status === 'in_transit' || linkedTripStatus === 'in_transit')) {
             const { data: loc } = await supabase
               .from('driver_locations')
               .select('lat, lng, heading, speed, updated_at')
-              .eq('driver_id', reviewTruckerId)
+              .eq('driver_id', localTruckerId)
               .order('updated_at', { ascending: false })
               .limit(1)
               .maybeSingle();
 
             if (loc) {
               setTruckerLocation({
-                id: `track-${reviewTruckerId}`,
-                driverId: reviewTruckerId,
-                driverName: acceptedTrucker?.full_name || 'Trucker',
+                id: `track-${localTruckerId}`,
+                driverId: localTruckerId,
+                driverName: localTruckerName || acceptedTrucker?.full_name || 'Trucker',
                 lat: loc.lat,
                 lng: loc.lng,
                 heading: loc.heading,

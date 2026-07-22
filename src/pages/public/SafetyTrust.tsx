@@ -6,7 +6,7 @@ import { Shield, Star, CheckCircle, UserCheck, FileText, Award, ArrowRight } fro
 import { Button } from "@/components/ui/button";
 
 const colorMap: Record<"orange" | "blue" | "green" | "purple" | "teal" | "red", { border: string; bg: string; icon: string }> = {
-  orange: { border: "border-orange-500/20 hover:border-orange-500000/40", bg: "bg-orange-600/10 dark:bg-orange-500/10", icon: "text-orange-600 dark:text-orange-400" },
+  orange: { border: "border-orange-500/20 hover:border-orange-500/40", bg: "bg-orange-600/10 dark:bg-orange-500/10", icon: "text-orange-600 dark:text-orange-400" },
   blue: { border: "border-blue-500/20 hover:border-blue-500/40", bg: "bg-blue-600/10 dark:bg-blue-500/10", icon: "text-blue-600 dark:text-blue-400" },
   green: { border: "border-green-500/20 hover:border-green-500/40", bg: "bg-green-600/10 dark:bg-green-500/10", icon: "text-green-600 dark:text-green-400" },
   purple: { border: "border-purple-500/20 hover:border-purple-500/40", bg: "bg-purple-600/10 dark:bg-purple-500/10", icon: "text-purple-600 dark:text-purple-400" },

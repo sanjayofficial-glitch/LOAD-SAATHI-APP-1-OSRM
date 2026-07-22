@@ -1,5 +1,4 @@
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
-import { showError } from '@/utils/toast';
 
 interface NotificationPayload {
   userId: string;
@@ -16,17 +15,19 @@ export const sendNotification = async (payload: NotificationPayload): Promise<vo
 
     const supabase = createClerkSupabaseClient(token);
 
-    // Use the SECURITY DEFINER RPC function to create notifications
-    // (bypasses RLS restrictions on direct table inserts)
-    await supabase.rpc('create_notification', {
-      p_user_id: payload.userId,
-      p_message: payload.message,
-      p_related_trip_id: payload.relatedTripId ?? null,
-      p_related_shipment_request_id: payload.relatedShipmentRequestId ?? null,
-    });
+    // Insert notification directly (RLS allows authenticated users to insert their own)
+    const { error } = await supabase
+      .from('notifications')
+      .insert({
+        user_id: payload.userId,
+        message: payload.message,
+        related_trip_id: payload.relatedTripId ?? null,
+        related_shipment_request_id: payload.relatedShipmentRequestId ?? null,
+      });
+    if (error) throw error;
   } catch (err) {
     console.error('[sendNotification] Error:', err);
-    showError('Failed to send notification');
+    console.warn('[sendNotification] Failed:', err);
   }
 };
 

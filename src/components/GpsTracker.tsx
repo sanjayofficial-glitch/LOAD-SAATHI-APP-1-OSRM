@@ -36,11 +36,16 @@ export default function GpsTracker({
   const [permissionState, setPermissionState] = useState<PermissionState | null>(null);
   const watchIdRef = useRef<number | null>(null);
   const lastPersistRef = useRef<number>(0);
+  const permissionHandlerRef = useRef<(() => void) | null>(null);
 
   const clearTracking = useCallback(() => {
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
+    }
+    if (permissionHandlerRef.current) {
+      permissionHandlerRef.current();
+      permissionHandlerRef.current = null;
     }
   }, []);
 
@@ -120,9 +125,9 @@ export default function GpsTracker({
     if (navigator.permissions) {
       navigator.permissions.query({ name: 'geolocation' }).then((status) => {
         setPermissionState(status.state);
-        status.addEventListener('change', () => {
-          setPermissionState(status.state);
-        });
+        const handleChange = () => setPermissionState(status.state);
+        status.addEventListener('change', handleChange);
+        permissionHandlerRef.current = () => status.removeEventListener('change', handleChange);
       });
     }
 

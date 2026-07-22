@@ -57,7 +57,7 @@ const AuthSync = () => {
     };
 
     handleAuthSync();
-  }, [isLoaded, isSignedIn, user, session, navigate]);
+  }, [isLoaded, isSignedIn, user, session?.id, navigate]);
 
   if (checking) {
     return (

@@ -202,7 +202,7 @@ export default function ChatPreview() {
                             </div>
                           ) : msg.status === 'delivered' ? (
                             <div className="flex">
-                              <Check className="h-2.5 w-2.2.5 text-muted-foreground" />
+                              <Check className="h-2.5 w-2.5 text-muted-foreground" />
                               <Check className="h-2.5 w-2.5 text-muted-foreground -ml-1" />
                             </div>
                           ) : (

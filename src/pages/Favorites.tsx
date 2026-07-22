@@ -167,7 +167,7 @@ const Favorites = () => {
                           <span className="capitalize">{trip.status}</span>
                         </div>
                       </Link>
-                      <FavoriteButton entityType="trip" entityId={trip.id} userId={userProfile!.id} />
+                      <FavoriteButton entityType="trip" entityId={trip.id} userId={userProfile?.id ?? ''} />
                     </div>
                   </CardContent>
                 </Card>
@@ -209,7 +209,7 @@ const Favorites = () => {
                           <span className="capitalize">{shipment.status}</span>
                         </div>
                       </Link>
-                      <FavoriteButton entityType="shipment" entityId={shipment.id} userId={userProfile!.id} />
+                      <FavoriteButton entityType="shipment" entityId={shipment.id} userId={userProfile?.id ?? ''} />
                     </div>
                   </CardContent>
                 </Card>
@@ -245,7 +245,7 @@ const Favorites = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user.user_type} · {user.rating?.toFixed(1) || "New"}</p>
                       </div>
                     </div>
-                    <FavoriteButton entityType="user" entityId={user.id} userId={userProfile!.id} />
+                    <FavoriteButton entityType="user" entityId={user.id} userId={userProfile?.id ?? ''} />
                   </CardContent>
                 </Card>
               ))}

@@ -40,7 +40,7 @@ export function calculateEmissions({ distanceKm, vehicleType, loadTonnes }: Emis
     factorKgPerKm,
     totalKg: Math.round(totalKg * 10) / 10,
     tonnesCO2e: Math.round((totalKg / 1000) * 1000) / 1000,
-    intensityKgPerTonneKm: safeLoad ? Math.round((totalKg / (safeDistance * safeLoad)) * 1000) / 1000 : null,
+    intensityKgPerTonneKm: safeLoad && safeDistance > 0 ? Math.round((totalKg / (safeDistance * safeLoad)) * 1000) / 1000 : null,
     vehicleClass,
   };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react'; // Clerk's useAuth for getToken
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
@@ -50,16 +50,7 @@ const Profile = () => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const { data: creditData } = useCreditScore();
 
-  useEffect(() => {
-    if (userProfile) {
-      setFullName(userProfile.full_name || '');
-      setPhone(userProfile.phone || '');
-      fetchStats();
-      fetchReviews();
-    }
-  }, [userProfile]);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     if (!userProfile) return;
     setStatsLoading(true);
     
@@ -97,9 +88,9 @@ const Profile = () => {
     } finally {
       setStatsLoading(false);
     }
-  };
+  }, [userProfile, getToken]);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     if (!userProfile) return;
     setReviewsLoading(true);
     try {
@@ -122,7 +113,16 @@ const Profile = () => {
     } finally {
       setReviewsLoading(false);
     }
-  };
+  }, [userProfile, getToken]);
+
+  useEffect(() => {
+    if (userProfile) {
+      setFullName(userProfile.full_name || '');
+      setPhone(userProfile.phone || '');
+      fetchStats();
+      fetchReviews();
+    }
+  }, [userProfile, fetchStats, fetchReviews]);
 
   const handleUpdate = async () => {
     setLoading(true);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { 
@@ -46,6 +46,14 @@ const ReviewDialog = ({
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setRating(0);
+      setHover(0);
+      setComment('');
+    }
+  }, [isOpen]);
 
   const handleSubmit = async () => {
     if (rating === 0) {

@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     try {
-      const supabaseToken = await clerk.session?.getToken({ template: 'supabase' });
+      const supabaseToken = await session?.getToken({ template: 'supabase' });
       if (!supabaseToken) {
         console.warn('[AuthContext] No Supabase token returned from Clerk');
         setUserProfile(null);
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
       return null;
     }
-  }, [user?.id]);
+  }, [user?.id, session]);
 
   useEffect(() => {
     if (!clerkLoaded) return;
@@ -101,11 +101,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = useCallback(async () => {
     await clerk.signOut();
     setUserProfile(null);
-    try {
-      await fetch('/', { method: 'HEAD', cache: 'no-store' });
-    } catch {
-      // Best-effort token/session cleanup — ensures no residual auth state
-    }
   }, [clerk]);
 
   const resetPassword = useCallback(async (email: string) => {

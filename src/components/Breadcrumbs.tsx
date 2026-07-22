@@ -67,7 +67,7 @@ export default function Breadcrumbs() {
           const isLast = index === pathnames.length - 1;
 
           return (
-            <li key={segment} className="flex items-center gap-1.5">
+            <li key={`${segment}-${index}`} className="flex items-center gap-1.5">
               <ChevronRight className="h-3 w-3" />
               {isLast ? (
                 <span className="text-foreground font-medium truncate max-w-[200px]">{label}</span>

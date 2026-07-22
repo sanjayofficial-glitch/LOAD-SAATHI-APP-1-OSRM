@@ -12,7 +12,7 @@ const footerLinks = {
     { label: "Features", path: "/features" },
     { label: "How It Works", path: "/how-it-works" },
     { label: "Pricing", path: "/pricing" },
-    { label: "Network", path: "/features" },
+    { label: "Network", path: "/about" },
   ],
   Solutions: [
     { label: "For Shippers", path: "/solutions/shippers" },
@@ -88,8 +88,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           {Object.entries(footerLinks).map(([group, links]) => (
             <div key={group} className="flex flex-col gap-3">
               <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{group}</span>
-              {links.map(link => (
-                <Link key={link.path} to={link.path} className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">
+              {links.map((link, i) => (
+                <Link key={`${group}-${i}`} to={link.path} className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">
                   {link.label}
                 </Link>
               ))}
