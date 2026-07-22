@@ -9,6 +9,7 @@ import OfflineBanner from '@/components/OfflineBanner';
 import ThemeToggle from '@/components/ThemeToggle';
 import IndexSkeleton from '@/components/IndexSkeleton';
 import { useTheme } from '@/theme/theme';
+import LogoMark from '@/components/LogoMark';
 
 const tabs = [
   { id: 'shipper', label: 'Shipper OS' },
@@ -263,9 +264,7 @@ const Index = () => {
       <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-20">
         <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-full">
           <Link to="/" className="flex items-center gap-2">
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-xl shadow-md">
-              <Truck className="h-5 w-5 text-white" />
-            </div>
+            <LogoMark size="h-10 w-10" />
             <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -744,9 +743,7 @@ const Index = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
           <div className="col-span-2 md:col-span-1 mb-4 md:mb-0">
             <div className="flex items-center gap-2 mb-4">
-              <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-xl">
-                <Truck className="h-5 w-5 text-white" />
-              </div>
+              <LogoMark size="h-10 w-10" />
               <span className="text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">Precision Freight Intelligence — matching every load to its perfect space using AI.</p>

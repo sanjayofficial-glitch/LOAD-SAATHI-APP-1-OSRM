@@ -28,6 +28,7 @@ import { useCreditScore, useCreditInsights } from '@/hooks/useCreditScore';
 import CreditScoreBadge from '@/components/CreditScoreBadge';
 import CreditScoreGauge from '@/components/CreditScoreGauge';
 import LiveMap from '@/components/LiveMap';
+import LogoMark from '@/components/LogoMark';
 import type { TruckLocation } from '@/components/LiveMap';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -224,9 +225,7 @@ const TruckerDashboard = () => {
       <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1.5 rounded-lg shadow-sm">
-              <Truck className="h-4 w-4 text-white" />
-            </div>
+            <LogoMark size="h-8 w-8" />
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Trucker Dashboard</h1>
           </div>
           <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">

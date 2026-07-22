@@ -6,6 +6,7 @@ import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { showSuccess, showError } from '@/utils/toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { User as UserType } from '@/types';
+import LogoMark from '@/components/LogoMark';
 
 const ChooseRole = () => {
   const { user, isLoaded } = useUser();
@@ -113,9 +114,7 @@ const ChooseRole = () => {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
       <div className="max-w-2xl w-full mx-auto animate-scale-in">
         <div className="text-center mb-12">
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-orange-200/50 dark:shadow-orange-900/30">
-            <Truck className="h-10 w-10 text-white" />
-          </div>
+          <LogoMark size="h-16 w-16" className="mx-auto mb-6" />
           <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4">Welcome to LoadSaathi!</h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">How will you be using the platform today?</p>
         </div>

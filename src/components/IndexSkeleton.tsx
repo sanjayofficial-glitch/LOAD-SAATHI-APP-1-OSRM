@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { Truck } from "lucide-react";
+import LogoMark from "@/components/LogoMark";
 
 const IndexSkeleton = () => {
   return (
@@ -9,9 +9,7 @@ const IndexSkeleton = () => {
       <header className="fixed top-0 w-full z-50 h-20 border-b border-white/10" style={{ background: 'rgba(5, 8, 22, 0.7)' }}>
         <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
           <div className="flex items-center gap-2">
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1.5 rounded-lg">
-              <Truck className="h-5 w-5 text-white opacity-50" />
-            </div>
+            <LogoMark size="h-9 w-9 opacity-70" />
             <Skeleton className="h-6 w-28 rounded" />
           </div>
           <div className="flex gap-3">

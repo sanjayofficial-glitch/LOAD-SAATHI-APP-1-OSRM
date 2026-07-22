@@ -1,10 +1,11 @@
 "use client";
 
 import { Link } from "react-router-dom";
-import { Truck, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import OfflineBanner from "./OfflineBanner";
 import { Button } from "./ui/button";
+import LogoMark from "./LogoMark";
 
 const footerLinks = {
   Platform: [
@@ -38,9 +39,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-20">
         <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-full">
           <Link to="/" className="flex items-center gap-2">
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-xl shadow-md">
-              <Truck className="h-5 w-5 text-white" />
-            </div>
+            <LogoMark size="h-10 w-10" />
             <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -72,9 +71,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
           <div className="col-span-2 md:col-span-1 mb-4 md:mb-0">
             <div className="flex items-center gap-2 mb-4">
-              <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-xl">
-                <Truck className="h-5 w-5 text-white" />
-              </div>
+              <LogoMark size="h-10 w-10" />
               <span className="text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">

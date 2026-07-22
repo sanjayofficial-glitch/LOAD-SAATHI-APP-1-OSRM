@@ -29,6 +29,7 @@ import {
   LayoutDashboard,
   Heart,
 } from "lucide-react";
+import LogoMark from "./LogoMark";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./NotificationBell";
 import OfflineBanner from "./OfflineBanner";
@@ -160,9 +161,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center gap-4 sm:gap-8">
               <Link to="/" className="flex items-center gap-2 shrink-0">
-                <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1.5 rounded-lg shadow-sm">
-                  <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                </div>
+                <LogoMark size="h-8 w-8 sm:h-9 sm:w-9" />
                 <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">
                   <span className="sm:hidden">LS</span>
                   <span className="hidden sm:inline">LoadSaathi</span>
@@ -264,9 +263,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <footer className="hidden lg:block bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 sm:py-8 mt-auto">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1 rounded-lg">
-              <Truck className="h-4 w-4 text-white" />
-            </div>
+            <LogoMark size="h-8 w-8" />
             <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">LoadSaathi</span>
           </div>
           <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mb-4">
