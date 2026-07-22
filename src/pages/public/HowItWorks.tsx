@@ -23,6 +23,19 @@ const truckerSteps = [
 ];
 
 const HowItWorks = () => {
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Ship Freight on LoadSaathi",
+    "description": "A step-by-step guide to posting and shipping freight on LoadSaathi's AI-powered marketplace.",
+    "step": shipperSteps.map((step) => ({
+      "@type": "HowToStep",
+      position: parseInt(step.step),
+      name: step.title,
+      text: step.desc,
+    })),
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -45,6 +58,8 @@ const HowItWorks = () => {
         description="Learn how LoadSaathi works for shippers and truckers. Post shipments, find loads, get AI-matched, track in real-time, and get paid — all on one platform."
         keywords="how LoadSaathi works, post shipment online, find truck loads India, digital freight platform guide"
         canonical="/how-it-works"
+        breadcrumbs={[{ name: "How It Works", url: "/how-it-works" }]}
+        jsonLd={howToSchema}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

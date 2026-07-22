@@ -307,6 +307,29 @@ export default function ShipperSolution() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="fade-section py-24 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 relative">
+        <div className="max-w-3xl mx-auto px-6 sm:px-12 relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">Shipper FAQ</h2>
+            <p className="text-lg text-muted-foreground">Questions from shippers about using LoadSaathi.</p>
+          </div>
+          <div className="space-y-4">
+            {[
+              { q: "How do I post a shipment on LoadSaathi?", a: "Register as a shipper, go to your dashboard, and click 'Post Shipment'. Enter origin, destination, cargo type, weight, and preferred pickup window. Our AI will start matching immediately — the process takes under 3 minutes." },
+              { q: "How is pricing determined for my shipment?", a: "Our AI Price Predictor analyzes market rates, fuel costs, route distance, and demand to suggest fair pricing. You set your budget, and transporters bid within that range — creating a transparent, competitive marketplace." },
+              { q: "Can I track my shipment in real time?", a: "Yes. Every shipment includes live GPS tracking with ETAs, route visualization, and geofence alerts. You'll see your shipment's location on a map and receive notifications at every milestone." },
+              { q: "What if there's a dispute with a trucker?", a: "Our support team reviews GPS data, timestamps, photos, and communication history. We aim to resolve disputes within 48 hours with fair outcomes for both parties. Escrow-backed payments protect your funds." },
+            ].map((item, i) => (
+              <div key={i} className="glass-card p-6 rounded-xl border-border dark:border-white/[0.08]">
+                <h3 className="font-bold text-foreground mb-2">{item.q}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="fade-section py-32 relative overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-900/5 to-transparent dark:bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.12),transparent_70%)]" />

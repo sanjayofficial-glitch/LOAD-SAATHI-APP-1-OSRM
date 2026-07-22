@@ -46,6 +46,7 @@ const Contact = () => {
         description="Reach out to LoadSaathi's support team. We're available 24/7 via email, phone, or our contact form. Get help with shipments, account issues, or partnership inquiries."
         keywords="contact LoadSaathi, freight support India, logistics help, trucking platform support"
         canonical="/contact"
+        breadcrumbs={[{ name: "Contact", url: "/contact" }]}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

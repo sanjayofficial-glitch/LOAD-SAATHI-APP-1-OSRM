@@ -187,6 +187,7 @@ const FAQ = () => {
       keywords="LoadSaathi FAQ, freight marketplace questions, how LoadSaathi works, trucking platform help, logistics support India"
       canonical="/faq"
       jsonLd={faqSchema}
+      breadcrumbs={[{ name: "FAQ", url: "/faq" }]}
     />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

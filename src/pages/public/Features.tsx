@@ -53,6 +53,7 @@ const Features = () => {
         description="Explore LoadSaathi's features: AI-powered matching, real-time GPS tracking, digital credit scores, bidirection reviews, and smart fare calculator for shippers and truckers."
         keywords="freight platform features, AI load matching, GPS tracking India, digital freight credit score, logistics platform India"
         canonical="/features"
+        breadcrumbs={[{ name: "Features", url: "/features" }]}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
@@ -153,6 +154,29 @@ const Features = () => {
                 <feature.icon className="h-10 w-10 text-orange-600 dark:text-orange-400 mb-6 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="text-xl font-bold text-foreground mb-4">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="fade-section py-24 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 relative">
+        <div className="max-w-3xl mx-auto px-6 sm:px-12 relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">Features FAQ</h2>
+            <p className="text-lg text-muted-foreground">Common questions about LoadSaathi's platform capabilities.</p>
+          </div>
+          <div className="space-y-4">
+            {[
+              { q: "How does AI matching work on LoadSaathi?", a: "Our matching engine analyzes route compatibility, vehicle capacity, pricing history, on-time performance, cargo type, and real-time availability. It ranks the best matches with a compatibility score so you can choose with confidence." },
+              { q: "What is the Digital Freight Credit Score?", a: "Every participant receives a score between 300 and 900 based on completion rates, on-time performance, reviews, communication, and tenure. Higher scores unlock better loads, lower fees, and faster payments." },
+              { q: "Is real-time GPS tracking included?", a: "Yes. Every shipment and trip on LoadSaathi includes live GPS tracking with ETAs, route visualization, and geofence alerts. Location data stays within the platform and is never sold to third parties." },
+              { q: "How does the AI Price Predictor work?", a: "The system uses a multi-provider AI chain (Gemini, Groq, OpenRouter) to analyze route, weight, vehicle type, and historical data. It recommends a fair market rate with confidence level and trend indicator." },
+            ].map((item, i) => (
+              <div key={i} className="glass-card p-6 rounded-xl border-border dark:border-white/[0.08]">
+                <h3 className="font-bold text-foreground mb-2">{item.q}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.a}</p>
               </div>
             ))}
           </div>

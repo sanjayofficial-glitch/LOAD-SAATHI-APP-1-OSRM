@@ -43,6 +43,7 @@ const About = () => {
         description="LoadSaathi is India's shared freight marketplace connecting shippers and truckers directly. AI-powered matching, zero middlemen, lower costs for East India corridors."
         keywords="about LoadSaathi, freight marketplace India, logistics startup Rourkela, shared freight East India"
         canonical="/about"
+        breadcrumbs={[{ name: "About", url: "/about" }]}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

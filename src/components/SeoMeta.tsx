@@ -1,5 +1,10 @@
 import { Helmet } from "react-helmet-async";
 
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
 interface SeoMetaProps {
   title: string;
   description: string;
@@ -10,6 +15,7 @@ interface SeoMetaProps {
   publishedTime?: string;
   author?: string;
   jsonLd?: Record<string, unknown>;
+  breadcrumbs?: BreadcrumbItem[];
 }
 
 const BASE_URL = "https://loadsaathi.in";
@@ -25,9 +31,31 @@ export default function SeoMeta({
   publishedTime,
   author,
   jsonLd,
+  breadcrumbs,
 }: SeoMetaProps) {
   const fullTitle = `${title} | LoadSaathi`;
   const url = canonical ? `${BASE_URL}${canonical}` : BASE_URL;
+
+  const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: BASE_URL,
+          },
+          ...breadcrumbs.map((item, i) => ({
+            "@type": "ListItem",
+            position: i + 2,
+            name: item.name,
+            item: item.url.startsWith("http") ? item.url : `${BASE_URL}${item.url}`,
+          })),
+        ],
+      }
+    : null;
 
   return (
     <Helmet>
@@ -54,6 +82,9 @@ export default function SeoMeta({
 
       {jsonLd && (
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      )}
+      {breadcrumbSchema && (
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
       )}
     </Helmet>
   );

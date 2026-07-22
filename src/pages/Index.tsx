@@ -264,6 +264,42 @@ const Index = () => {
       title="Shared Freight Marketplace | PTL/LTL East India"
       description="LoadSaathi connects shippers and truckers for PTL and LTL shared freight across East India. Save up to 40% on freight costs on the Rourkela–Ranchi–Burdwan corridor. Book part loads online."
       keywords="PTL freight Rourkela, LTL transport East India, shared truck Ranchi Burdwan, part load Jharkhand Odisha, freight marketplace India, truck booking Rourkela"
+      jsonLd={{
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "LoadSaathi",
+        "alternateName": ["Load Saathi", "LoadSaathi Logistics", "LoadSaathi App", "Load Saathi Freight"],
+        "url": "https://loadsaathi.in",
+        "logo": "https://loadsaathi.in/icons/icon.svg",
+        "description": "India's AI-powered shared freight marketplace for PTL/LTL loads on East India industrial corridors. Connects shippers and truckers with AI matching, GPS tracking, and digital credit scores.",
+        "foundingDate": "2025",
+        "numberOfEmployees": { "@type": "QuantitativeValue", "value": "10-50" },
+        "industry": "Logistics & Freight Technology",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Rourkela",
+          "addressRegion": "Odisha",
+          "postalCode": "769001",
+          "addressCountry": "IN"
+        },
+        "areaServed": [
+          { "@type": "City", "name": "Rourkela" },
+          { "@type": "City", "name": "Ranchi" },
+          { "@type": "City", "name": "Burdwan" },
+          { "@type": "State", "name": "Jharkhand" },
+          { "@type": "State", "name": "Odisha" },
+          { "@type": "State", "name": "West Bengal" }
+        ],
+        "sameAs": [
+          "https://www.linkedin.com/company/loadsaathi"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "email": "support@loadsaathi.in",
+          "availableLanguage": ["English", "Hindi"]
+        }
+      }}
     />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       <OfflineBanner />
@@ -320,6 +356,9 @@ const Index = () => {
               </h1>
               <p className="text-lg sm:text-xl text-muted-foreground max-w-xl leading-relaxed">
                 We transform unused truck capacity into economic opportunity. LoadSaathi is the high-precision intelligence platform designed to eliminate empty return trips.
+              </p>
+              <p className="text-sm text-muted-foreground/80 max-w-xl leading-relaxed">
+                LoadSaathi is India's AI-powered shared freight marketplace that connects shippers with truckers for PTL and LTL loads across East India. It uses AI matching, GPS tracking, and digital credit scores to eliminate empty return trips and reduce freight costs by up to 40%.
               </p>
               <div className="flex items-center gap-4 pt-4">
                 <Link to="/register">

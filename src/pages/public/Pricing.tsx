@@ -80,6 +80,60 @@ const faqItems = [
   },
 ];
 
+const pricingSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "LoadSaathi Freight Marketplace",
+  "description": "AI-powered shared freight marketplace for PTL/LTL loads across East India. Free to join, pay 2-5% per completed transaction.",
+  "url": "https://loadsaathi.in/pricing",
+  "brand": {
+    "@type": "Organization",
+    "name": "LoadSaathi",
+  },
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Shipper Plan",
+      "price": "0",
+      "priceCurrency": "INR",
+      "description": "Free to join. 3-5% transaction fee per completed shipment.",
+      "availability": "https://schema.org/InStock",
+      "seller": { "@type": "Organization", "name": "LoadSaathi" },
+    },
+    {
+      "@type": "Offer",
+      "name": "Trucker Plan",
+      "price": "0",
+      "priceCurrency": "INR",
+      "description": "Free to join. 2-4% transaction fee per completed trip. Reduced rates for high credit scores.",
+      "availability": "https://schema.org/InStock",
+      "seller": { "@type": "Organization", "name": "LoadSaathi" },
+    },
+    {
+      "@type": "Offer",
+      "name": "Enterprise Plan",
+      "price": "0",
+      "priceCurrency": "INR",
+      "description": "Custom pricing for 50+ loads per month. Reduced transaction fees, priority support, API access.",
+      "availability": "https://schema.org/InStock",
+      "seller": { "@type": "Organization", "name": "LoadSaathi" },
+    },
+  ],
+};
+
+const pricingFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.a,
+    },
+  })),
+};
+
 const Pricing = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -103,7 +157,10 @@ const Pricing = () => {
         description="LoadSaathi's transparent pricing: free registration, pay only 2-5% on completed shipments. No hidden fees, no subscriptions. Compare plans for shippers and truckers."
         keywords="LoadSaathi pricing, freight platform fees, logistics commission rates, trucking platform pricing India"
         canonical="/pricing"
+        jsonLd={pricingSchema}
+        breadcrumbs={[{ name: "Pricing", url: "/pricing" }]}
       />
+      <script type="application/ld+json">{JSON.stringify(pricingFaqSchema)}</script>
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
@@ -225,6 +282,9 @@ const Pricing = () => {
             <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">LoadSaathi vs Traditional Brokers</h2>
             <p className="text-lg text-muted-foreground">See how we compare to the old way of doing logistics.</p>
           </div>
+          <p className="text-sm text-muted-foreground mb-8 text-center max-w-2xl mx-auto">
+            LoadSaathi charges a 2-5% transaction fee per completed shipment, compared to 10-20% broker margins from traditional intermediaries. The platform offers AI-powered matching in seconds, escrow-backed payments, live GPS tracking, and a digital credit score system — all features absent from the broker model.
+          </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
