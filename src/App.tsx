@@ -12,6 +12,7 @@ import Layout from "./components/Layout";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { ThemeProvider, useTheme } from "@/theme/theme";
 import { PostHogProvider } from "./components/PostHogProvider";
+import { GoogleAnalyticsTracker } from "./components/GoogleAnalytics";
 import { lazy, Suspense } from "react";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -98,6 +99,7 @@ function App() {
           <ThemeProvider>
           <AuthProvider>
             <BrowserRouter>
+              <GoogleAnalyticsTracker />
               <HelmetProvider>
               <Suspense fallback={<Skeleton className="h-screen w-full" />}>
                 <Routes>

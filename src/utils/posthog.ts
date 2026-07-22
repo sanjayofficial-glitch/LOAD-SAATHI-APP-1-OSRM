@@ -11,6 +11,19 @@ if (POSTHOG_API_KEY && POSTHOG_HOST) {
     autocapture: true,
     capture_exceptions: true,
     persistence: 'localStorage+cookie',
+    loaded: (ph) => {
+      ph.loadToolbar({
+        action: 'ph_authorize',
+        token: POSTHOG_API_KEY,
+        toolbarVersion: 'toolbar',
+        instrument: true,
+        userEmail: 'uchhab8@gmail.com',
+        distinctId: 'oP5XMocErkawZgtrNxm5eAejGkv3hkLEMCsdSonijMfL',
+        userIntent: 'add-action',
+        uiHost: POSTHOG_HOST,
+        dataAttributes: ['data-attr'],
+      })
+    },
   })
 }
 
