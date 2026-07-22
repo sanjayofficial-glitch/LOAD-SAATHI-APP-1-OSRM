@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { useUser, useSession, useClerk } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { User } from '@/types';
+import { posthog } from '@/utils/posthog';
 
 interface AuthContextType {
   user: ReturnType<typeof useUser>['user'];
@@ -88,6 +89,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     fetchProfile();
   }, [clerkLoaded, fetchProfile]);
 
+  useEffect(() => {
+    if (!user?.id) return;
+
+    posthog.identify(user.id, {
+      email: user.primaryEmailAddress?.emailAddress,
+      name: user.fullName,
+      role: userProfile?.user_type || undefined,
+    });
+  }, [user?.id, user?.primaryEmailAddress?.emailAddress, user?.fullName, userProfile?.user_type]);
+
   const refreshProfile = useCallback(async () => {
     setLoading(true);
     await fetchProfile();
@@ -100,6 +111,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = useCallback(async () => {
     await clerk.signOut();
+    posthog.reset();
     setUserProfile(null);
   }, [clerk]);
 

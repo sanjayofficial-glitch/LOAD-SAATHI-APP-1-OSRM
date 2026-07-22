@@ -18,6 +18,7 @@ import { showSuccess, showError } from "@/utils/toast";
 import { PricePredictor } from "@/components/PricePredictor";
 import TemplateSelector from "@/components/TemplateSelector";
 import SaveAsTemplate from "@/components/SaveAsTemplate";
+import { posthog } from "@/utils/posthog";
 
 type LocationData = Record<string, Record<string, string[]>>;
 
@@ -135,10 +136,19 @@ const PostTrip = () => {
         }
       }
 
+      posthog.capture('trip_posted', {
+        trip_id: tripData.id,
+        origin_state: formData.origin_state,
+        destination_state: formData.destination_state,
+        capacity_tonnes: capacity,
+        price_per_tonne: price,
+        vehicle_type: formData.vehicle_type,
+      });
       showSuccess('Trip posted successfully!');
       navigate('/trucker/dashboard');
     } catch (err) {
       console.error('[PostTrip] Error:', err);
+      posthog.captureException(err, { flow: 'post_trip' });
       showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);

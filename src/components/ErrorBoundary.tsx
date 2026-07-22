@@ -3,6 +3,7 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, AlertTriangle } from "lucide-react";
+import { posthog } from "@/utils/posthog";
 
 type Props = {
   children: ReactNode;
@@ -25,6 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error(`[ErrorBoundary] ${error.message}`, info);
+    posthog.captureException(error, { component_stack: info.componentStack });
 
     const sentry = (window as { Sentry?: { captureException: (err: Error, extra: object) => void } }).Sentry;
     if (sentry) {

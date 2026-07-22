@@ -15,6 +15,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowLeft, Send, Loader2, User as UserIcon, WifiOff, Phone } from 'lucide-react';
 import { showError } from '@/utils/toast';
 import { supabase } from '@/integrations/supabase/client';
+import { posthog } from '@/utils/posthog';
 
 const Chat = () => {
   const { requestId } = useParams<{ requestId: string }>();
@@ -115,8 +116,13 @@ const Chat = () => {
     try {
       const sentMsg = await sendMessage({ recipientId: recipient.id, content: newMessage, requestId, getToken: () => getToken({ template: 'supabase' }), userId: userProfile!.id });
       setMessages(prev => [...prev, sentMsg]);
+      posthog.capture('message_sent', {
+        request_id: requestId,
+        sender_role: userProfile?.user_type,
+      });
       setNewMessage('');
-    } catch {
+    } catch (error) {
+      posthog.captureException(error, { flow: 'send_message' });
       showError('Failed to send message');
     } finally {
       setSending(false);

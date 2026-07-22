@@ -38,6 +38,8 @@ import {
 } from '@/utils/notifications';
 import ReviewDialog from '@/components/ReviewDialog';
 import type { Trip, Request } from '@/types';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { posthog } from '@/utils/posthog';
 
 const StatusBadge = ({ status }: { status: string }) => {
   const cfg: Record<string, string> = {
@@ -106,7 +108,7 @@ const TruckerTripDetail = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const updateLinkedShipmentStatuses = async (supabase: any, newStatus: string) => {
+  const updateLinkedShipmentStatuses = async (supabase: SupabaseClient, newStatus: string) => {
     const linked = bookingRequests.filter(r => r.status === 'accepted' && r.shipment_id);
     if (linked.length === 0) return;
     const shipmentIds = linked.map(r => r.shipment_id!);
@@ -141,6 +143,12 @@ const TruckerTripDetail = () => {
         })
       ));
 
+      posthog.capture('trip_status_updated', {
+        trip_id: trip.id,
+        previous_status: trip.status,
+        new_status: 'in_transit',
+        accepted_booking_count: acceptedShippers.length,
+      });
       showSuccess('Trip started! Shippers have been notified.');
       fetchData();
     } catch (err) {
@@ -175,6 +183,12 @@ const TruckerTripDetail = () => {
         })
       ));
 
+      posthog.capture('trip_status_updated', {
+        trip_id: trip.id,
+        previous_status: trip.status,
+        new_status: 'delivered',
+        accepted_booking_count: acceptedShippers.length,
+      });
       showSuccess('Marked as delivered! Shippers have been notified.');
       fetchData();
     } catch (err) {
@@ -213,6 +227,12 @@ const TruckerTripDetail = () => {
 
       await Promise.all(notificationPromises);
 
+      posthog.capture('trip_status_updated', {
+        trip_id: trip.id,
+        previous_status: trip.status,
+        new_status: 'completed',
+        accepted_booking_count: acceptedRequests.length,
+      });
       showSuccess('Trip marked as completed! Shippers have been notified.');
       fetchData();
     } catch (err) {
@@ -232,6 +252,13 @@ const TruckerTripDetail = () => {
         .eq('id', request.id);
 
       if (error) throw error;
+
+      posthog.capture('booking_request_updated', {
+        trip_id: trip?.id,
+        request_id: request.id,
+        new_status: status,
+        weight_tonnes: request.weight_tonnes,
+      });
 
       if (status === 'accepted') {
         await notifyShipperOfRequestAccepted({
@@ -256,6 +283,7 @@ const TruckerTripDetail = () => {
       }
       fetchData();
     } catch (err) {
+      posthog.captureException(err, { flow: 'update_booking_request', new_status: status });
       showError(`Failed to ${status} request`);
     } finally {
       setActionLoading(null);

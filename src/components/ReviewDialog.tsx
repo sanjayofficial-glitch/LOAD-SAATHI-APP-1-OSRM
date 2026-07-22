@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Star, Loader2 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { notifyTruckerOfNewReview, notifyShipperOfNewReview } from '@/utils/notifications';
+import { posthog } from '@/utils/posthog';
 
 interface ReviewDialogProps {
   isOpen: boolean;
@@ -114,10 +115,17 @@ const ReviewDialog = ({
         });
       }
 
+      posthog.capture('review_submitted', {
+        trip_id: tripId,
+        reviewer_role: reviewerRole,
+        rating,
+        has_comment: Boolean(comment.trim()),
+      });
       showSuccess('Review submitted! Thank you for your feedback.');
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: unknown) {
+      posthog.captureException(err, { flow: 'submit_review', reviewer_role: reviewerRole });
       showError(err instanceof Error ? err.message : 'Failed to submit review');
     } finally {
       setSubmitting(false);

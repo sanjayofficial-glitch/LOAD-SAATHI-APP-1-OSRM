@@ -18,6 +18,7 @@ import { getRoute } from "@/utils/osrm";
 import { PricePredictor } from "@/components/PricePredictor";
 import TemplateSelector from "@/components/TemplateSelector";
 import SaveAsTemplate from "@/components/SaveAsTemplate";
+import { posthog } from "@/utils/posthog";
 
 type LocationData = Record<string, Record<string, string[]>>;
 
@@ -139,9 +140,17 @@ const PostShipments = () => {
         }
       }
 
+      posthog.capture('shipment_posted', {
+        shipment_id: shipmentData.id,
+        origin_state: formData.origin_state,
+        destination_state: formData.destination_state,
+        weight_tonnes: weight,
+        budget_per_tonne: budget,
+      });
       showSuccess('Shipment posted successfully!');
       navigate('/shipper/dashboard');
     } catch (err: unknown) {
+      posthog.captureException(err, { flow: 'post_shipment' });
       showError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SeoMeta from "@/components/SeoMeta";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { posthog } from "@/utils/posthog";
 
 interface FareResult {
   avgPrice: number;
@@ -70,6 +71,12 @@ export default function FareCalculator() {
         dataPoints: data.historicalLoads || 0,
         avgPerTonne: data.recommendedPrice || 0,
       });
+      posthog.capture("fare_estimated", {
+        weight_tonnes: weightNum,
+        recommended_price_per_tonne: data.recommendedPrice || 0,
+        historical_loads: data.historicalLoads || 0,
+        estimate_source: "market_data",
+      });
     } catch (err) {
       // Fallback: simple distance-based estimate
       setError(null);
@@ -90,6 +97,12 @@ export default function FareCalculator() {
         trend: "stable",
         dataPoints: 0,
         avgPerTonne: Math.round(avgPrice),
+      });
+      posthog.capture("fare_estimated", {
+        weight_tonnes: weightNum,
+        recommended_price_per_tonne: Math.round(avgPrice),
+        historical_loads: 0,
+        estimate_source: "fallback",
       });
     } finally {
       setLoading(false);
