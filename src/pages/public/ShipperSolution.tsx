@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Search, MapPin, Shield, TrendingUp, Clock, BarChart3, Users, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SeoMeta from "@/components/SeoMeta";
 
 const problems = [
   {
@@ -87,7 +88,14 @@ export default function ShipperSolution() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+    <>
+      <SeoMeta
+        title="For Shippers — Smarter Freight Shipping"
+        description="LoadSaathi helps shippers save up to 40% on freight costs. AI-matched trucks, real-time tracking, escrow payments, and zero middlemen on East India corridors."
+        keywords="freight shipping India, PTL LTL shipper, book truck online, reduce logistics cost East India"
+        canonical="/solutions/shippers"
+      />
+      <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
 
       {/* HERO */}
       <section className="relative min-h-[680px] flex items-center overflow-hidden pt-24">
@@ -328,5 +336,6 @@ export default function ShipperSolution() {
       </section>
 
     </div>
+    </>
   );
 }

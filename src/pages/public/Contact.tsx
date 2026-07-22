@@ -6,6 +6,7 @@ import { Mail, MessageSquare, Clock, MapPin, Send, ArrowRight, Truck } from "luc
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import SeoMeta from "@/components/SeoMeta";
 
 const supportInfo = [
   { icon: Mail, label: "Email Us", value: "support@loadsaathi.com", detail: "We respond within 2-4 hours" },
@@ -39,7 +40,14 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+    <>
+      <SeoMeta
+        title="Contact Us — Get in Touch"
+        description="Reach out to LoadSaathi's support team. We're available 24/7 via email, phone, or our contact form. Get help with shipments, account issues, or partnership inquiries."
+        keywords="contact LoadSaathi, freight support India, logistics help, trucking platform support"
+        canonical="/contact"
+      />
+      <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[400px] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-50" />
@@ -204,6 +212,7 @@ const Contact = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

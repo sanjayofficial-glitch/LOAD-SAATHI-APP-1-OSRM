@@ -10,6 +10,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import IndexSkeleton from '@/components/IndexSkeleton';
 import { useTheme } from '@/theme/theme';
 import LogoMark from '@/components/LogoMark';
+import SeoMeta from '@/components/SeoMeta';
 
 const tabs = [
   { id: 'shipper', label: 'Shipper OS' },
@@ -258,6 +259,12 @@ const Index = () => {
   }
 
   return (
+    <>
+    <SeoMeta
+      title="Shared Freight Marketplace | PTL/LTL East India"
+      description="LoadSaathi connects shippers and truckers for PTL and LTL shared freight across East India. Save up to 40% on freight costs on the Rourkela–Ranchi–Burdwan corridor. Book part loads online."
+      keywords="PTL freight Rourkela, LTL transport East India, shared truck Ranchi Burdwan, part load Jharkhand Odisha, freight marketplace India, truck booking Rourkela"
+    />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       <OfflineBanner />
 
@@ -778,6 +785,7 @@ const Index = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

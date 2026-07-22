@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Shield, Star, CheckCircle, UserCheck, FileText, Award, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SeoMeta from "@/components/SeoMeta";
 
 const colorMap: Record<"orange" | "blue" | "green" | "purple" | "teal" | "red", { border: string; bg: string; icon: string }> = {
   orange: { border: "border-orange-500/20 hover:border-orange-500/40", bg: "bg-orange-600/10 dark:bg-orange-500/10", icon: "text-orange-600 dark:text-orange-400" },
@@ -119,7 +120,14 @@ const SafetyTrust = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+    <>
+      <SeoMeta
+        title="Safety & Trust — Verified Freight Network"
+        description="LoadSaathi's multi-layer trust system: ID verification, escrow payments, GPS tracking, bidirectional reviews, and fraud detection. Safe freight for everyone."
+        keywords="freight safety India, trucking trust system, verified shippers truckers, secure freight payments"
+        canonical="/safety-trust"
+      />
+      <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-50" />
@@ -243,6 +251,7 @@ const SafetyTrust = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

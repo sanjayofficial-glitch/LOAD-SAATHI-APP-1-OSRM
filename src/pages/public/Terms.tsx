@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SeoMeta from "@/components/SeoMeta";
 
 const sections = [
   {
@@ -110,6 +111,12 @@ const Terms = () => {
   const lastUpdated = "January 1, 2026";
 
   return (
+    <>
+    <SeoMeta
+      title="Terms of Service"
+      description="LoadSaathi's terms of service — the rules and guidelines for using our freight marketplace platform. Please read these terms carefully before using LoadSaathi."
+      canonical="/terms"
+    />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[350px] flex items-center overflow-hidden">
@@ -185,6 +192,7 @@ const Terms = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { Calendar, Clock, User, ArrowLeft, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import SeoMeta from "@/components/SeoMeta";
 
 const articles: Record<string, {
   category: string;
@@ -126,6 +127,16 @@ const articles: Record<string, {
   },
 };
 
+function parseDate(dateStr: string): string {
+  const months: Record<string, string> = {
+    January: "01", February: "02", March: "03", April: "04", May: "05", June: "06",
+    July: "07", August: "08", September: "09", October: "10", November: "11", December: "12",
+  };
+  const parts = dateStr.split(" ");
+  if (parts.length !== 3) return dateStr;
+  return `${parts[2]}-${months[parts[0]] || "01"}-${parts[1].replace(",", "").padStart(2, "0")}`;
+}
+
 export default function BlogArticle() {
   const { slug } = useParams<{ slug: string }>();
   const article = slug ? articles[slug] : null;
@@ -151,7 +162,40 @@ export default function BlogArticle() {
     toast.success("Link copied to clipboard!");
   };
 
+  const isoDate = parseDate(article.date);
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.content[0].substring(0, 160),
+    author: {
+      "@type": "Person",
+      name: article.author,
+    },
+    datePublished: isoDate,
+    publisher: {
+      "@type": "Organization",
+      name: "LoadSaathi",
+      url: "https://loadsaathi.in",
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://loadsaathi.in/blog/${slug}`,
+    },
+  };
+
   return (
+    <>
+    <SeoMeta
+      title={article.title}
+      description={article.content[0].substring(0, 160)}
+      canonical={`/blog/${slug}`}
+      type="article"
+      publishedTime={isoDate}
+      author={article.author}
+      jsonLd={articleSchema}
+    />
     <div className="min-h-screen bg-background dark:bg-[#050816]">
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-40" />
@@ -209,5 +253,6 @@ export default function BlogArticle() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Target, Eye, Heart, Shield, Zap, Users, Globe, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SeoMeta from "@/components/SeoMeta";
 
 const values = [
   { icon: Target, title: "Purpose-Driven Innovation", desc: "Every feature we build directly targets India's 40% empty kilometer problem. We don't add fluff — we solve real logistics inefficiencies." },
@@ -36,7 +37,14 @@ const About = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+    <>
+      <SeoMeta
+        title="About Us — India's Smart Freight Network"
+        description="LoadSaathi is India's shared freight marketplace connecting shippers and truckers directly. AI-powered matching, zero middlemen, lower costs for East India corridors."
+        keywords="about LoadSaathi, freight marketplace India, logistics startup Rourkela, shared freight East India"
+        canonical="/about"
+      />
+      <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-50" />
@@ -198,6 +206,7 @@ const About = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

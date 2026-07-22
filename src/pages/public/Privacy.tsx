@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SeoMeta from "@/components/SeoMeta";
 
 const sections = [
   {
@@ -133,6 +134,12 @@ const Privacy = () => {
   const lastUpdated = "January 1, 2026";
 
   return (
+    <>
+    <SeoMeta
+      title="Privacy Policy"
+      description="LoadSaathi's privacy policy — how we collect, use, and protect your personal data. We are committed to safeguarding your privacy on our freight marketplace."
+      canonical="/privacy"
+    />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[350px] flex items-center overflow-hidden">
@@ -204,6 +211,7 @@ const Privacy = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

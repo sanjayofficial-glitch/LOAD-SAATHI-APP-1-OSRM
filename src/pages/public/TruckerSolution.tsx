@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Truck, Route, DollarSign, Shield, MessageSquare, TrendingUp, Clock, Star, MapPin, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SeoMeta from "@/components/SeoMeta";
 
 const problems = [
   {
@@ -87,7 +88,14 @@ export default function TruckerSolution() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+    <>
+      <SeoMeta
+        title="For Truckers — Find Loads & Earn More"
+        description="Join LoadSaathi to find return loads, reduce empty kilometers, get paid faster, and build your digital credit score. India's trucker-friendly freight platform."
+        keywords="find truck loads India, return load for truck, trucker app, reduce empty kilometers, freight platform for truckers"
+        canonical="/solutions/truckers"
+      />
+      <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
 
       {/* HERO */}
       <section className="relative min-h-[680px] flex items-center overflow-hidden pt-24">
@@ -348,5 +356,6 @@ export default function TruckerSolution() {
       </section>
 
     </div>
+    </>
   );
 }

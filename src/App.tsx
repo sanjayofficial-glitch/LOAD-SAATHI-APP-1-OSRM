@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Skeleton } from "./components/ui/skeleton";
@@ -97,6 +98,7 @@ function App() {
           <ThemeProvider>
           <AuthProvider>
             <BrowserRouter>
+              <HelmetProvider>
               <Suspense fallback={<Skeleton className="h-screen w-full" />}>
                 <Routes>
                   {/* Public routes with individual error boundaries */}
@@ -251,6 +253,7 @@ function App() {
                   </Route>
                 </Routes>
               </Suspense>
+              </HelmetProvider>
             </BrowserRouter>
             <ThemedToaster />
           </AuthProvider>

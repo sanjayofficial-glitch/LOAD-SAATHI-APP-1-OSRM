@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Check, Truck, Package, Shield, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import SeoMeta from "@/components/SeoMeta";
 
 const faqData = [
   {
@@ -139,6 +140,21 @@ const faqData = [
   },
 ];
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqData.flatMap((cat) =>
+    cat.items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
+    }))
+  ),
+};
+
 const FAQ = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -156,6 +172,14 @@ const FAQ = () => {
   }, []);
 
   return (
+    <>
+    <SeoMeta
+      title="FAQ — Frequently Asked Questions"
+      description="Find answers to common questions about LoadSaathi's freight marketplace — how it works, pricing, payments, trust & safety, and technical support for shippers and truckers."
+      keywords="LoadSaathi FAQ, freight marketplace questions, how LoadSaathi works, trucking platform help, logistics support India"
+      canonical="/faq"
+      jsonLd={faqSchema}
+    />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[400px] flex items-center overflow-hidden">
@@ -234,6 +258,7 @@ const FAQ = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

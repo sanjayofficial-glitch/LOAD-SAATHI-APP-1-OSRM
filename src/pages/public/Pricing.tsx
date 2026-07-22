@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle, X, HelpCircle, Truck, Package, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SeoMeta from "@/components/SeoMeta";
 
 const plans = [
   {
@@ -96,7 +97,14 @@ const Pricing = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+    <>
+      <SeoMeta
+        title="Pricing — Transparent Freight Rates"
+        description="LoadSaathi's transparent pricing: free registration, pay only 2-5% on completed shipments. No hidden fees, no subscriptions. Compare plans for shippers and truckers."
+        keywords="LoadSaathi pricing, freight platform fees, logistics commission rates, trucking platform pricing India"
+        canonical="/pricing"
+      />
+      <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-50" />
@@ -296,6 +304,7 @@ const Pricing = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

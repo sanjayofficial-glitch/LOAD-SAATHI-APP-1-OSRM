@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { UserPlus, ClipboardList, Route, MapPin, CheckCircle, Truck, DollarSign, Package, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SeoMeta from "@/components/SeoMeta";
 
 const shipperSteps = [
   { icon: UserPlus, step: "01", title: "Register Your Account", desc: "Create your shipper profile in minutes. Add your business details, verify your identity, and get onboarded to the LoadSaathi network." },
@@ -38,7 +39,14 @@ const HowItWorks = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+    <>
+      <SeoMeta
+        title="How It Works — Ship or Haul Freight"
+        description="Learn how LoadSaathi works for shippers and truckers. Post shipments, find loads, get AI-matched, track in real-time, and get paid — all on one platform."
+        keywords="how LoadSaathi works, post shipment online, find truck loads India, digital freight platform guide"
+        canonical="/how-it-works"
+      />
+      <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-50" />
@@ -156,6 +164,7 @@ const HowItWorks = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Bell, Map, Package, Truck, Route, Shield, TrendingUp, Brain, BarChart3, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SeoMeta from "@/components/SeoMeta";
 
 const shipperFeatures = [
   { icon: Package, title: "Shipment Management", desc: "Post, track, and manage all your shipments from a single dashboard. Real-time updates, document management, and automated workflows streamline your logistics operations." },
@@ -46,7 +47,14 @@ const Features = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
+    <>
+      <SeoMeta
+        title="Features — AI-Powered Freight Platform"
+        description="Explore LoadSaathi's features: AI-powered matching, real-time GPS tracking, digital credit scores, bidirection reviews, and smart fare calculator for shippers and truckers."
+        keywords="freight platform features, AI load matching, GPS tracking India, digital freight credit score, logistics platform India"
+        canonical="/features"
+      />
+      <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-50" />
@@ -177,6 +185,7 @@ const Features = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

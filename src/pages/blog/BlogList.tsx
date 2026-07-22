@@ -2,6 +2,7 @@
 
 import { Link } from "react-router-dom";
 import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";
+import SeoMeta from "@/components/SeoMeta";
 
 const articles = [
   {
@@ -88,6 +89,13 @@ const categoryColors: Record<string, string> = {
 
 export default function BlogList() {
   return (
+    <>
+    <SeoMeta
+      title="Blog — Freight & Logistics Insights"
+      description="Insights, guides, and stories from India's intelligent freight network. Learn about AI freight matching, reducing empty kilometers, digital load boards, and more."
+      keywords="freight blog India, logistics insights, trucking tips India, PTL LTL blog, digital freight marketplace, load board India"
+      canonical="/blog"
+    />
     <div className="min-h-screen bg-background dark:bg-[#050816]">
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-40" />
@@ -144,5 +152,6 @@ export default function BlogList() {
         </div>
       </div>
     </div>
+    </>
   );
 }
