@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Check, Truck, Package, Shield, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -156,6 +156,9 @@ const faqSchema = {
 };
 
 const FAQ = () => {
+  const accordionRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -167,7 +170,12 @@ const FAQ = () => {
       },
       { threshold: 0.1 }
     );
-    document.querySelectorAll(".fade-section").forEach((el) => observer.observe(el));
+
+    const refs = [accordionRef.current, ctaRef.current].filter(Boolean);
+    refs.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
     return () => observer.disconnect();
   }, []);
 
@@ -208,7 +216,7 @@ const FAQ = () => {
       </section>
 
       {/* FAQ ACCORDIONS */}
-      <section className="fade-section py-24 relative">
+      <section ref={accordionRef} className="fade-section py-24 relative">
         <div className="max-w-4xl mx-auto px-6 sm:px-12 relative z-10 space-y-16">
           {faqData.map((category, idx) => {
             const Icon = category.icon;
@@ -239,7 +247,7 @@ const FAQ = () => {
       </section>
 
       {/* CTA */}
-      <section className="fade-section py-24 relative overflow-hidden bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5">
+      <section ref={ctaRef} className="fade-section py-24 relative overflow-hidden bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5">
         <div className="max-w-2xl mx-auto px-6 sm:px-12 relative z-10 text-center">
           <h2 className="text-3xl sm:text-4xl font-black text-foreground dark:text-white mb-4">Still Have Questions?</h2>
           <p className="text-muted-foreground mb-8">Our support team is here to help you 24/7.</p>

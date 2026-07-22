@@ -180,7 +180,7 @@ const SafetyTrust = () => {
                     <div className="space-y-3 mb-4">
                       {component.items.map((item, j) => (
                         <div key={j}>
-                          <div className="flex justify-between text-xs mb- text-xs mb-1">
+                          <div className="flex justify-between text-xs mb-1">
                             <span className="text-muted-foreground">{item.label}</span>
                           </div>
                           <div className="w-full h-2 rounded-full bg-muted dark:bg-white/5 overflow-hidden">
