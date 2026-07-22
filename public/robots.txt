@@ -1,11 +1,27 @@
 User-agent: *
 Allow: /
 
-# Block auth and private routes from indexing
-Disallow: /dashboard
+# Block auth pages
+Disallow: /login
+Disallow: /register
+Disallow: /choose-role
+Disallow: /forgot-password
+Disallow: /auth-sync
+
+# Block authenticated user areas
+Disallow: /admin/
+Disallow: /trucker/
+Disallow: /shipper/
 Disallow: /profile
-Disallow: /settings
-Disallow: /admin
+Disallow: /messages
+Disallow: /chat/
+Disallow: /favorites
+Disallow: /credit-score
+Disallow: /browse-trucks
+Disallow: /trips/
+
+# Block internal
 Disallow: /api/
+Disallow: /dashboard
 
 Sitemap: https://loadsaathi.in/sitemap.xml
