@@ -154,7 +154,7 @@ async function openRouterProvider(body: PricePredictRequest, prompt: string): Pr
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
-          "HTTP-Referer": "https://loadsaathi.app",
+          "HTTP-Referer": "https://loadsaathi.in",
         },
         body: JSON.stringify({
           model,

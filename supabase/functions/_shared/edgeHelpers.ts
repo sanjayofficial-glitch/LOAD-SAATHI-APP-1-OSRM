@@ -2,8 +2,8 @@
 // Import as: import { getCorsHeaders, checkRateLimit, ... } from "../_shared/edgeHelpers.ts";
 
 const ALLOWED_ORIGINS = [
-  "https://loadsaathi.app",
-  "https://www.loadsaathi.app",
+  "https://loadsaathi.in",
+  "https://www.loadsaathi.in",
   "http://localhost:8080",
   "http://localhost:5173",
 ];
