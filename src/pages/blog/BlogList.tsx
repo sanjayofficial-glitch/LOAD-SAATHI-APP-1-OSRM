@@ -8,10 +8,10 @@ const articles = [
   {
     slug: "indian-logistics-eway-bill-gst-2026",
     category: "Industry Insights",
-    title: "Indian Logistics & e-Way Bill Rules in 2026: GST Compliance, MSME Impact & What Changed",
-    excerpt: "New mandatory e-Way Bill fields, voluntary closure features, and real-time GST analytics are reshaping compliance for freight operators and MSMEs in 2026. Here's what changed and what to do now.",
+    title: "e-Way Bill Rules 2026: New GST Compliance Changes Every Indian Business Must Know",
+    excerpt: "The GSTN has introduced mandatory Ship-To GSTIN fields and voluntary e-Way Bill closure effective August 1, 2026. Here's what changed, who's affected, and how to stay compliant.",
     date: "July 23, 2026",
-    readTime: "10 min read",
+    readTime: "12 min read",
     author: "LoadSaathi Team",
   },
   {
