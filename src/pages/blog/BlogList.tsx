@@ -6,6 +6,15 @@ import SeoMeta from "@/components/SeoMeta";
 
 const articles = [
   {
+    slug: "indian-logistics-eway-bill-gst-2026",
+    category: "Industry Insights",
+    title: "Indian Logistics & e-Way Bill Rules in 2026: GST Compliance, MSME Impact & What Changed",
+    excerpt: "New mandatory e-Way Bill fields, voluntary closure features, and real-time GST analytics are reshaping compliance for freight operators and MSMEs in 2026. Here's what changed and what to do now.",
+    date: "July 23, 2026",
+    readTime: "10 min read",
+    author: "LoadSaathi Team",
+  },
+  {
     slug: "ai-freight-matching",
     category: "Industry Insights",
     title: "How AI is Transforming Freight Matching in India",
