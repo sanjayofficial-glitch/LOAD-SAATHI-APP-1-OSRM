@@ -44,6 +44,8 @@ const ReviewsPreview = lazy(() => import("./pages/screens/ReviewsPreview"));
 const AdminPreview = lazy(() => import("./pages/screens/AdminPreview"));
 const BlogList = lazy(() => import("./pages/blog/BlogList"));
 const BlogArticle = lazy(() => import("./pages/blog/BlogArticle"));
+const RoutesIndex = lazy(() => import("./pages/public/RoutesIndex"));
+const RouteDetail = lazy(() => import("./pages/public/RouteDetail"));
 const TruckerDashboard = lazy(() => import("./pages/trucker/Dashboard"));
 const PostTrip = lazy(() => import("./pages/trucker/PostTrip"));
 const TruckerHub = lazy(() => import("./pages/trucker/TruckerHub"));
@@ -139,6 +141,10 @@ function App() {
                     {/* Blog */}
                     <Route path="/blog" element={<BlogList />} />
                     <Route path="/blog/:slug" element={<BlogArticle />} />
+
+                    {/* Freight Routes */}
+                    <Route path="/routes" element={<RoutesIndex />} />
+                    <Route path="/routes/:slug" element={<RouteDetail />} />
                   </Route>
 
                   {/* Authenticated routes wrapped with Layout */}
