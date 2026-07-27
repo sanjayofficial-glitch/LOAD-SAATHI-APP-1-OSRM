@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Truck, ArrowRight, Route, Handshake, EyeOff, CircuitBoard, Search, Bell, Map, Package, ChevronRight, LayoutDashboard, Brain, MessageSquare, Shield, Star, Activity, UserCheck } from 'lucide-react';
+import { Truck, ArrowRight, Route, Handshake, EyeOff, CircuitBoard, Search, Bell, Map, Package, ChevronRight, LayoutDashboard, Brain, MessageSquare, Shield, Star, Activity, UserCheck, Menu, X, MapPin, TrendingUp, DollarSign, BarChart3 } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -23,6 +23,14 @@ const Index = () => {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [activeTab, setActiveTab] = useState('shipper');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const scrollToSection = (id: string) => {
+    setMobileMenuOpen(false);
+    setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    }, 150);
+  };
   const globeRef = useRef<HTMLDivElement>(null);
   const globeInited = useRef(false);
   const { isDark } = useTheme();
@@ -71,11 +79,12 @@ const Index = () => {
     let scene: any, camera: any, renderer: any, group: any;
     let animationId: number;
     let mouseX = 0, mouseY = 0;
+    const geometries: any[] = [];
+    const meshes: any[] = [];
 
     const init = async () => {
       try {
         const THREE = await new Promise<any>((resolve) => {
-          // Check if already loaded
           if ((window as any).THREE) {
             resolve((window as any).THREE);
             return;
@@ -117,7 +126,10 @@ const Index = () => {
           opacity: isLightMode ? 0.25 : 0.15,
         });
         globeMatRef.current = globeMat;
-        group.add(new THREE.Mesh(globeGeo, globeMat));
+        const globeMesh = new THREE.Mesh(globeGeo, globeMat);
+        geometries.push(globeGeo);
+        meshes.push(globeMesh);
+        group.add(globeMesh);
 
         const innerGeo = new THREE.SphereGeometry(1.95, 64, 64);
         const innerMat = new THREE.MeshPhongMaterial({
@@ -126,7 +138,10 @@ const Index = () => {
           opacity: isLightMode ? 0.25 : 0.4,
         });
         innerMatRef.current = innerMat;
-        group.add(new THREE.Mesh(innerGeo, innerMat));
+        const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+        geometries.push(innerGeo);
+        meshes.push(innerMesh);
+        group.add(innerMesh);
 
         const pointsCount = 500;
         const positions = new Float32Array(pointsCount * 3);
@@ -146,7 +161,10 @@ const Index = () => {
           opacity: isLightMode ? 0.5 : 0.8
         });
         pointsMatRef.current = pointsMat;
-        group.add(new THREE.Points(pointsGeo, pointsMat));
+        const pointsMesh = new THREE.Points(pointsGeo, pointsMat);
+        geometries.push(pointsGeo);
+        meshes.push(pointsMesh);
+        group.add(pointsMesh);
 
         for (let i = 0; i < 15; i++) {
           const si = Math.floor(Math.random() * pointsCount) * 3;
@@ -162,6 +180,7 @@ const Index = () => {
             opacity: isLightMode ? 0.2 : 0.3
           });
           arcMatsRef.current.push(arcMat);
+          geometries.push(arcGeo);
           group.add(new THREE.Line(arcGeo, arcMat));
         }
 
@@ -181,7 +200,6 @@ const Index = () => {
         window.addEventListener('mousemove', handleMouseMove);
         cleanupFnsRef.current.push(() => window.removeEventListener('mousemove', handleMouseMove));
 
-        // Pause globe when not visible (performance optimization)
         let isGlobeVisible = true;
         globeObserverRef.current = new IntersectionObserver(
           (entries) => {
@@ -198,8 +216,8 @@ const Index = () => {
           animationId = requestAnimationFrame(animate);
           if (isGlobeVisible) {
             group.rotation.y += 0.003;
-            group.rotation.y += (mouseX * 0.5 - 0) * 0.05;
-            group.rotation.x += (mouseY * 0.5 - 0) * 0.03;
+            group.rotation.y += mouseX * 0.008;
+            group.rotation.x += mouseY * 0.005;
             renderer.render(scene, camera);
           }
         };
@@ -228,6 +246,19 @@ const Index = () => {
       if (globeObserverRef.current) globeObserverRef.current.disconnect();
       cleanupFnsRef.current.forEach(fn => fn());
       cleanupFnsRef.current = [];
+      geometries.forEach((g) => { try { g.dispose(); } catch {} });
+      if (scene) {
+        scene.traverse((child: any) => {
+          if (child.isMesh) {
+            child.geometry?.dispose();
+            if (Array.isArray(child.material)) {
+              child.material.forEach((m: any) => m.dispose());
+            } else {
+              child.material?.dispose();
+            }
+          }
+        });
+      }
       if (renderer) {
         renderer.dispose();
         if (renderer.domElement && renderer.domElement.parentNode) {
@@ -323,13 +354,57 @@ const Index = () => {
             <Link to="/login" className="hidden sm:inline-block text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
               Sign In
             </Link>
-            <Link to="/register">
+            <Link to="/register" className="hidden sm:inline-block">
               <Button className="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold tracking-wider uppercase px-5 py-2 h-auto shadow-lg">
                 Get Started
               </Button>
             </Link>
+            <button
+              type="button"
+              className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu overlay */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+            <div className="absolute right-0 top-0 h-full w-72 max-w-[80vw] bg-background dark:bg-[#050816] border-l border-border shadow-2xl animate-slide-in-right">
+              <div className="flex justify-between items-center px-6 h-20 border-b border-border">
+                <span className="text-lg font-bold text-orange-600 dark:text-orange-400">Menu</span>
+                <button
+                  type="button"
+                  className="p-2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="flex flex-col gap-1 p-6">
+                <Link to="/features" onClick={() => setMobileMenuOpen(false)} className="py-3 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 border-b border-border/50 transition-colors">Features</Link>
+                <Link to="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="py-3 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 border-b border-border/50 transition-colors">How It Works</Link>
+                <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="py-3 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 border-b border-border/50 transition-colors">Pricing</Link>
+                <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="py-3 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 border-b border-border/50 transition-colors">About</Link>
+                <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="py-3 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 border-b border-border/50 transition-colors">FAQ</Link>
+                <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="py-3 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 border-b border-border/50 transition-colors">Contact</Link>
+              </div>
+              <div className="px-6 pt-4 space-y-3">
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center py-3 text-sm font-semibold text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors">
+                  Sign In
+                </Link>
+                <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center py-3 text-sm font-bold tracking-wider uppercase bg-orange-600 hover:bg-orange-700 text-white rounded-lg shadow-lg transition-colors">
+                  Get Started
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       <main className="pt-20">
@@ -355,22 +430,20 @@ const Index = () => {
                 <span className="text-gradient-orange-blue">Build India&apos;s freight OS.</span>
               </h1>
               <p className="text-lg sm:text-xl text-muted-foreground max-w-xl leading-relaxed">
-                We transform unused truck capacity into economic opportunity. LoadSaathi is the high-precision intelligence platform designed to eliminate empty return trips.
-              </p>
-              <p className="text-sm text-muted-foreground/80 max-w-xl leading-relaxed">
-                LoadSaathi is India's AI-powered shared freight marketplace that connects shippers with truckers for PTL and LTL loads across East India. It uses AI matching, GPS tracking, and digital credit scores to eliminate empty return trips and reduce freight costs by up to 40%.
+                LoadSaathi is India's AI-powered shared freight marketplace transforming unused truck capacity into economic opportunity — matching shippers with truckers for PTL/LTL loads using AI matching, GPS tracking, and digital credit scores to eliminate empty return trips and reduce costs by up to 40%.
               </p>
               <div className="flex items-center gap-4 pt-4">
-                <Link to="/register">
-                  <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-6 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)] group">
+                <Button asChild className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-6 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)] group">
+                  <Link to="/register">
                     Deploy Intelligence
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>                  <a href="#vision">
-                  <Button variant="outline" className="text-sm font-bold tracking-wider uppercase px-8 py-6 h-auto rounded-lg border-border hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-foreground">
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="text-sm font-bold tracking-wider uppercase px-8 py-6 h-auto rounded-lg border-border text-foreground">
+                  <button type="button" onClick={() => scrollToSection('vision')}>
                     View Vision
-                  </Button>
-                </a>
+                  </button>
+                </Button>
               </div>
             </div>
             <div className="relative animate-float h-full min-h-[500px] flex items-center justify-center">
@@ -414,7 +487,7 @@ const Index = () => {
 
         {/* PROOF BAR */}
         <section className="fade-section border-y border-border dark:border-white/5 bg-muted/50 dark:bg-[#010f1f]/80 backdrop-blur-sm">
-          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-8 flex flex-col md:flex-row justify-around items-center gap-8">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-8 flex flex-col md:flex-row justify-center items-center gap-x-16 gap-y-8">
             {[
               { value: '40%', label: 'Empty Kilometers Today' },
               { value: '₹1.5L Cr', label: 'Annual Economic Loss' },
@@ -437,19 +510,19 @@ const Index = () => {
               <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">The Utilization Crisis</h2>
               <p className="text-lg text-muted-foreground max-w-2xl">India doesn&apos;t have a truck shortage. India has a utilization problem. Legacy systems create friction, leaving capacity stranded.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-min">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 { icon: Route, title: 'Empty Return Trips', desc: 'Trucks frequently return empty after a delivery, burning fuel and wasting economic potential due to lack of network visibility.', badge: 'CRITICAL INEFFICIENCY', badgeClass: 'text-red-500 dark:bg-red-900/20 dark:border-red-800/30 bg-red-100 border-red-200', colSpan: 'md:col-span-2', iconColor: 'text-orange-600 dark:text-orange-400' },
                 { icon: Handshake, title: 'Broker Dependency', desc: 'Opaque pricing and multiple intermediaries erode margins for both shippers and transporters.', badge: null, iconColor: 'text-blue-500' },
                 { icon: EyeOff, title: 'Zero Visibility', desc: 'Lack of real-time tracking leads to supply chain anxiety and manual intervention.', badge: null, iconColor: 'text-muted-foreground' },
                 { icon: CircuitBoard, title: 'Fragmented Data Silos', desc: 'Disconnected systems prevent systemic optimization and intelligent capacity planning.', badge: null, iconColor: 'text-orange-500', colSpan: 'md:col-span-2' },
               ].map((card, i) => (
-                <div key={i} className={`glass-card p-8 rounded-xl ${card.colSpan || ''} hover:border-orange-500/30 transition-all duration-300 group`}>
-                  <card.icon className={`${card.iconColor} text-3xl mb-4 group-hover:scale-110 transition-transform duration-300`} />
+                <div key={i} className={`glass-card p-8 rounded-xl min-h-[260px] flex flex-col ${card.colSpan || ''} hover:border-orange-500/30 transition-all duration-300 group`}>
+                  <card.icon className={`${card.iconColor} text-3xl mb-4 group-hover:scale-110 transition-transform duration-300 shrink-0`} />
                   <h3 className="text-lg font-bold text-foreground mb-2">{card.title}</h3>
-                  <p className="text-sm text-muted-foreground">{card.desc}</p>
+                  <p className="text-sm text-muted-foreground flex-grow">{card.desc}</p>
                   {card.badge && (
-                    <div className="mt-6 border-t border-border pt-4">
+                    <div className="mt-auto pt-6 border-t border-border">
                       <span className={`text-xs font-semibold ${card.badgeClass} px-2 py-1 rounded border`}>{card.badge}</span>
                     </div>
                   )}
@@ -556,102 +629,113 @@ const Index = () => {
             </div>
             <div className="relative w-full aspect-[16/9] max-h-[700px]">
               {/* Shipper OS */}
-              <div className={`tab-content ${activeTab === 'shipper' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border-border overflow-hidden shadow-2xl flex-col`}
-                style={{ display: activeTab === 'shipper' ? 'flex' : 'none' }}>
-                <div className="h-12 border-b border-border bg-card/80 flex items-center px-4 gap-4">
-                  <span className="text-xs text-muted-foreground">SHIPPER_WORKSPACE</span>
+              <div role="tabpanel" className={`tab-content ${activeTab === 'shipper' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border-blue-500/20 overflow-hidden shadow-2xl flex-col`}
+                style={{ display: activeTab === 'shipper' ? 'flex' : 'none' }}
+                inert={activeTab !== 'shipper' ? true : undefined}>
+                <div className="h-12 border-b border-blue-500/20 bg-card/80 flex items-center px-5 gap-3">
+                  <Package className="h-4 w-4 text-blue-400" />
+                  <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Shipper OS</span>
                   <div className="flex-grow" />
-                  <Search className="h-4 w-4 text-muted-foreground" />
-                  <Bell className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded border border-border/50">v2.4.1</span>
                 </div>
-                <div className="flex-grow p-6 grid grid-cols-3 gap-6 bg-background/50 dark:bg-[#050816]/50">
-                  <div className="col-span-1 space-y-4">
-                    <div className="glass-card p-4 rounded">
-                      <div className="text-xs text-muted-foreground uppercase mb-2">Active Shipments</div>
-                      <div className="text-3xl font-black text-foreground">124</div>
-                    </div>
-                    <div className="glass-card p-4 rounded">
-                      <div className="text-xs text-muted-foreground uppercase mb-2">Pending Tenders</div>
-                      <div className="space-y-2 mt-4">
-                        <div className="flex justify-between items-center border-b border-border pb-2">
-                          <span className="text-xs text-foreground">MUM-DEL (FTL)</span>
-                          <span className="text-xs text-blue-400">Awaiting Bid</span>
+                <div className="flex-grow p-5 lg:p-6 bg-background/50 dark:bg-[#050816]/50 overflow-y-auto">
+                  <p className="text-sm text-muted-foreground mb-5 max-w-2xl">Empower your supply chain with AI-driven tools to post, track, and optimize every shipment across East India's industrial corridors.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { icon: Package, title: 'AI-Powered Shipment Posting', desc: 'Enter load details — origin, destination, weight, timeline. AI suggests optimal pricing based on market data.', accent: 'Smart Pricing', accentClass: 'text-blue-400 bg-blue-900/20 border-blue-700/30' },
+                      { icon: Search, title: 'Intelligent Truck Matching', desc: 'Find available trucks matched to your route and cargo type. View credit scores, ratings, and past performance.', accent: '98% Match Accuracy', accentClass: 'text-emerald-400 bg-emerald-900/20 border-emerald-700/30' },
+                      { icon: MapPin, title: 'Real-Time GPS Tracking', desc: 'Live tracking from pickup to delivery with ETA updates. No more "kahan pahuncha?" coordination calls.', accent: 'Live', accentClass: 'text-blue-400 bg-blue-900/20 border-blue-700/30' },
+                      { icon: Shield, title: 'Shipper Credit Score (300–900)', desc: 'Build your shipper reputation with every transaction. Higher scores attract premium truckers instantly.', accent: 'Score: 720', accentClass: 'text-orange-400 bg-orange-900/20 border-orange-700/30' },
+                      { icon: BarChart3, title: 'Shipment Analytics & Insights', desc: 'Track costs, transit times, and carrier performance. Data-driven decisions to optimize your logistics.', accent: '+34% Efficiency', accentClass: 'text-emerald-400 bg-emerald-900/20 border-emerald-700/30' },
+                      { icon: MessageSquare, title: 'Direct Shipper–Trucker Chat', desc: 'Communicate directly with truckers. Share documents, negotiate rates, and build relationships — no middlemen.', accent: 'Instant', accentClass: 'text-blue-400 bg-blue-900/20 border-blue-700/30' },
+                    ].map((feat, i) => {
+                      const Icon = feat.icon;
+                      return (
+                        <div key={i} className="glass-card p-4 rounded-lg border border-border hover:border-blue-500/30 transition-all duration-300 group min-h-[180px] flex flex-col">
+                          <div className="bg-blue-900/10 dark:bg-blue-900/10 w-9 h-9 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shrink-0">
+                            <Icon className="h-4 w-4 text-blue-400" />
+                          </div>
+                          <h4 className="text-sm font-bold text-foreground mb-1.5">{feat.title}</h4>
+                          <p className="text-xs text-muted-foreground leading-relaxed flex-grow">{feat.desc}</p>
+                          <span className={`mt-auto inline-block text-[10px] font-semibold ${feat.accentClass} px-2 py-0.5 rounded border w-fit`}>{feat.accent}</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-border pb-2">
-                          <span className="text-xs text-foreground">BLR-HYD (PTL)</span>
-                          <span className="text-xs text-orange-400">Matched</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-span-2 glass-card p-4 rounded relative overflow-hidden">
-                    <div className="text-xs text-muted-foreground uppercase mb-4 border-b border-border pb-2">Live Tracking Heatmap</div>
-                    <div className="absolute inset-x-4 top-16 bottom-4 bg-card/50 dark:bg-[#0B1220] rounded border border-border flex items-center justify-center opacity-50 bg-grid-pattern">
-                      <Map className="text-4xl text-muted-foreground" />
-                    </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
               {/* Transporter OS */}
-              <div className={`tab-content ${activeTab === 'transporter' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border-border overflow-hidden shadow-2xl flex-col`}
-                style={{ display: activeTab === 'transporter' ? 'flex' : 'none' }}>
-                <div className="h-12 border-b border-border bg-card/80 flex items-center px-4 gap-4">
-                  <span className="text-xs text-muted-foreground">FLEET_MANAGER</span>
+              <div role="tabpanel" className={`tab-content ${activeTab === 'transporter' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border-orange-500/20 overflow-hidden shadow-2xl flex-col`}
+                style={{ display: activeTab === 'transporter' ? 'flex' : 'none' }}
+                inert={activeTab !== 'transporter' ? true : undefined}>
+                <div className="h-12 border-b border-orange-500/20 bg-card/80 flex items-center px-5 gap-3">
+                  <Truck className="h-4 w-4 text-orange-400" />
+                  <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">Transporter OS</span>
+                  <div className="flex-grow" />
+                  <span className="text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded border border-border/50">v2.4.1</span>
                 </div>
-                <div className="flex-grow p-6 grid grid-cols-3 gap-6 bg-background/50 dark:bg-[#050816]/50">
-                  <div className="col-span-1 space-y-4">
-                    <div className="glass-card p-4 rounded">
-                      <div className="text-xs text-muted-foreground uppercase mb-2">Fleet Utilization</div>
-                      <div className="text-3xl font-black text-orange-400">87%</div>
-                      <div className="text-xs text-muted-foreground mt-1">+12% this month</div>
-                    </div>
-                    <div className="glass-card p-4 rounded">
-                      <div className="text-xs text-muted-foreground uppercase mb-2">Active Routes</div>
-                      <div className="space-y-2 mt-4">
-                        <div className="flex justify-between items-center border-b border-border pb-2">
-                          <span className="text-xs text-foreground">DEL-MUM</span>
-                          <span className="text-xs text-green-400">On Time</span>
+                <div className="flex-grow p-5 lg:p-6 bg-background/50 dark:bg-[#050816]/50 overflow-y-auto">
+                  <p className="text-sm text-muted-foreground mb-5 max-w-2xl">Maximize your fleet's earning potential. Discover high-value loads, optimize routes, and build a digital reputation that commands premium rates.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { icon: Truck, title: 'Load Discovery Dashboard', desc: 'Browse available shipments matched to your route and vehicle type. AI prioritizes the highest-paying loads first.', accent: '12 Loads Found', accentClass: 'text-orange-400 bg-orange-900/20 border-orange-700/30' },
+                      { icon: Route, title: 'Smart Route Optimization', desc: 'AI suggests return loads to eliminate empty trips. Maximize every kilometer on the Rourkela–Ranchi–Burdwan corridor.', accent: '0% Empty Target', accentClass: 'text-emerald-400 bg-emerald-900/20 border-emerald-700/30' },
+                      { icon: MapPin, title: 'Live Location Sharing', desc: 'Share your trip location with shippers automatically. Build trust through complete transparency on every delivery.', accent: 'Sharing', accentClass: 'text-orange-400 bg-orange-900/20 border-orange-700/30' },
+                      { icon: TrendingUp, title: 'Transporter Credit Score', desc: '300–900 credit score based on completion rate, reviews, and tenure. Higher scores unlock premium, higher-paying loads.', accent: 'Score: 810', accentClass: 'text-emerald-400 bg-emerald-900/20 border-emerald-700/30' },
+                      { icon: DollarSign, title: 'Earnings & Payments Dashboard', desc: 'Track trip earnings, incentives, and payment history in real time. Digital settlements mean faster, transparent payouts.', accent: '₹45K This Week', accentClass: 'text-orange-400 bg-orange-900/20 border-orange-700/30' },
+                      { icon: Star, title: 'Reputation & Bidirectional Reviews', desc: 'Build your profile with ratings from every trip. Higher ratings mean preferential access to top-paying loads.', accent: '4.8 ★ Rating', accentClass: 'text-yellow-400 bg-yellow-900/20 border-yellow-700/30' },
+                    ].map((feat, i) => {
+                      const Icon = feat.icon;
+                      return (
+                        <div key={i} className="glass-card p-4 rounded-lg border border-border hover:border-orange-500/30 transition-all duration-300 group min-h-[180px] flex flex-col">
+                          <div className="bg-orange-900/10 dark:bg-orange-900/10 w-9 h-9 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shrink-0">
+                            <Icon className="h-4 w-4 text-orange-400" />
+                          </div>
+                          <h4 className="text-sm font-bold text-foreground mb-1.5">{feat.title}</h4>
+                          <p className="text-xs text-muted-foreground leading-relaxed flex-grow">{feat.desc}</p>
+                          <span className={`mt-auto inline-block text-[10px] font-semibold ${feat.accentClass} px-2 py-0.5 rounded border w-fit`}>{feat.accent}</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-border pb-2">
-                          <span className="text-xs text-foreground">BLR-CCU</span>
-                          <span className="text-xs text-yellow-400">Delayed 2h</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-span-2 glass-card p-4 rounded relative overflow-hidden">
-                    <div className="text-xs text-muted-foreground uppercase mb-4 border-b border-border pb-2">Capacity Planning Map</div>
-                    <div className="absolute inset-x-4 top-16 bottom-4 bg-card/50 dark:bg-[#0B1220] rounded border border-border flex items-center justify-center opacity-50 bg-grid-pattern">
-                      <Package className="text-4xl text-muted-foreground" />
-                    </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
               {/* AI Command Center */}
-              <div className={`tab-content ${activeTab === 'command' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border border-orange-500/20 overflow-hidden shadow-[0_0_30px_rgba(249,115,22,0.1)] flex-col`}
-                style={{ display: activeTab === 'command' ? 'flex' : 'none' }}>
-                <div className="h-12 border-b border-orange-500/20 bg-orange-900/10 flex items-center px-4 gap-4">
-                  <span className="text-xs font-bold text-orange-400">CORE_INTELLIGENCE_NODE</span>
+              <div role="tabpanel" className={`tab-content ${activeTab === 'command' ? 'active' : ''} absolute inset-0 glass-card rounded-xl border-orange-500/20 overflow-hidden shadow-[0_0_30px_rgba(249,115,22,0.1)] flex-col`}
+                style={{ display: activeTab === 'command' ? 'flex' : 'none' }}
+                inert={activeTab !== 'command' ? true : undefined}>
+                <div className="h-12 border-b border-orange-500/20 bg-orange-900/10 flex items-center px-5 gap-3">
+                  <Brain className="h-4 w-4 text-orange-400" />
+                  <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">AI Command Center</span>
                   <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse-ring" />
+                  <div className="flex-grow" />
+                  <span className="text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded border border-border/50">NEURAL CORE v3.1</span>
                 </div>
-                <div className="flex-grow relative dark:bg-[#010f1f] bg-background">
-                  <div className="absolute inset-0 bg-grid-pattern opacity-30" />
-                  <div className="absolute inset-0 p-6 flex flex-col justify-between pointer-events-none">
-                    <div className="flex justify-between">
-                      <div className="glass-panel p-3 rounded border border-orange-500/20">
-                        <div className="text-xs text-orange-400 uppercase mb-1">Network Density</div>
-                        <div className="text-lg font-bold text-foreground">HIGH OPTIMIZATION</div>
-                      </div>
-                    </div>
-                    <div className="glass-panel p-4 rounded border-border self-end w-64">
-                      <div className="text-xs text-muted-foreground uppercase border-b border-border pb-2 mb-2">Algorithm Status</div>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs"><span className="text-foreground">Route Matching</span><span className="text-blue-400">ACTIVE</span></div>
-                        <div className="flex justify-between text-xs"><span className="text-foreground">Price Prediction</span><span className="text-blue-400">TRAINING</span></div>
-                      </div>
-                    </div>
+                <div className="flex-grow p-5 lg:p-6 bg-background/50 dark:bg-[#050816]/50 overflow-y-auto">
+                  <p className="text-sm text-muted-foreground mb-5 max-w-2xl">The intelligence layer powering the entire LoadSaathi network. Real-time algorithms optimize every match, predict every price, and secure every transaction.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { icon: Brain, title: 'Smart Load–Truck Matching', desc: 'Proprietary neural algorithm pairs every shipment with the optimal truck based on route, capacity, timing, and price preferences.', accent: '99.2% Accuracy', accentClass: 'text-orange-400 bg-orange-900/20 border-orange-700/30' },
+                      { icon: TrendingUp, title: 'Dynamic Price Prediction', desc: 'Real-time pricing engine analyzes market demand, fuel costs, and seasonal patterns to suggest fair, competitive rates instantly.', accent: 'Market +5.2%', accentClass: 'text-emerald-400 bg-emerald-900/20 border-emerald-700/30' },
+                      { icon: Activity, title: 'Network Demand Forecasting', desc: 'Predict capacity shortages 7 days in advance. AI identifies high-demand corridors and alerts transporters to position their fleet.', accent: 'Demand: High', accentClass: 'text-orange-400 bg-orange-900/20 border-orange-700/30' },
+                      { icon: Shield, title: 'Fraud Detection & Trust Layer', desc: 'Automated verification flags suspicious activity across the network. Digital trail on every transaction ensures accountability.', accent: '0 Fraud Incidents', accentClass: 'text-emerald-400 bg-emerald-900/20 border-emerald-700/30' },
+                      { icon: BarChart3, title: 'Fleet Utilization Analytics', desc: 'Aggregate network-wide analytics — fill rates, empty kilometers, route efficiency. Benchmark your fleet against corridor averages.', accent: '87% Utilization', accentClass: 'text-blue-400 bg-blue-900/20 border-blue-700/30' },
+                      { icon: Map, title: 'Corridor Intelligence', desc: 'Real-time insights on East India\'s primary freight corridors. Traffic patterns, weather conditions, and route disruptions.', accent: '3 Corridors Live', accentClass: 'text-orange-400 bg-orange-900/20 border-orange-700/30' },
+                    ].map((feat, i) => {
+                      const Icon = feat.icon;
+                      return (
+                        <div key={i} className="glass-card p-4 rounded-lg border border-border hover:border-orange-500/30 transition-all duration-300 group min-h-[180px] flex flex-col">
+                          <div className="bg-orange-900/10 dark:bg-orange-900/10 w-9 h-9 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shrink-0">
+                            <Icon className="h-4 w-4 text-orange-400" />
+                          </div>
+                          <h4 className="text-sm font-bold text-foreground mb-1.5">{feat.title}</h4>
+                          <p className="text-xs text-muted-foreground leading-relaxed flex-grow">{feat.desc}</p>
+                          <span className={`mt-auto inline-block text-[10px] font-semibold ${feat.accentClass} px-2 py-0.5 rounded border w-fit`}>{feat.accent}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -786,8 +870,8 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
-          <div className="col-span-2 md:col-span-1 mb-4 md:mb-0">
+        <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-4 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
+          <div className="sm:col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <LogoMark size="h-10 w-10" />
               <span className="text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
