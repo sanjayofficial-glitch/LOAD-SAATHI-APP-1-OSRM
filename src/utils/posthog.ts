@@ -6,6 +6,7 @@ const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST
 if (POSTHOG_API_KEY && POSTHOG_HOST) {
   posthog.init(POSTHOG_API_KEY, {
     api_host: POSTHOG_HOST,
+    ui_host: 'https://us.posthog.com',
     capture_pageview: true,
     capture_pageleave: true,
     autocapture: true,
@@ -17,10 +18,6 @@ if (POSTHOG_API_KEY && POSTHOG_HOST) {
         token: POSTHOG_API_KEY,
         toolbarVersion: 'toolbar',
         instrument: true,
-        userEmail: 'uchhab8@gmail.com',
-        distinctId: 'oP5XMocErkawZgtrNxm5eAejGkv3hkLEMCsdSonijMfL',
-        userIntent: 'add-action',
-        uiHost: POSTHOG_HOST,
         dataAttributes: ['data-attr'],
       })
     },

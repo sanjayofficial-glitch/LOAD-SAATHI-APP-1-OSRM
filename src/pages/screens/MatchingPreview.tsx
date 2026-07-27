@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, MapPin, Truck, Package, Star, Brain, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import SeoMeta from "@/components/SeoMeta";
 
 const shipments = [
   { id: 'SHP-1024', origin: 'Mumbai, MH', dest: 'Delhi, DL', weight: '18T', type: 'FTL', price: '₹42,000', date: '2026-07-08', match: 98, matchLabel: 'Excellent', driver: 'Rajesh Kumar', rating: 4.9, trips: 342 },
@@ -44,10 +45,12 @@ export default function MatchingPreview() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-blue-500/5 via-transparent to-transparent">
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', filter: 'blur(60px)' }} />
+    <>
+      <SeoMeta title="AI Matching Preview — LoadSaathi App Screens" description="Preview LoadSaathi's AI-powered load matching: intelligent shipment-to-truck matching with confidence scores, filters, and driver profiles." />
+      <div className="min-h-screen bg-background">
+        <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-blue-500/5 via-transparent to-transparent">
+          <div className="absolute top-0 right-1/4 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
+            style={{ background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', filter: 'blur(60px)' }} />
         <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
           <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: AI Matching</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
@@ -182,5 +185,6 @@ export default function MatchingPreview() {
         </div>
       </div>
     </div>
+    </>
   );
 }

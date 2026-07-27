@@ -8,6 +8,7 @@ import {
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip
 } from 'recharts';
+import SeoMeta from "@/components/SeoMeta";
 
 const responseTimeData = [
   { time: '00:00', value: 245 }, { time: '04:00', value: 180 }, { time: '08:00', value: 320 },
@@ -79,12 +80,14 @@ export default function AdminPreview() {
   const [activeSection, setActiveSection] = useState<'events' | 'metrics'>('events');
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-red-500/5 via-transparent to-transparent">
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full opacity-[0.05] pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #ef4444 0%, transparent 70%)', filter: 'blur(80px)' }} />
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Admin Center</h1>
+    <>
+      <SeoMeta title="Admin Center Preview — LoadSaathi App Screens" description="Preview LoadSaathi's admin command center with system health monitoring, business intelligence, and live event tracking." />
+      <div className="min-h-screen bg-background">
+        <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-red-500/5 via-transparent to-transparent">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full opacity-[0.05] pointer-events-none"
+            style={{ background: 'radial-gradient(circle, #ef4444 0%, transparent 70%)', filter: 'blur(80px)' }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
+            <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Admin Center</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
             Real-time command center with system health monitoring, business intelligence, and live event tracking.
           </p>
@@ -230,5 +233,6 @@ export default function AdminPreview() {
         </div>
       </div>
     </div>
+    </>
   );
 }

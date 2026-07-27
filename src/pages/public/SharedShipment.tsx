@@ -6,6 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import SeoMeta from "@/components/SeoMeta";
 import { Package, MapPin, Calendar, IndianRupee, Weight, Clock, ArrowRight, Share2 } from "lucide-react";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -61,37 +62,49 @@ export default function SharedShipment() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/10 dark:to-background flex items-center justify-center px-6">
-        <Card className="w-full max-w-lg">
-          <CardContent className="p-8 space-y-4">
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-20 w-full" />
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <SeoMeta title="Loading Shipment Details" description="Loading shared shipment information from LoadSaathi." />
+        <div className="min-h-screen bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/10 dark:to-background flex items-center justify-center px-6">
+          <Card className="w-full max-w-lg">
+            <CardContent className="p-8 space-y-4">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-20 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   if (error || !shipment) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/10 dark:to-background flex items-center justify-center px-6">
-        <Card className="w-full max-w-lg text-center">
-          <CardContent className="p-8">
-            <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Shipment Not Found</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{error}</p>
-            <Link to="/register">
-              <Button className="bg-blue-600 hover:bg-blue-700">Join LoadSaathi</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <SeoMeta title="Shipment Not Found" description="This shared shipment link is invalid or no longer available on LoadSaathi." />
+        <div className="min-h-screen bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/10 dark:to-background flex items-center justify-center px-6">
+          <Card className="w-full max-w-lg text-center">
+            <CardContent className="p-8">
+              <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Shipment Not Found</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{error}</p>
+              <Link to="/register">
+                <Button className="bg-blue-600 hover:bg-blue-700">Join LoadSaathi</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/10 dark:to-background">
+    <>
+      <SeoMeta
+        title={`${shipment.origin_city} to ${shipment.destination_city} — Shared Freight`}
+        description={`Book shared PTL/LTL freight from ${shipment.origin_city} to ${shipment.destination_city}. ${shipment.weight_tonnes}T load at ₹${shipment.budget_per_tonne}/T. ${shipment.goods_description || 'Freight'} via LoadSaathi.`}
+        canonical={`/share/shipment/${id}`}
+      />
+      <div className="min-h-screen bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/10 dark:to-background">
       {/* Header */}
       <div className="pt-24 pb-8 px-6 text-center">
         <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4">
@@ -187,6 +200,7 @@ export default function SharedShipment() {
         </p>
       </div>
     </div>
+    </>
   );
 }
 

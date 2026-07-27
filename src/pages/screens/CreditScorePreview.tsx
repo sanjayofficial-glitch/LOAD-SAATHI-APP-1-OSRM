@@ -1,6 +1,7 @@
 "use client";
 
 import { Shield, Star, TrendingUp, Award, Brain, Clock, MessageSquare } from 'lucide-react';
+import SeoMeta from "@/components/SeoMeta";
 
 const scoreFactors = [
   { label: 'Completion Rate', score: 92, max: 100, weight: '35%', color: 'bg-green-500', icon: Shield },
@@ -37,12 +38,14 @@ export default function CreditScorePreview() {
   const tier = 'Platinum';
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-purple-500/5 via-transparent to-transparent">
-        <div className="absolute top-0 right-1/3 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)', filter: 'blur(60px)' }} />
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Credit Score</h1>
+    <>
+      <SeoMeta title="Credit Score Preview — LoadSaathi App Screens" description="Preview LoadSaathi's digital freight credit score: a trust and reputation system that quantifies reliability across every interaction." />
+      <div className="min-h-screen bg-background">
+        <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-purple-500/5 via-transparent to-transparent">
+          <div className="absolute top-0 right-1/3 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
+            style={{ background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)', filter: 'blur(60px)' }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
+            <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Credit Score</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
             A trust and reputation system that quantifies reliability across every interaction on the platform.
           </p>
@@ -186,5 +189,6 @@ export default function CreditScorePreview() {
         </div>
       </div>
     </div>
+    </>
   );
 }

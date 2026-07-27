@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Star, ThumbsUp, MessageSquare, User, Clock, Filter, ChevronDown } from 'lucide-react';
+import SeoMeta from "@/components/SeoMeta";
 
 interface Review {
   id: number;
@@ -65,12 +66,14 @@ export default function ReviewsPreview() {
   const avgRating = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-yellow-500/5 via-transparent to-transparent">
-        <div className="absolute top-0 left-1/2 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #eab308 0%, transparent 70%)', filter: 'blur(60px)' }} />
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Reviews</h1>
+    <>
+      <SeoMeta title="Reviews Preview — LoadSaathi App Screens" description="Preview LoadSaathi's bidirectional review system: shippers rate truckers and truckers rate shippers for complete transparency." />
+      <div className="min-h-screen bg-background">
+        <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-yellow-500/5 via-transparent to-transparent">
+          <div className="absolute top-0 left-1/2 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
+            style={{ background: 'radial-gradient(circle, #eab308 0%, transparent 70%)', filter: 'blur(60px)' }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
+            <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Reviews</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
             Transparent, bidirectional review system — shippers rate truckers and truckers rate shippers.
           </p>
@@ -210,5 +213,6 @@ export default function ReviewsPreview() {
         </div>
       </div>
     </div>
+    </>
   );
 }

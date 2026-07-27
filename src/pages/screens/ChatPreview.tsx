@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { MessageSquare, Send, Check, Clock, Phone, MoreVertical, Search } from 'lucide-react';
+import SeoMeta from "@/components/SeoMeta";
 
 interface Message {
   id: number;
@@ -80,12 +81,14 @@ export default function ChatPreview() {
   const [messageText, setMessageText] = useState('');
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-green-500/5 via-transparent to-transparent">
-        <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
-          style={{ background: "radial-gradient(circle, #22c55e 0%, transparent 70%)", filter: "blur(60px)" }} />
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Chat</h1>
+    <>
+      <SeoMeta title="Chat Preview — LoadSaathi App Screens" description="Preview LoadSaathi's real-time messaging between shippers and truckers with delivery status, read receipts, and direct communication." />
+      <div className="min-h-screen bg-background">
+        <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-green-500/5 via-transparent to-transparent">
+          <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full opacity-[0.06] pointer-events-none"
+            style={{ background: "radial-gradient(circle, #22c55e 0%, transparent 70%)", filter: "blur(60px)" }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 sm:py-20 relative z-10">
+            <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4">App Preview: Chat</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
             Real-time messaging between shippers and truckers with delivery status and read receipts.
           </p>
@@ -238,5 +241,6 @@ export default function ChatPreview() {
         </div>
       </div>
     </div>
+    </>
   );
 }

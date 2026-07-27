@@ -19,7 +19,7 @@ interface SeoMetaProps {
 }
 
 const BASE_URL = "https://loadsaathi.in";
-const DEFAULT_IMAGE = "https://loadsaathi.in/logo.png";
+const DEFAULT_IMAGE = "https://loadsaathi.in/og-image.png";
 
 export default function SeoMeta({
   title,
@@ -69,6 +69,8 @@ export default function SeoMeta({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:site_name" content="LoadSaathi" />
       <meta property="og:locale" content="en_IN" />
 

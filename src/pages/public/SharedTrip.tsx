@@ -6,6 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import SeoMeta from "@/components/SeoMeta";
 import { Truck, MapPin, Calendar, IndianRupee, Weight, Clock, ArrowRight, ExternalLink, Share2 } from "lucide-react";
 import { generateWhatsAppLink } from "@/utils/whatsapp";
 
@@ -65,32 +66,38 @@ export default function SharedTrip() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background dark:from-orange-950/10 dark:to-background flex items-center justify-center px-6">
-        <Card className="w-full max-w-lg">
-          <CardContent className="p-8 space-y-4">
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-20 w-full" />
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <SeoMeta title="Loading Trip Details" description="Loading shared trip information from LoadSaathi." />
+        <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background dark:from-orange-950/10 dark:to-background flex items-center justify-center px-6">
+          <Card className="w-full max-w-lg">
+            <CardContent className="p-8 space-y-4">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-20 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   if (error || !trip) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background dark:from-orange-950/10 dark:to-background flex items-center justify-center px-6">
-        <Card className="w-full max-w-lg text-center">
-          <CardContent className="p-8">
-            <Truck className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Trip Not Found</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{error}</p>
-            <Link to="/register">
-              <Button className="bg-orange-600 hover:bg-orange-700">Join LoadSaathi</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <SeoMeta title="Trip Not Found" description="This shared trip link is invalid or no longer available on LoadSaathi." />
+        <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background dark:from-orange-950/10 dark:to-background flex items-center justify-center px-6">
+          <Card className="w-full max-w-lg text-center">
+            <CardContent className="p-8">
+              <Truck className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Trip Not Found</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{error}</p>
+              <Link to="/register">
+                <Button className="bg-orange-600 hover:bg-orange-700">Join LoadSaathi</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
@@ -106,7 +113,13 @@ export default function SharedTrip() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background dark:from-orange-950/10 dark:to-background">
+    <>
+      <SeoMeta
+        title={`${trip.origin_city} to ${trip.destination_city} — Shared Truck Space`}
+        description={`Available truck space from ${trip.origin_city} to ${trip.destination_city}. ${trip.available_capacity_tonnes}T capacity at ₹${trip.price_per_tonne}/T. ${trip.vehicle_type || 'Truck'} via LoadSaathi.`}
+        canonical={`/share/trip/${id}`}
+      />
+      <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background dark:from-orange-950/10 dark:to-background">
       {/* Header */}
       <div className="pt-24 pb-8 px-6 text-center">
         <div className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4">
@@ -206,6 +219,7 @@ export default function SharedTrip() {
         </p>
       </div>
     </div>
+    </>
   );
 }
 
