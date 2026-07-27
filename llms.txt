@@ -1,0 +1,21 @@
+# LoadSaathi
+
+> Online marketplace connecting truck owners and drivers with shippers needing cargo transport across India.
+
+- **Website:** https://loadsaathi.in
+- **Contact:** support@loadsaathi.in
+- **Address:** Mumbai, India
+- **Hours:** 24/7
+- **Currency:** INR
+
+## Key Features
+- Real-time load matching marketplace
+- In-app payments (cashless, dispute-free)
+- Smart return route suggestions to reduce empty runs
+- Rate & distance checking before booking
+
+## Target Audience
+Truck owners, drivers, shippers, small manufacturers, distributors in India (ages 25-55)
+
+## Top-level URLs
+- https://loadsaathi.in
