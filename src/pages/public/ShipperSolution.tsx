@@ -94,6 +94,7 @@ export default function ShipperSolution() {
         description="LoadSaathi helps shippers save up to 40% on freight costs. AI-matched trucks, real-time tracking, escrow payments, and zero middlemen on East India corridors."
         keywords="freight shipping India, PTL LTL shipper, book truck online, reduce logistics cost East India"
         canonical="/solutions/shippers"
+        breadcrumbs={[{ name: "For Shippers", url: "/solutions/shippers" }]}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
 

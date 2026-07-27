@@ -126,6 +126,7 @@ const SafetyTrust = () => {
         description="LoadSaathi's multi-layer trust system: ID verification, escrow payments, GPS tracking, bidirectional reviews, and fraud detection. Safe freight for everyone."
         keywords="freight safety India, trucking trust system, verified shippers truckers, secure freight payments"
         canonical="/safety-trust"
+        breadcrumbs={[{ name: "Safety & Trust", url: "/safety-trust" }]}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

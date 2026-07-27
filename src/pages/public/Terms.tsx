@@ -115,7 +115,9 @@ const Terms = () => {
     <SeoMeta
       title="Terms of Service"
       description="LoadSaathi's terms of service — the rules and guidelines for using our freight marketplace platform. Please read these terms carefully before using LoadSaathi."
+      keywords="LoadSaathi terms of service, freight marketplace terms, logistics platform terms India"
       canonical="/terms"
+      breadcrumbs={[{ name: "Terms of Service", url: "/terms" }]}
     />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

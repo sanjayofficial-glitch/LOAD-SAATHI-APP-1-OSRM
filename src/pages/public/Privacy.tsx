@@ -138,7 +138,9 @@ const Privacy = () => {
     <SeoMeta
       title="Privacy Policy"
       description="LoadSaathi's privacy policy — how we collect, use, and protect your personal data. We are committed to safeguarding your privacy on our freight marketplace."
+      keywords="LoadSaathi privacy, freight platform privacy policy, data protection India"
       canonical="/privacy"
+      breadcrumbs={[{ name: "Privacy Policy", url: "/privacy" }]}
     />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

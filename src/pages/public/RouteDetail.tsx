@@ -1,10 +1,11 @@
 "use client";
 
 import { useParams, Link } from "react-router-dom";
-import { ArrowRight, MapPin, Clock, Route, Truck, Package, Search, Shield, TrendingUp, CheckCircle } from "lucide-react";
+import { ArrowRight, MapPin, Clock, Route, Truck, Package, Search, Shield, TrendingUp, CheckCircle, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SeoMeta from "@/components/SeoMeta";
 import { routes } from "@/data/routes";
+import { articles } from "@/data/blog";
 
 const benefits = [
   {
@@ -323,6 +324,73 @@ export default function RouteDetail() {
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.a}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Related Blog Articles */}
+        {(function() {
+          const relevantArticles = Object.entries(articles).filter(
+            ([, a]) => a.relatedRoutes?.includes(route.slug)
+          ).slice(0, 3);
+          if (relevantArticles.length === 0) return null;
+          return (
+            <section className="py-20 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5">
+              <div className="max-w-[1440px] mx-auto px-6 sm:px-12">
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl sm:text-4xl font-black text-foreground dark:text-white mb-4">
+                    Related Resources for {route.from} → {route.to}
+                  </h2>
+                  <p className="text-lg text-muted-foreground">Guides and insights for shipping on this route.</p>
+                </div>
+                <div className="grid sm:grid-cols-3 gap-5">
+                  {relevantArticles.map(([s, a]) => (
+                    <Link key={s} to={`/blog/${s}`} className="glass-card p-5 rounded-xl border border-border hover:border-orange-500/30 transition-all group">
+                      <div className="flex items-center gap-2 mb-3">
+                        <BookOpen className="h-4 w-4 text-orange-400" />
+                        <span className="text-xs font-medium text-muted-foreground">{a.category}</span>
+                      </div>
+                      <h3 className="font-bold text-foreground text-sm mb-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors line-clamp-2">{a.title}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{a.summary.substring(0, 100)}...</p>
+                      <p className="text-xs text-muted-foreground mt-2">{a.readTime}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
+          );
+        })()}
+
+        {/* Other Routes You Might Need */}
+        <section className="py-20">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl sm:text-4xl font-black text-foreground dark:text-white mb-4">
+                Other Routes You Might Need
+              </h2>
+              <p className="text-lg text-muted-foreground">Explore more freight corridors across East India.</p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {routes.filter((r) => r.slug !== route.slug).slice(0, 8).map((r) => (
+                <Link key={r.slug} to={`/routes/${r.slug}`} className="glass-card p-4 rounded-xl border border-border hover:border-orange-500/30 transition-all group flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-bold text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">{r.from}</span>
+                      <ArrowRight className="h-3 w-3 text-orange-400" />
+                      <span className="text-sm font-bold text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">{r.to}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">{r.distanceKm} km · ~{r.transitTime} hrs</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-orange-400 shrink-0 ml-2" />
+                </Link>
+              ))}
+            </div>
+            <div className="text-center mt-6">
+              <Link to="/routes">
+                <Button variant="outline" className="border-orange-500/30 text-foreground hover:bg-orange-500/5">
+                  View All Routes <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </section>

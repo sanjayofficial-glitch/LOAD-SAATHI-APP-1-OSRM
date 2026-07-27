@@ -3,90 +3,9 @@
 import { Link } from "react-router-dom";
 import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";
 import SeoMeta from "@/components/SeoMeta";
+import { getBlogListItems } from "@/data/blog";
 
-const articles = [
-  {
-    slug: "indian-logistics-eway-bill-gst-2026",
-    category: "Industry Insights",
-    title: "e-Way Bill Rules 2026: New GST Compliance Changes Every Indian Business Must Know",
-    excerpt: "The GSTN has introduced mandatory Ship-To GSTIN fields and voluntary e-Way Bill closure effective August 1, 2026. Here's what changed, who's affected, and how to stay compliant.",
-    date: "July 23, 2026",
-    readTime: "12 min read",
-    author: "LoadSaathi Team",
-  },
-  {
-    slug: "ai-freight-matching",
-    category: "Industry Insights",
-    title: "How AI is Transforming Freight Matching in India",
-    excerpt: "India's logistics industry loses ₹1.5 lakh crore annually to empty truck returns. AI-powered freight matching is changing that by predicting the perfect load for every truck in real time.",
-    date: "June 15, 2026",
-    readTime: "5 min read",
-    author: "LoadSaathi Team",
-  },
-  {
-    slug: "reduce-empty-kilometers",
-    category: "Trucker Tips",
-    title: "5 Ways to Reduce Empty Truck Kilometers",
-    excerpt: "Empty return trips eat into your profits more than you think. Here are five actionable strategies to keep your truck loaded in both directions.",
-    date: "June 10, 2026",
-    readTime: "4 min read",
-    author: "Rajesh Kumar",
-  },
-  {
-    slug: "freight-credit-score-guide",
-    category: "Product Updates",
-    title: "Understanding the Digital Freight Credit Score",
-    excerpt: "Your digital reputation matters. LoadSaathi's credit score system helps truckers and shippers build trust before the first handshake.",
-    date: "June 5, 2026",
-    readTime: "6 min read",
-    author: "Priya Sharma",
-  },
-  {
-    slug: "first-shipment-guide",
-    category: "Shipper Guide",
-    title: "The Complete Guide to Posting Your First Shipment",
-    excerpt: "New to digital freight? Here's everything you need to know about posting a shipment, setting the right price, and choosing the best trucker for your load.",
-    date: "May 28, 2026",
-    readTime: "7 min read",
-    author: "Amit Verma",
-  },
-  {
-    slug: "digital-load-boards-india",
-    category: "Industry Insights",
-    title: "Why Indian Truckers Are Switching to Digital Load Boards",
-    excerpt: "From broker-dependent to direct digital matching — how India's truckers are reclaiming margins and control over their routes.",
-    date: "May 20, 2026",
-    readTime: "5 min read",
-    author: "LoadSaathi Team",
-  },
-  {
-    slug: "real-time-tracking-launch",
-    category: "Product Updates",
-    title: "LoadSaathi Launches Real-Time GPS Tracking",
-    excerpt: "Know exactly where your shipment is at every moment. Our new GPS integration gives both shippers and truckers unprecedented visibility.",
-    date: "May 12, 2026",
-    readTime: "3 min read",
-    author: "Vikram Singh",
-  },
-  {
-    slug: "ai-price-prediction",
-    category: "Product Updates",
-    title: "How Our AI Price Predictions Work",
-    excerpt: "Pricing freight is complex. Our multi-provider AI chain analyzes route, weight, market conditions, and historical data to recommend fair rates every time.",
-    date: "May 5, 2026",
-    readTime: "6 min read",
-    author: "Priya Sharma",
-  },
-  {
-    slug: "broker-to-direct-shipper",
-    category: "Case Study",
-    title: "From Broker-Dependent to Direct: One Shipper's Journey",
-    excerpt: "How a Delhi-based manufacturer cut logistics costs by 28% in three months by switching to LoadSaathi's direct matching platform.",
-    date: "April 28, 2026",
-    readTime: "8 min read",
-    author: "Amit Verma",
-  },
-];
+const articles = getBlogListItems();
 
 const categoryColors: Record<string, string> = {
   "Industry Insights": "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/30",

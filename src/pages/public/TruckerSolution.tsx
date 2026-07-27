@@ -94,6 +94,7 @@ export default function TruckerSolution() {
         description="Join LoadSaathi to find return loads, reduce empty kilometers, get paid faster, and build your digital credit score. India's trucker-friendly freight platform."
         keywords="find truck loads India, return load for truck, trucker app, reduce empty kilometers, freight platform for truckers"
         canonical="/solutions/truckers"
+        breadcrumbs={[{ name: "For Truckers", url: "/solutions/truckers" }]}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
 

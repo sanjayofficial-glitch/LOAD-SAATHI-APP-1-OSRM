@@ -120,6 +120,7 @@ export default function FareCalculator() {
       description="Calculate estimated freight rates for PTL and LTL shipments across East India. AI-powered fare estimates for Rourkela, Ranchi, Burdwan, and more."
       keywords="freight fare calculator India, PTL LTL rate calculator, truck freight cost estimation, Rourkela Ranchi transport rate"
       canonical="/fare-calculator"
+      breadcrumbs={[{ name: "Fare Calculator", url: "/fare-calculator" }]}
     />
     <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background dark:from-orange-950/10 dark:to-background">
       {/* Hero */}
