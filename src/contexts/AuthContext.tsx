@@ -1,10 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useUser, useSession, useClerk } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { User } from '@/types';
 import { posthog } from '@/utils/posthog';
+import { showError } from '@/utils/toast';
 
 interface AuthContextType {
   user: ReturnType<typeof useUser>['user'];
@@ -26,6 +27,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const clerk = useClerk();
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const fetchRetryRef = useRef(0);
+  const fetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchProfile = useCallback(async () => {
     if (!user) {
@@ -38,6 +41,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const supabaseToken = await session?.getToken({ template: 'supabase' });
       if (!supabaseToken) {
         console.warn('[AuthContext] No Supabase token returned from Clerk');
+        // Retry once after a short delay — token may not be ready yet
+        if (fetchRetryRef.current < 1) {
+          fetchRetryRef.current += 1;
+          fetchTimeoutRef.current = setTimeout(() => fetchProfile(), 1500);
+          return null;
+        }
         setUserProfile(null);
         setLoading(false);
         return null;
@@ -52,10 +61,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) {
         console.error('[AuthContext] Error fetching profile:', error);
+        if (fetchRetryRef.current < 1) {
+          fetchRetryRef.current += 1;
+          fetchTimeoutRef.current = setTimeout(() => fetchProfile(), 1500);
+          return null;
+        }
+        showError('Failed to load your profile. Please refresh the page.');
         setUserProfile(null);
         setLoading(false);
         return null;
       }
+
+      fetchRetryRef.current = 0;
 
       if (data) {
         const profile: User = {
@@ -78,6 +95,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return null;
     } catch (err) {
       console.error('[AuthContext] Error:', err);
+      if (fetchRetryRef.current < 1) {
+        fetchRetryRef.current += 1;
+        fetchTimeoutRef.current = setTimeout(() => fetchProfile(), 1500);
+        return null;
+      }
+      showError('Something went wrong loading your account. Please refresh.');
       setUserProfile(null);
       setLoading(false);
       return null;
@@ -86,7 +109,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!clerkLoaded) return;
+    fetchRetryRef.current = 0;
     fetchProfile();
+    return () => {
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current);
+        fetchTimeoutRef.current = null;
+      }
+    };
   }, [clerkLoaded, fetchProfile]);
 
   useEffect(() => {

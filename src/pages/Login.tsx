@@ -27,6 +27,14 @@ const Login = () => {
             afterSignInUrl="/auth-sync"
             signUpFallbackRedirectUrl="/register"
           />
+          <div className="mt-4 text-center">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-semibold hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
         </div>
       </div>
     </div>

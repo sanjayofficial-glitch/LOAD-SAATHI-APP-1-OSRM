@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser, useSession } from '@clerk/clerk-react';
 import { Loader2, User, Truck, CheckCircle2 } from 'lucide-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
@@ -13,8 +13,11 @@ const ChooseRole = () => {
   const { session } = useSession();
   const { setProfile, userProfile } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const suggestedRole = searchParams.get('type');
 
   // Redirect if user already has a role
   useEffect(() => {
@@ -129,7 +132,9 @@ const ChooseRole = () => {
           <button
             onClick={() => handleRoleSelection('shipper')}
             disabled={loading}
-            className="group relative flex flex-col items-center text-center bg-white dark:bg-gray-900 hover:border-blue-500 dark:hover:border-blue-500 border-2 border-gray-100 dark:border-gray-800 transition-all p-8 rounded-2xl shadow-sm hover:shadow-xl disabled:opacity-50 hover:-translate-y-1 duration-300"
+            className={`group relative flex flex-col items-center text-center bg-white dark:bg-gray-900 hover:border-blue-500 dark:hover:border-blue-500 border-2 border-gray-100 dark:border-gray-800 transition-all p-8 rounded-2xl shadow-sm hover:shadow-xl disabled:opacity-50 hover:-translate-y-1 duration-300 ${
+              suggestedRole === 'shipper' ? 'ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/10' : ''
+            }`}
           >
             <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
               <User className="h-10 w-10 text-blue-600 dark:text-blue-400" />
@@ -146,7 +151,9 @@ const ChooseRole = () => {
           <button
             onClick={() => handleRoleSelection('trucker')}
             disabled={loading}
-            className="group relative flex flex-col items-center text-center bg-white dark:bg-gray-900 hover:border-orange-500 dark:hover:border-orange-500 border-2 border-gray-100 dark:border-gray-800 transition-all p-8 rounded-2xl shadow-sm hover:shadow-xl disabled:opacity-50 hover:-translate-y-1 duration-300"
+            className={`group relative flex flex-col items-center text-center bg-white dark:bg-gray-900 hover:border-orange-500 dark:hover:border-orange-500 border-2 border-gray-100 dark:border-gray-800 transition-all p-8 rounded-2xl shadow-sm hover:shadow-xl disabled:opacity-50 hover:-translate-y-1 duration-300 ${
+              suggestedRole === 'trucker' ? 'ring-2 ring-orange-500/50 shadow-lg shadow-orange-500/10' : ''
+            }`}
           >
             <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/50 dark:to-orange-800/50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
               <Truck className="h-10 w-10 text-orange-600 dark:text-orange-400" />

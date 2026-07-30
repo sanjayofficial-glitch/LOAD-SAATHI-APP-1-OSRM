@@ -1,9 +1,12 @@
 import { SignUp } from "@clerk/clerk-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import LogoMark from "@/components/LogoMark";
 
 const Register = () => {
+  const [searchParams] = useSearchParams();
+  const roleType = searchParams.get("type");
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4 py-4">
       <div className="flex justify-between items-center max-w-6xl mx-auto w-full mb-8">
@@ -24,7 +27,7 @@ const Register = () => {
             routing="path"
             path="/register"
             signInFallbackRedirectUrl="/login"
-            afterSignUpUrl="/choose-role"
+            afterSignUpUrl={roleType ? `/choose-role?type=${roleType}` : "/choose-role"}
           />
         </div>
       </div>

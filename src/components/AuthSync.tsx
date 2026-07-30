@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useUser, useSession } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
@@ -11,15 +11,23 @@ const AuthSync = () => {
   const { session } = useSession();
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
+  const syncedRef = useRef(false);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user) return;
+    if (!isLoaded || !isSignedIn || !user || syncedRef.current) return;
+    syncedRef.current = true;
+
+    const timeout = setTimeout(() => {
+      console.warn("[AuthSync] Timeout reached — redirecting to choose-role");
+      navigate("/choose-role");
+    }, 8000);
 
     const handleAuthSync = async () => {
       try {
         const supabaseToken = await session?.getToken({ template: "supabase" });
         if (!supabaseToken) {
           console.warn("[AuthSync] No Supabase token — user may not have role yet");
+          clearTimeout(timeout);
           navigate("/choose-role");
           return;
         }
@@ -31,6 +39,8 @@ const AuthSync = () => {
           .select("user_type")
           .eq("id", user.id)
           .maybeSingle();
+
+        clearTimeout(timeout);
 
         if (error) {
           console.error("[AuthSync] Error fetching user:", error);
@@ -49,6 +59,7 @@ const AuthSync = () => {
         else if (role === "admin") navigate("/admin/monitoring", { replace: true });
         else navigate("/choose-role", { replace: true });
       } catch (err) {
+        clearTimeout(timeout);
         console.error("[AuthSync] Error:", err);
         navigate("/choose-role", { replace: true });
       } finally {
@@ -57,7 +68,7 @@ const AuthSync = () => {
     };
 
     handleAuthSync();
-  }, [isLoaded, isSignedIn, user, session?.id, navigate]);
+  }, [isLoaded, isSignedIn, user, navigate]);
 
   if (checking) {
     return (

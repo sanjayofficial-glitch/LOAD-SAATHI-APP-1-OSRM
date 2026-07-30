@@ -2,7 +2,7 @@
 
 import { Component, ErrorInfo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, AlertTriangle } from "lucide-react";
+import { RefreshCw, AlertTriangle, Home } from "lucide-react";
 import { posthog } from "@/utils/posthog";
 
 type Props = {
@@ -55,9 +55,12 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-sm text-gray-400 dark:text-gray-400 mb-6 font-mono bg-gray-50 dark:bg-gray-800 p-2 rounded">
               {this.state.error?.message || "Unknown error"}
             </p>
-            <div className="flex gap-3 justify-center">
+            <div className="flex gap-3 justify-center flex-wrap">
               <Button variant="outline" onClick={this.handleRetry} className="gap-2">
                 <RefreshCw className="h-4 w-4" /> Try Again
+              </Button>
+              <Button variant="outline" onClick={() => window.location.href = '/'} className="gap-2 border-gray-300 dark:border-gray-600">
+                <Home className="h-4 w-4" /> Go Home
               </Button>
               <Button onClick={this.handleRefresh} className="bg-orange-600 hover:bg-orange-700 gap-2">
                 <RefreshCw className="h-4 w-4" /> Refresh Page
