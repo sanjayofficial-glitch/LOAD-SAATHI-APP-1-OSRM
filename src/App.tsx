@@ -95,7 +95,7 @@ function App() {
   return (
     <ErrorBoundary>
       <PostHogProvider>
-      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} allowedRedirectOrigins={['https://localhost']}>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
           <AuthProvider>
