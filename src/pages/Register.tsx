@@ -26,8 +26,8 @@ const Register = () => {
           <SignUp
             routing="path"
             path="/register"
-            signInFallbackRedirectUrl="/login"
-            afterSignUpUrl={roleType ? `/choose-role?type=${roleType}` : "/choose-role"}
+            signInFallbackRedirectUrl="https://loadsaathi.in/login"
+            afterSignUpUrl={roleType ? `https://loadsaathi.in/choose-role?type=${roleType}` : "https://loadsaathi.in/choose-role"}
           />
         </div>
       </div>

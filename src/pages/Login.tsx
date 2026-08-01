@@ -23,9 +23,9 @@ const Login = () => {
           <SignIn
             routing="path"
             path="/login"
-            fallbackRedirectUrl="/auth-sync"
-            afterSignInUrl="/auth-sync"
-            signUpFallbackRedirectUrl="/register"
+            fallbackRedirectUrl="https://loadsaathi.in/auth-sync"
+            afterSignInUrl="https://loadsaathi.in/auth-sync"
+            signUpFallbackRedirectUrl="https://loadsaathi.in/register"
           />
           <div className="mt-4 text-center">
             <Link
