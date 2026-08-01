@@ -521,5 +521,8 @@ export function parseDate(dateStr: string): string {
   };
   const parts = dateStr.split(" ");
   if (parts.length !== 3) return dateStr;
-  return `${parts[2]}-${months[parts[0]] || "01"}-${parts[1].replace(",", "").padStart(2, "0")}`;
+  const month = parts[0]!;
+  const day = parts[1]!;
+  const year = parts[2]!;
+  return `${year}-${months[month] || "01"}-${day.replace(",", "").padStart(2, "0")}`;
 }

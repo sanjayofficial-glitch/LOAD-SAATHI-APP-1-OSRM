@@ -14,7 +14,7 @@ interface SeoMetaProps {
   type?: string;
   publishedTime?: string;
   author?: string;
-  jsonLd?: Record<string, unknown>;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   breadcrumbs?: BreadcrumbItem[];
 }
 

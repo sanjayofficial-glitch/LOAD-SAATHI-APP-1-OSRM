@@ -1,4 +1,3 @@
-"use client";
 
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, Clock, Route, Truck } from "lucide-react";

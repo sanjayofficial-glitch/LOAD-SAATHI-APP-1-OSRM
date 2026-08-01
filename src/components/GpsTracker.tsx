@@ -57,7 +57,7 @@ export default function GpsTracker({
       if (now - lastPersistRef.current < 10000) return;
       lastPersistRef.current = now;
       try {
-        const token = await getToken();
+        const token = await getToken({ template: 'supabase' });
         if (!token) return;
         const supabase = createClerkSupabaseClient(token);
         const { error: upsertError } = await supabase

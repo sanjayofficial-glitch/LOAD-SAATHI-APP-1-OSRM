@@ -1,5 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
+/**
+ * Anonymous Supabase client (no auth header).
+ * Used ONLY for Realtime subscriptions which use RLS policies
+ * to filter events — no auth header needed.
+ * For data mutations, use createClerkSupabaseClient from @/utils/supabaseClient.
+ */
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 

@@ -3,7 +3,29 @@ import ReactDOM from "react-dom/client";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import "./globals.css";
-import "leaflet/dist/leaflet.css";
+
+// Validate environment variables at startup
+import "./config/env";
+
+// Preconnect to frequently-used API origins so their TLS + DNS work
+// starts early (maps, geocoding, Supabase). Maps import leaflet CSS
+// locally, so it's no longer loaded globally for every page.
+function addPreconnect(href: string, crossOrigin = true) {
+  const link = document.createElement("link");
+  link.rel = "preconnect";
+  link.href = href;
+  if (crossOrigin) link.crossOrigin = "anonymous";
+  document.head.appendChild(link);
+}
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+if (supabaseUrl) {
+  try {
+    addPreconnect(new URL(supabaseUrl).origin);
+  } catch {
+    // ignore malformed env value
+  }
+}
 
 async function mountApp() {
   try {

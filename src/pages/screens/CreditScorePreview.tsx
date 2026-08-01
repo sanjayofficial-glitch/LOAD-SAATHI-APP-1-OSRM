@@ -1,4 +1,3 @@
-"use client";
 
 import { Shield, Star, TrendingUp, Award, Brain, Clock, MessageSquare } from 'lucide-react';
 import SeoMeta from "@/components/SeoMeta";

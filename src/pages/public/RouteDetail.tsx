@@ -1,4 +1,3 @@
-"use client";
 
 import { useParams, Link } from "react-router-dom";
 import { ArrowRight, MapPin, Clock, Route, Truck, Package, Search, Shield, TrendingUp, CheckCircle, BookOpen } from "lucide-react";

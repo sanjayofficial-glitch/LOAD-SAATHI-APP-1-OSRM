@@ -1,7 +1,6 @@
-"use client";
 
 import { Link, useParams } from "react-router-dom";
-import { Calendar, Clock, User, ArrowLeft, Share2, BookOpen, FileText, Shield, TrendingUp, CheckCircle, MapPin } from "lucide-react";
+import { Calendar, Clock, User, ArrowLeft, ArrowRight, Share2, BookOpen, FileText, Shield, TrendingUp, CheckCircle, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import SeoMeta from "@/components/SeoMeta";

@@ -14,7 +14,6 @@ if (POSTHOG_API_KEY && POSTHOG_HOST) {
     persistence: 'localStorage+cookie',
     loaded: (ph) => {
       ph.loadToolbar({
-        action: 'ph_authorize',
         token: POSTHOG_API_KEY,
         toolbarVersion: 'toolbar',
         instrument: true,

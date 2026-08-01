@@ -21,6 +21,7 @@
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#ea580c" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -31,6 +32,10 @@
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     <link rel="preconnect" href="https://cdn.cookiehub.eu" crossorigin />
     <link rel="preconnect" href="https://clerk.loadsaathi.in" crossorigin />
+    <link rel="preconnect" href="https://router.project-osrm.org" crossorigin />
+    <link rel="preconnect" href="https://nominatim.openstreetmap.org" crossorigin />
+    <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin />
+    <link rel="dns-prefetch" href="https://unpkg.com" />
 
     <!-- Primary SEO -->
     <title>LoadSaathi — Shared Freight Marketplace | PTL/LTL East India</title>
@@ -94,7 +99,9 @@
     <script>
       window.addEventListener('error', function(e) {
         var root = document.getElementById('root');
-        if (root && root.children.length === 0) {
+        // Show the fallback error UI only when the boot loader is still visible
+        // (i.e. React never mounted successfully).
+        if (root && document.getElementById('boot-loader')) {
           root.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f9fafb;padding:24px;font-family:system-ui,sans-serif;"><div style="max-width:480px;background:white;padding:32px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.12);text-align:center;"><div style="font-size:48px;margin-bottom:16px;">⚠️</div><h1 style="font-size:20px;font-weight:700;color:#dc2626;margin:0 0 8px;">Failed to Load App</h1><p style="color:#6b7280;font-size:14px;margin:0 0 16px;line-height:1.5;">' + (e.message || 'Unknown error') + '</p><button onclick="location.reload()" style="background:#ea580c;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Reload Page</button></div></div>';
         }
       });
@@ -106,14 +113,22 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <noscript><h1>LoadSaathi — Shared Freight Marketplace for PTL/LTL East India</h1></noscript>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Inline boot loader: visible instantly, replaced by React on mount -->
+      <div id="boot-loader" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fafafa;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;">
+        <div style="text-align:center;">
+          <div style="width:44px;height:44px;border:4px solid rgba(234,88,12,0.15);border-top-color:#ea580c;border-radius:50%;animation:ls-spin 0.7s linear infinite;margin:0 auto 14px;"></div>
+          <div style="color:#78716c;font-size:13px;font-weight:600;letter-spacing:0.4px;">Loading LoadSaathi…</div>
+        </div>
+      </div>
+      <style>
+        @keyframes ls-spin { to { transform: rotate(360deg); } }
+        @media (prefers-color-scheme: dark) {
+          #boot-loader { background: #0c0a09; }
+          #boot-loader div:last-child { color: #a8a29e; }
+        }
+      </style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
-        });
-      }
-    </script>
   </body>
 </html>

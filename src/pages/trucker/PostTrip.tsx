@@ -1,4 +1,3 @@
-"use client";
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -79,7 +78,6 @@ const PostTrip = () => {
       const supabaseToken = await getToken({ template: 'supabase' });
       if (!supabaseToken) throw new Error('No Supabase token');
 
-      console.log('[PostTrip] Token obtained, inserting trip...');
       const supabaseClient = createClerkSupabaseClient(supabaseToken);
       const insertPayload = {
         ...formData,
@@ -88,15 +86,13 @@ const PostTrip = () => {
         price_per_tonne: price,
         status: 'active'
       };
-      console.log('[PostTrip] Payload:', JSON.stringify(insertPayload, null, 2));
 
       const { data: tripData, error } = await supabaseClient.from('trips').insert(insertPayload).select('id').single();
 
       if (error) {
-        console.error('[PostTrip] Supabase error:', JSON.stringify(error, null, 2));
+        console.error('[PostTrip] Supabase error:', error.message);
         throw error;
       }
-      console.log('[PostTrip] Trip created:', tripData);
 
       // Save price history — fire-and-forget, non-blocking
       if (tripData?.id) {

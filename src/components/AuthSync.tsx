@@ -1,4 +1,3 @@
-"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useUser, useSession } from "@clerk/clerk-react";

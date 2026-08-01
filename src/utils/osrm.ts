@@ -111,22 +111,28 @@ export async function optimizeRoute(
   if (waypoints.length < 2) return null;
 
   const start = waypoints[0];
+  if (!start) return null;
   const remaining = waypoints.slice(1);
   const ordered: Waypoint[] = [start];
   const pool = [...remaining];
 
   while (pool.length > 0) {
     const last = ordered[ordered.length - 1];
+    if (!last) return null;
     let bestIdx = 0;
     let bestDist = Infinity;
     for (let i = 0; i < pool.length; i++) {
-      const d = haversineDistance(last, pool[i]);
+      const wp = pool[i];
+      if (!wp) continue;
+      const d = haversineDistance(last, wp);
       if (d < bestDist) {
         bestDist = d;
         bestIdx = i;
       }
     }
-    ordered.push(pool[bestIdx]);
+    const best = pool[bestIdx];
+    if (!best) return null;
+    ordered.push(best);
     pool.splice(bestIdx, 1);
   }
 
@@ -137,6 +143,7 @@ export async function optimizeRoute(
   for (let i = 0; i < ordered.length - 1; i++) {
     const from = ordered[i];
     const to = ordered[i + 1];
+    if (!from || !to) return null;
     const segment = await getRoute(from.lng, from.lat, to.lng, to.lat);
     if (!segment) return null;
     segments.push(segment);

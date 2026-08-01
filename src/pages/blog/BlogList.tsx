@@ -1,4 +1,3 @@
-"use client";
 
 import { Link } from "react-router-dom";
 import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";

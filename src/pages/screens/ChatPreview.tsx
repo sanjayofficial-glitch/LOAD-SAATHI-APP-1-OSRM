@@ -1,4 +1,3 @@
-"use client";
 
 import { useState } from 'react';
 import { MessageSquare, Send, Check, Clock, Phone, MoreVertical, Search } from 'lucide-react';

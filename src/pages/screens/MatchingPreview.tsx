@@ -1,4 +1,3 @@
-"use client";
 
 import { useState } from 'react';
 import { Search, MapPin, Truck, Package, Star, Brain, ChevronDown, SlidersHorizontal } from 'lucide-react';

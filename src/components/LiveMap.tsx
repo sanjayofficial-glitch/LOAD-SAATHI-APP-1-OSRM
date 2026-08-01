@@ -34,7 +34,9 @@ function FitBounds({ trucks }: { trucks: TruckLocation[] }) {
   useEffect(() => {
     if (trucks.length === 0) return;
     if (trucks.length === 1) {
-      map.setView([trucks[0].lat, trucks[0].lng], 12);
+      const truck = trucks[0];
+      if (!truck) return;
+      map.setView([truck.lat, truck.lng], 12);
       return;
     }
     const coords: [number, number][] = trucks.map((t) => [t.lat, t.lng]);

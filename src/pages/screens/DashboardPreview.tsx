@@ -1,4 +1,3 @@
-"use client";
 
 import SeoMeta from "@/components/SeoMeta";
 import {

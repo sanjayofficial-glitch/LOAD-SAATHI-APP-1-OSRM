@@ -1,5 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
+/**
+ * Clerk-authenticated Supabase client factory.
+ * Used for ALL data mutations (inserts, updates, deletes) that require
+ * user authorization via Clerk JWT. The token is passed as the
+ * Authorization header so Supabase RLS policies can verify the user.
+ *
+ * For Realtime subscriptions (read-only), use the anonymous client
+ * from @/integrations/supabase/client instead.
+ */
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 

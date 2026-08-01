@@ -1,4 +1,3 @@
-"use client";
 
 import { useState } from 'react';
 import { Star, ThumbsUp, MessageSquare, User, Clock, Filter, ChevronDown } from 'lucide-react';

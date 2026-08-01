@@ -110,6 +110,8 @@ const Index = () => {
         });
 
         if (!THREE) return;
+        // Component may have unmounted while the CDN script was loading
+        if (!container.isConnected) return;
 
         const width = container.clientWidth || 800;
         const height = container.clientHeight || 500;
@@ -247,9 +249,24 @@ const Index = () => {
       }
     };
 
-    init();
+    // Defer the heavy Three.js CDN download + WebGL init until the browser is
+    // idle so it never competes with first paint / LCP on the landing page.
+    const scheduleGlobeInit = () => {
+      if ('requestIdleCallback' in window) {
+        return window.requestIdleCallback(() => { init(); }, { timeout: 2500 });
+      }
+      return setTimeout(() => { init(); }, 500);
+    };
+    const globeIdleHandle = scheduleGlobeInit();
 
     return () => {
+      if (typeof globeIdleHandle === 'number') {
+        if ('cancelIdleCallback' in window) {
+          window.cancelIdleCallback(globeIdleHandle);
+        } else {
+          clearTimeout(globeIdleHandle);
+        }
+      }
       if (animationId) cancelAnimationFrame(animationId);
       if (globeObserverRef.current) globeObserverRef.current.disconnect();
       cleanupFnsRef.current.forEach(fn => fn());

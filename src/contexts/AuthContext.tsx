@@ -1,10 +1,8 @@
-"use client";
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useUser, useSession, useClerk } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { User } from '@/types';
-import { posthog } from '@/utils/posthog';
 import { showError } from '@/utils/toast';
 
 interface AuthContextType {
@@ -122,11 +120,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!user?.id) return;
 
-    posthog.identify(user.id, {
-      email: user.primaryEmailAddress?.emailAddress,
-      name: user.fullName,
-      role: userProfile?.user_type || undefined,
-    });
+    // posthog is lazy-loaded to keep it off the critical bundle
+    let cancelled = false;
+    import('@/utils/posthog')
+      .then(({ posthog }) => {
+        if (cancelled) return;
+        posthog.identify(user.id, {
+          email: user.primaryEmailAddress?.emailAddress,
+          name: user.fullName,
+          role: userProfile?.user_type || undefined,
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [user?.id, user?.primaryEmailAddress?.emailAddress, user?.fullName, userProfile?.user_type]);
 
   const refreshProfile = useCallback(async () => {
@@ -141,7 +149,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = useCallback(async () => {
     await clerk.signOut();
-    posthog.reset();
+    import('@/utils/posthog')
+      .then(({ posthog }) => posthog.reset())
+      .catch(() => {});
     setUserProfile(null);
   }, [clerk]);
 

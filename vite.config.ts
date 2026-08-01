@@ -40,6 +40,12 @@ export default defineConfig(() => ({
           // Supabase client
           "vendor-supabase": ["@supabase/supabase-js"],
 
+          // Leaflet maps — only loads on map-heavy pages (trip/shipment detail)
+          "vendor-leaflet": ["leaflet", "react-leaflet"],
+
+          // Recharts — only loads on dashboard / chart pages
+          "vendor-recharts": ["recharts"],
+
           // TanStack Query (data fetching)
           "vendor-query": ["@tanstack/react-query"],
 
