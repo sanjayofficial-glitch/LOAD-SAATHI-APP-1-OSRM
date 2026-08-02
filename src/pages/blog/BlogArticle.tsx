@@ -56,31 +56,44 @@ export default function BlogArticle() {
 
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.summary.substring(0, 160),
-    author: {
-      "@type": "Person",
-      name: article.author,
-      description: article.authorBio,
-    },
-    datePublished: isoDate,
-    dateModified: isoLastUpdated,
-    publisher: {
-      "@type": "Organization",
-      name: "LoadSaathi",
-      url: "https://loadsaathi.in",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://loadsaathi.in/logo.png",
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: article.title,
+        description: article.summary.substring(0, 160),
+        author: {
+          "@type": "Person",
+          name: article.author,
+          description: article.authorBio,
+        },
+        datePublished: isoDate,
+        dateModified: isoLastUpdated,
+        publisher: {
+          "@type": "Organization",
+          name: "LoadSaathi",
+          url: "https://loadsaathi.in",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://loadsaathi.in/logo.png",
+          },
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `https://loadsaathi.in/blog/${slug}`,
+        },
+        articleSection: article.category,
+        wordCount: article.content.join(" ").split(/\s+/).length,
+        image: "https://loadsaathi.in/og-image.png",
       },
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `https://loadsaathi.in/blog/${slug}`,
-    },
-    articleSection: article.category,
-    wordCount: article.content.join(" ").split(/\s+/).length,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://loadsaathi.in" },
+          { "@type": "ListItem", position: 2, name: "Blog", item: "https://loadsaathi.in/blog" },
+          { "@type": "ListItem", position: 3, name: article.title, item: `https://loadsaathi.in/blog/${slug}` },
+        ],
+      },
+    ],
   };
 
   const faqSchema = slug === "indian-logistics-eway-bill-gst-2026" ? {
@@ -149,6 +162,7 @@ export default function BlogArticle() {
       author={article.author}
       jsonLd={faqSchema ? [articleSchema, faqSchema] : articleSchema}
       breadcrumbs={[
+        { name: "Home", url: "/" },
         { name: "Blog", url: "/blog" },
         { name: article.title, url: `/blog/${slug}` },
       ]}
@@ -182,6 +196,17 @@ export default function BlogArticle() {
           </div>
         </div>
       </div>
+
+      {article.coverImage && (
+        <div className="max-w-[800px] mx-auto px-6 sm:px-12 -mt-4 mb-8">
+          <img
+            src={article.coverImage}
+            alt={article.title}
+            className="w-full h-64 sm:h-80 object-cover rounded-xl border border-border"
+            loading="eager"
+          />
+        </div>
+      )}
 
       <div className="max-w-[800px] mx-auto px-6 sm:px-12 pb-24">
         <div className="glass-card p-6 rounded-xl border border-orange-500/20 dark:border-orange-500/10 mb-10">

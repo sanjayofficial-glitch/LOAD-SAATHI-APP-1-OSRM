@@ -22,6 +22,10 @@ export default function BlogList() {
       description="Insights, guides, and stories from India's intelligent freight network. Learn about AI freight matching, reducing empty kilometers, digital load boards, and more."
       keywords="freight blog India, logistics insights, trucking tips India, PTL LTL blog, digital freight marketplace, load board India"
       canonical="/blog"
+      breadcrumbs={[
+        { name: "Home", url: "/" },
+        { name: "Blog", url: "/blog" },
+      ]}
     />
     <div className="min-h-screen bg-background dark:bg-[#050816]">
       <div className="relative overflow-hidden">
@@ -51,10 +55,21 @@ export default function BlogList() {
               className="glass-card rounded-xl border border-border hover:border-orange-500/30 transition-all duration-300 group overflow-hidden"
             >
               <div className="h-48 bg-gradient-to-br from-orange-500/10 via-blue-500/5 to-transparent dark:from-orange-900/20 dark:via-blue-900/10 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-grid-pattern opacity-20" />
-                <div className="text-6xl opacity-20 group-hover:scale-110 transition-transform duration-500">
-                  📦
-                </div>
+                {article.coverImage ? (
+                  <img
+                    src={article.coverImage}
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                ) : (
+                  <>
+                    <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+                    <div className="text-6xl opacity-20 group-hover:scale-110 transition-transform duration-500">
+                      📦
+                    </div>
+                  </>
+                )}
               </div>
               <div className="p-6">
                 <span className={`text-xs font-semibold px-2 py-1 rounded-full border ${categoryColors[article.category] || ""}`}>

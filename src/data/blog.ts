@@ -9,12 +9,14 @@ export interface BlogArticle {
   summary: string;
   content: string[];
   relatedRoutes?: string[];
+  coverImage?: string;
 }
 
 export const articles: Record<string, BlogArticle> = {
   "ai-freight-matching": {
     category: "Industry Insights",
     title: "How AI is Transforming Freight Matching in India",
+    coverImage: "/blog/og/ai-freight-matching.svg",
     date: "June 15, 2026",
     lastUpdated: "July 10, 2026",
     readTime: "5 min read",
@@ -31,6 +33,7 @@ export const articles: Record<string, BlogArticle> = {
   "reduce-empty-kilometers": {
     category: "Trucker Tips",
     title: "5 Ways to Reduce Empty Truck Kilometers",
+    coverImage: "/blog/og/reduce-empty-kilometers.svg",
     date: "June 10, 2026",
     lastUpdated: "July 5, 2026",
     readTime: "4 min read",
@@ -49,6 +52,7 @@ export const articles: Record<string, BlogArticle> = {
   "freight-credit-score-guide": {
     category: "Product Updates",
     title: "Understanding the Digital Freight Credit Score",
+    coverImage: "/blog/og/freight-credit-score-guide.svg",
     date: "June 5, 2026",
     lastUpdated: "July 8, 2026",
     readTime: "6 min read",
@@ -66,6 +70,7 @@ export const articles: Record<string, BlogArticle> = {
   "first-shipment-guide": {
     category: "Shipper Guide",
     title: "The Complete Guide to Posting Your First Shipment",
+    coverImage: "/blog/og/first-shipment-guide.svg",
     date: "May 28, 2026",
     lastUpdated: "July 12, 2026",
     readTime: "7 min read",
@@ -83,6 +88,7 @@ export const articles: Record<string, BlogArticle> = {
   "digital-load-boards-india": {
     category: "Industry Insights",
     title: "Why Indian Truckers Are Switching to Digital Load Boards",
+    coverImage: "/blog/og/digital-load-boards-india.svg",
     date: "May 20, 2026",
     lastUpdated: "June 30, 2026",
     readTime: "5 min read",
@@ -100,6 +106,7 @@ export const articles: Record<string, BlogArticle> = {
   "real-time-tracking-launch": {
     category: "Product Updates",
     title: "LoadSaathi Launches Real-Time GPS Tracking",
+    coverImage: "/blog/og/real-time-tracking-launch.svg",
     date: "May 12, 2026",
     lastUpdated: "June 20, 2026",
     readTime: "3 min read",
@@ -116,6 +123,7 @@ export const articles: Record<string, BlogArticle> = {
   "ai-price-prediction": {
     category: "Product Updates",
     title: "How Our AI Price Predictions Work",
+    coverImage: "/blog/og/ai-price-prediction.svg",
     date: "May 5, 2026",
     lastUpdated: "July 1, 2026",
     readTime: "6 min read",
@@ -132,6 +140,7 @@ export const articles: Record<string, BlogArticle> = {
   "indian-logistics-eway-bill-gst-2026": {
     category: "Industry Insights",
     title: "e-Way Bill Rules 2026: New GST Compliance Changes Every Indian Business Must Know",
+    coverImage: "/blog/og/indian-logistics-eway-bill-gst-2026.svg",
     date: "July 23, 2026",
     lastUpdated: "July 23, 2026",
     readTime: "12 min read",
@@ -154,6 +163,7 @@ export const articles: Record<string, BlogArticle> = {
   "broker-to-direct-shipper": {
     category: "Case Study",
     title: "From Broker-Dependent to Direct: One Shipper's Journey",
+    coverImage: "/blog/og/broker-to-direct-shipper.svg",
     date: "April 28, 2026",
     lastUpdated: "June 15, 2026",
     readTime: "8 min read",
@@ -173,6 +183,7 @@ export const articles: Record<string, BlogArticle> = {
   "rourkela-to-ranchi-trucking-rates": {
     category: "Shipper Guide",
     title: "Trucking Rates from Rourkela to Ranchi: Complete Pricing Guide 2026",
+    coverImage: "/blog/og/rourkela-to-ranchi-trucking-rates.svg",
     date: "July 25, 2026",
     readTime: "5 min read",
     author: "Amit Verma",
@@ -189,6 +200,7 @@ export const articles: Record<string, BlogArticle> = {
   "jamshedpur-to-kolkata-freight-rates": {
     category: "Shipper Guide",
     title: "Jamshedpur to Kolkata Freight Rates: What to Expect in 2026",
+    coverImage: "/blog/og/jamshedpur-to-kolkata-freight-rates.svg",
     date: "July 22, 2026",
     readTime: "4 min read",
     author: "Rajesh Kumar",
@@ -205,6 +217,7 @@ export const articles: Record<string, BlogArticle> = {
   "ptl-vs-ftl-difference": {
     category: "Shipper Guide",
     title: "PTL vs FTL: Which Freight Option Is Right for Your Business?",
+    coverImage: "/blog/og/ptl-vs-ftl-difference.svg",
     date: "July 20, 2026",
     readTime: "6 min read",
     author: "LoadSaathi Team",
@@ -220,6 +233,7 @@ export const articles: Record<string, BlogArticle> = {
   "how-to-ship-steel-india": {
     category: "Shipper Guide",
     title: "How to Ship Steel in India: A Complete Guide for Manufacturers",
+    coverImage: "/blog/og/how-to-ship-steel-india.svg",
     date: "July 18, 2026",
     readTime: "7 min read",
     author: "Rajesh Kumar",
@@ -236,6 +250,7 @@ export const articles: Record<string, BlogArticle> = {
   "how-to-ship-textiles-india": {
     category: "Shipper Guide",
     title: "Textile Shipping Guide: Transporting Fabrics and Garments Safely",
+    coverImage: "/blog/og/how-to-ship-textiles-india.svg",
     date: "July 15, 2026",
     readTime: "5 min read",
     author: "Priya Sharma",
@@ -252,6 +267,7 @@ export const articles: Record<string, BlogArticle> = {
   "seafood-transport-odisha": {
     category: "Trucker Tips",
     title: "Cold Chain Transport: Shipping Seafood from Odisha Ports",
+    coverImage: "/blog/og/seafood-transport-odisha.svg",
     date: "July 12, 2026",
     readTime: "5 min read",
     author: "Rajesh Kumar",
@@ -268,6 +284,7 @@ export const articles: Record<string, BlogArticle> = {
   "coal-transport-jharkhand": {
     category: "Industry Insights",
     title: "Coal Transport in Jharkhand: Logistics for the Energy Sector",
+    coverImage: "/blog/og/coal-transport-jharkhand.svg",
     date: "July 10, 2026",
     readTime: "5 min read",
     author: "LoadSaathi Team",
@@ -284,6 +301,7 @@ export const articles: Record<string, BlogArticle> = {
   "shipping-agricultural-products-india": {
     category: "Trucker Tips",
     title: "Shipping Agricultural Products: A Guide for Farmers and Traders",
+    coverImage: "/blog/og/shipping-agricultural-products-india.svg",
     date: "July 8, 2026",
     readTime: "6 min read",
     author: "Amit Verma",
@@ -300,6 +318,7 @@ export const articles: Record<string, BlogArticle> = {
   "monsoon-logistics-tips": {
     category: "Trucker Tips",
     title: "Monsoon Logistics: Shipping During India's Rainy Season",
+    coverImage: "/blog/og/monsoon-logistics-tips.svg",
     date: "July 5, 2026",
     readTime: "5 min read",
     author: "Rajesh Kumar",
@@ -316,6 +335,7 @@ export const articles: Record<string, BlogArticle> = {
   "gst-for-transporters-complete-guide": {
     category: "Industry Insights",
     title: "GST for Transporters: Complete Compliance Guide 2026",
+    coverImage: "/blog/og/gst-for-transporters-complete-guide.svg",
     date: "July 3, 2026",
     readTime: "8 min read",
     author: "LoadSaathi Team",
@@ -332,6 +352,7 @@ export const articles: Record<string, BlogArticle> = {
   "how-to-become-truck-owner-india": {
     category: "Trucker Tips",
     title: "How to Become a Truck Owner in India: 2026 Guide",
+    coverImage: "/blog/og/how-to-become-truck-owner-india.svg",
     date: "July 1, 2026",
     readTime: "8 min read",
     author: "Rajesh Kumar",
@@ -348,6 +369,7 @@ export const articles: Record<string, BlogArticle> = {
   "digital-payments-for-truckers": {
     category: "Product Updates",
     title: "Digital Payments for Truckers: How LoadSaathi Ensures Fast Settlement",
+    coverImage: "/blog/og/digital-payments-for-truckers.svg",
     date: "June 28, 2026",
     readTime: "4 min read",
     author: "Priya Sharma",
@@ -363,6 +385,7 @@ export const articles: Record<string, BlogArticle> = {
   "rourkela-logistics-guide": {
     category: "Industry Insights",
     title: "Rourkela Logistics and Transportation: Complete Guide 2026",
+    coverImage: "/blog/og/rourkela-logistics-guide.svg",
     date: "June 25, 2026",
     readTime: "6 min read",
     author: "Amit Verma",
@@ -379,6 +402,7 @@ export const articles: Record<string, BlogArticle> = {
   "ranchi-logistics-guide": {
     category: "Industry Insights",
     title: "Ranchi Logistics and Transportation: Complete Guide 2026",
+    coverImage: "/blog/og/ranchi-logistics-guide.svg",
     date: "June 22, 2026",
     readTime: "5 min read",
     author: "LoadSaathi Team",
@@ -395,6 +419,7 @@ export const articles: Record<string, BlogArticle> = {
   "bhubaneswar-logistics-guide": {
     category: "Industry Insights",
     title: "Bhubaneswar Logistics and Transportation: Complete Guide 2026",
+    coverImage: "/blog/og/bhubaneswar-logistics-guide.svg",
     date: "June 20, 2026",
     readTime: "5 min read",
     author: "Amit Verma",
@@ -411,6 +436,7 @@ export const articles: Record<string, BlogArticle> = {
   "kolkata-logistics-guide": {
     category: "Industry Insights",
     title: "Kolkata Logistics and Transportation: Complete Guide 2026",
+    coverImage: "/blog/og/kolkata-logistics-guide.svg",
     date: "June 18, 2026",
     readTime: "6 min read",
     author: "Rajesh Kumar",
@@ -427,6 +453,7 @@ export const articles: Record<string, BlogArticle> = {
   "jamshedpur-industrial-logistics": {
     category: "Industry Insights",
     title: "Jamshedpur Industrial Logistics: Shipping Steel and Heavy Machinery",
+    coverImage: "/blog/og/jamshedpur-industrial-logistics.svg",
     date: "June 15, 2026",
     readTime: "5 min read",
     author: "Rajesh Kumar",
@@ -443,6 +470,7 @@ export const articles: Record<string, BlogArticle> = {
   "east-india-freight-corridors": {
     category: "Industry Insights",
     title: "Top 10 Freight Corridors in East India for 2026",
+    coverImage: "/blog/og/east-india-freight-corridors.svg",
     date: "June 12, 2026",
     readTime: "7 min read",
     author: "LoadSaathi Team",
@@ -459,6 +487,7 @@ export const articles: Record<string, BlogArticle> = {
   "shipper-tips-lower-freight-cost": {
     category: "Shipper Guide",
     title: "10 Proven Tips to Lower Your Freight Costs in India",
+    coverImage: "/blog/og/shipper-tips-lower-freight-cost.svg",
     date: "June 8, 2026",
     readTime: "6 min read",
     author: "Amit Verma",
@@ -474,6 +503,7 @@ export const articles: Record<string, BlogArticle> = {
   "how-load-saathi-matching-works": {
     category: "Product Updates",
     title: "How LoadSaathi AI Matching Works Under the Hood",
+    coverImage: "/blog/og/how-load-saathi-matching-works.svg",
     date: "June 1, 2026",
     readTime: "5 min read",
     author: "Vikram Singh",
@@ -496,6 +526,7 @@ export interface BlogListItem {
   date: string;
   readTime: string;
   author: string;
+  coverImage?: string;
 }
 
 export function getBlogListItems(): BlogListItem[] {
@@ -509,6 +540,7 @@ export function getBlogListItems(): BlogListItem[] {
       date: article.date,
       readTime: article.readTime,
       author: article.author,
+      coverImage: article.coverImage,
     });
   }
   return items;

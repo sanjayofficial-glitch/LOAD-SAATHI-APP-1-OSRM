@@ -34,6 +34,15 @@ LoadSaathi is India's AI-powered shared freight marketplace connecting shippers 
 - [For Truckers](https://loadsaathi.in/solutions/truckers)
 - [About](https://loadsaathi.in/about)
 - [Contact](https://loadsaathi.in/contact)
+- [All Freight Routes](https://loadsaathi.in/routes)
+- [Location: Rourkela](https://loadsaathi.in/location/rourkela)
+- [Location: Ranchi](https://loadsaathi.in/location/ranchi)
+- [Location: Kolkata](https://loadsaathi.in/location/kolkata)
+- [Location: Bhubaneswar](https://loadsaathi.in/location/bhubaneswar)
+- [Location: Jamshedpur](https://loadsaathi.in/location/jamshedpur)
+- [Guide: PTL vs FTL](https://loadsaathi.in/guide/ptl-vs-ftl)
+- [Guide: Freight Rates East India](https://loadsaathi.in/guide/freight-rates-east-india)
+- [Guide: Shipping Steel](https://loadsaathi.in/guide/shipping-steel)
 
 ## Contact
 

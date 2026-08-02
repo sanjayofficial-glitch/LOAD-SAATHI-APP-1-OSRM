@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, MessageSquare, Clock, MapPin, Send, ArrowRight, Truck } from "lucide-react";
+import { Mail, MessageSquare, Clock, MapPin, Send, ArrowRight, Truck, Phone, Linkedin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +11,7 @@ const supportInfo = [
   { icon: Mail, label: "Email Us", value: "support@loadsaathi.com", detail: "We respond within 2-4 hours" },
   { icon: MessageSquare, label: "Live Chat", value: "Available 24/7", detail: "Instant responses from our support team" },
   { icon: Clock, label: "Response Time", value: "Under 4 hours", detail: "Average first response time" },
-  { icon: MapPin, label: "Office", value: "Bengaluru, India", detail: "Remote-first team across India" },
+  { icon: MapPin, label: "Office", value: "Foundation for Technology and Business Incubation (FTBI)", detail: "First Floor, T1-109, NIT Rourkela, Sector 1, Rourkela, Odisha 769008" },
 ];
 
 const Contact = () => {
@@ -192,6 +192,67 @@ const Contact = () => {
                 <a href="mailto:enterprise@loadsaathi.com" className="text-sm text-orange-500 hover:text-orange-400 font-semibold underline underline-offset-2">
                   enterprise@loadsaathi.com
                 </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Leadership Team */}
+          <div className="mt-20">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">Leadership Team</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Meet the people building India&apos;s smart freight network.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              {/* CEO */}
+              <div className="glass-card p-8 rounded-xl border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300 group">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                    <span className="text-2xl font-black text-orange-600 dark:text-orange-400">SS</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground">Sanjaya Sahu</h3>
+                    <p className="text-sm text-muted-foreground">Founder & CEO</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                  Building LoadSaathi to bridge the gap between shippers and truckers with technology, not intermediaries.
+                </p>
+                <div className="space-y-3">
+                  <a href="tel:+918328998031" className="flex items-center gap-3 text-sm text-foreground hover:text-orange-500 transition-colors group/link">
+                    <Phone className="h-4 w-4 text-orange-500 shrink-0" />
+                    <span>+91 83289 98031</span>
+                  </a>
+                  <a href="https://www.linkedin.com/in/sanjaya-sahu-253315305/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-foreground hover:text-orange-500 transition-colors group/link">
+                    <Linkedin className="h-4 w-4 text-orange-500 shrink-0" />
+                    <span>LinkedIn Profile</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* COO */}
+              <div className="glass-card p-8 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all duration-300 group">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <span className="text-2xl font-black text-blue-600 dark:text-blue-400">PM</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground">Prince Mallik</h3>
+                    <p className="text-sm text-muted-foreground">Co-Founder & COO</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                  Driving operations and growth to ensure LoadSaathi delivers seamless freight experiences across East India.
+                </p>
+                <div className="space-y-3">
+                  <a href="tel:+917684843985" className="flex items-center gap-3 text-sm text-foreground hover:text-blue-500 transition-colors group/link">
+                    <Phone className="h-4 w-4 text-blue-500 shrink-0" />
+                    <span>+91 76848 43985</span>
+                  </a>
+                  <a href="https://www.linkedin.com/in/prince-mallik-177a472a0/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-foreground hover:text-blue-500 transition-colors group/link">
+                    <Linkedin className="h-4 w-4 text-blue-500 shrink-0" />
+                    <span>LinkedIn Profile</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>

@@ -66,15 +66,172 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "LoadSaathi",
-      "url": "https://loadsaathi.in",
-      "description": "India's AI-powered shared freight marketplace for PTL/LTL loads on East India industrial corridors",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://loadsaathi.in/search?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://loadsaathi.in/#organization",
+          "name": "LoadSaathi",
+          "url": "https://loadsaathi.in",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://loadsaathi.in/logo.png",
+            "width": 512,
+            "height": 512
+          },
+          "description": "India's AI-powered shared freight marketplace for PTL and LTL loads across East India industrial corridors.",
+          "foundingDate": "2025",
+          "founder": {
+            "@type": "Person",
+            "name": "Sanjaya Sahu",
+            "url": "https://www.linkedin.com/in/sanjaya-sahu-253315305/"
+          },
+          "employee": [
+            {
+              "@type": "Person",
+              "name": "Sanjaya Sahu",
+              "jobTitle": "Founder & CEO",
+              "telephone": "+91-83289-98031",
+              "sameAs": "https://www.linkedin.com/in/sanjaya-sahu-253315305/"
+            },
+            {
+              "@type": "Person",
+              "name": "Prince Mallik",
+              "jobTitle": "Co-Founder & COO",
+              "telephone": "+91-76848-43985",
+              "sameAs": "https://www.linkedin.com/in/prince-mallik-177a472a0/"
+            }
+          ],
+          "sameAs": [
+            "https://x.com/LoadSaathi",
+            "https://www.facebook.com/people/Load-Saathi/61590859902405/",
+            "https://www.instagram.com/loadsaathi/",
+            "https://www.linkedin.com/in/load-saathi-119867422/",
+            "https://www.reddit.com/user/Loadsaathi/"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "email": "support@loadsaathi.com",
+            "availableLanguage": ["English", "Hindi"]
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "First Floor, FTBI, T1-109, National Institute of Technology, Sector 1",
+            "addressLocality": "Rourkela",
+            "postalCode": "769008",
+            "addressRegion": "Odisha",
+            "addressCountry": "IN"
+          }
+        },
+        {
+          "@type": "LocalBusiness",
+          "@id": "https://loadsaathi.in/#localbusiness",
+          "name": "LoadSaathi",
+          "description": "AI-powered shared freight marketplace connecting shippers and truckers across East India.",
+          "url": "https://loadsaathi.in",
+          "telephone": "TBD",
+          "priceRange": "₹₹",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "First Floor, FTBI, T1-109, National Institute of Technology, Sector 1",
+            "addressLocality": "Rourkela",
+            "postalCode": "769008",
+            "addressRegion": "Odisha",
+            "addressCountry": "IN"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 22.2604,
+            "longitude": 84.8536
+          },
+          "hasMap": "https://maps.app.goo.gl/iQ4HFPppSmPvZHGu5",
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+            "opens": "00:00",
+            "closes": "23:59"
+          },
+          "areaServed": [
+            "Odisha", "Jharkhand", "West Bengal", "Bihar", "Chhattisgarh"
+          ],
+          "sameAs": [
+            "https://x.com/LoadSaathi",
+            "https://www.facebook.com/people/Load-Saathi/61590859902405/"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://loadsaathi.in/#website",
+          "name": "LoadSaathi",
+          "url": "https://loadsaathi.in",
+          "description": "India's AI-powered shared freight marketplace for PTL/LTL loads on East India industrial corridors",
+          "publisher": {
+            "@id": "https://loadsaathi.in/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://loadsaathi.in/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://loadsaathi.in/#webpage",
+          "url": "https://loadsaathi.in",
+          "name": "LoadSaathi — Shared Freight Marketplace | PTL/LTL East India",
+          "isPartOf": {
+            "@id": "https://loadsaathi.in/#website"
+          },
+          "about": {
+            "@id": "https://loadsaathi.in/#organization"
+          },
+          "description": "LoadSaathi connects shippers and truckers for shared PTL/LTL freight across East India. Save up to 40% on the Rourkela–Ranchi–Burdwan corridor.",
+          "breadcrumb": {
+            "@id": "https://loadsaathi.in/#breadcrumb"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://loadsaathi.in/#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://loadsaathi.in"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is LoadSaathi?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "LoadSaathi is India's AI-powered shared freight marketplace that connects shippers with verified truckers for PTL (Part Truck Load) and LTL (Less Than Truckload) shipments across East India. It helps MSMEs save up to 40% on freight costs by matching loads with available truck capacity using artificial intelligence."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which corridors does LoadSaathi serve?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "LoadSaathi covers major East India freight corridors including Rourkela–Ranchi, Rourkela–Bhubaneswar, Rourkela–Kolkata, Ranchi–Jamshedpur, Bhubaneswar–Kolkata, and Jamshedpur–Kolkata. The platform operates across Odisha, Jharkhand, West Bengal, Bihar, and Chhattisgarh."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does LoadSaathi's AI matching work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "LoadSaathi uses a multi-layered AI scoring engine that analyzes route alignment, capacity fit, price compatibility, timeliness, historical performance, communication responsiveness, and tenure to match shippers with the best-suited truckers in seconds."
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
 

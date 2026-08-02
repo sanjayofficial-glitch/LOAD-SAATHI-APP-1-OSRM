@@ -20,11 +20,17 @@ const footerLinks = {
     { label: "Safety & Trust", path: "/safety-trust" },
     { label: "Fare Calculator", path: "/fare-calculator" },
   ],
+  Freight: [
+    { label: "All Routes", path: "/routes" },
+    { label: "Rourkela–Ranchi", path: "/routes/rourkela-to-ranchi" },
+    { label: "Ranchi–Kolkata", path: "/routes/ranchi-to-kolkata" },
+    { label: "Bhubaneswar–Kolkata", path: "/routes/bhubaneswar-to-kolkata" },
+  ],
   Company: [
     { label: "About", path: "/about" },
     { label: "Blog", path: "/blog" },
+    { label: "Guides", path: "/guide/ptl-vs-ftl" },
     { label: "Contact", path: "/contact" },
-    { label: "FAQ", path: "/faq" },
   ],
   Legal: [
     { label: "Privacy", path: "/privacy" },

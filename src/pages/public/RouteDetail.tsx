@@ -1,6 +1,6 @@
 
 import { useParams, Link } from "react-router-dom";
-import { ArrowRight, MapPin, Clock, Route, Truck, Package, Search, Shield, TrendingUp, CheckCircle, BookOpen } from "lucide-react";
+import { ArrowRight, MapPin, Clock, Route, Truck, Package, Search, Shield, TrendingUp, CheckCircle, BookOpen, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SeoMeta from "@/components/SeoMeta";
 import { routes } from "@/data/routes";
@@ -88,20 +88,66 @@ export default function RouteDetail() {
 
   const routeSchema = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: `PTL Freight ${route.from} to ${route.to}`,
-    description: route.metaDescription,
-    url: `https://loadsaathi.in/routes/${route.slug}`,
-    brand: {
-      "@type": "Brand",
-      name: "LoadSaathi",
-    },
-    offers: {
-      "@type": "AggregateOffer",
-      priceCurrency: "INR",
-      availability: "https://schema.org/InStock",
-      itemCondition: "https://schema.org/NewCondition",
-    },
+    "@graph": [
+      {
+        "@type": "Service",
+        "name": `PTL Freight ${route.from} to ${route.to}`,
+        "description": route.metaDescription,
+        "url": `https://loadsaathi.in/routes/${route.slug}`,
+        "provider": {
+          "@type": "Organization",
+          "name": "LoadSaathi",
+          "url": "https://loadsaathi.in"
+        },
+        "areaServed": [
+          { "@type": "City", "name": route.from },
+          { "@type": "City", "name": route.to }
+        ],
+        "serviceType": "PTL/LTL Freight Shipping",
+        "offers": {
+          "@type": "Offer",
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": `How much does it cost to ship PTL freight from ${route.from} to ${route.to}?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `Pricing depends on cargo weight, dimensions, vehicle type, and current market demand. On the ${route.from}–${route.to} corridor (${route.distanceKm} km), PTL rates typically range based on per-kg or per-CBM pricing. Use LoadSaathi's fare calculator to get an instant estimate, or post your shipment to receive competitive bids from available truckers.`
+            }
+          },
+          {
+            "@type": "Question",
+            "name": `How long does it take to ship from ${route.from} to ${route.to}?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `The average transit time on the ${route.from}–${route.to} corridor is approximately ${route.transitTime} hours, depending on road conditions, traffic, and the specific pickup and delivery locations.`
+            }
+          },
+          {
+            "@type": "Question",
+            "name": `What types of trucks are available on the ${route.from}–${route.to} route?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `LoadSaathi's network includes pickup vans, 7-ton trucks, 9-ton trucks, 14-ton trucks, 17-ton trucks, 21-ton trucks, 25-ton trailer trucks, and container trucks on this corridor.`
+            }
+          },
+          {
+            "@type": "Question",
+            "name": `Is PTL freight available on the ${route.from}–${route.to} route?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `Yes. LoadSaathi specializes in PTL (Part Truck Load) and LTL (Less Than Truck Load) freight, making it cost-effective to ship smaller loads on the ${route.from}–${route.to} corridor.`
+            }
+          }
+        ]
+      }
+    ]
   };
 
   return (
@@ -113,6 +159,7 @@ export default function RouteDetail() {
         keywords={route.keywords}
         jsonLd={routeSchema}
         breadcrumbs={[
+          { name: "Home", url: "/" },
           { name: "Freight Routes", url: "/routes" },
           { name: `${route.from} → ${route.to}`, url: `/routes/${route.slug}` },
         ]}
@@ -390,6 +437,58 @@ export default function RouteDetail() {
                   View All Routes <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Helpful Guides */}
+        <section className="py-20 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl sm:text-4xl font-black text-foreground dark:text-white mb-4">
+                Helpful Guides for Shippers
+              </h2>
+              <p className="text-lg text-muted-foreground">Learn more about freight shipping in East India.</p>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-5">
+              {[
+                { title: "PTL vs FTL: Which is Right for You?", slug: "ptl-vs-ftl", desc: "Understand the difference between Partial and Full Truckload shipping." },
+                { title: "Freight Rates in East India 2026", slug: "freight-rates-east-india", desc: "Current rates across major East India corridors." },
+                { title: "How to Ship Steel Safely", slug: "shipping-steel", desc: "Complete guide to transporting steel products." },
+              ].map((guide) => (
+                <Link key={guide.slug} to={`/guide/${guide.slug}`} className="glass-card p-5 rounded-xl border border-border hover:border-orange-500/30 transition-all group">
+                  <h3 className="font-bold text-foreground text-sm mb-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">{guide.title}</h3>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{guide.desc}</p>
+                  <span className="text-xs font-semibold text-orange-500 mt-3 inline-block">Read Guide →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Popular Locations */}
+        <section className="py-20 border-y border-border dark:border-white/5">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl sm:text-4xl font-black text-foreground dark:text-white mb-4">
+                Freight from Major Cities
+              </h2>
+              <p className="text-lg text-muted-foreground">Browse freight corridors by city.</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4">
+              {[
+                { city: "Rourkela", slug: "rourkela" },
+                { city: "Ranchi", slug: "ranchi" },
+                { city: "Kolkata", slug: "kolkata" },
+                { city: "Bhubaneswar", slug: "bhubaneswar" },
+                { city: "Jamshedpur", slug: "jamshedpur" },
+              ].map((loc) => (
+                <Link key={loc.slug} to={`/location/${loc.slug}`} className="glass-card px-5 py-3 rounded-xl border border-border hover:border-orange-500/30 transition-all group flex items-center gap-2">
+                  <Map className="h-4 w-4 text-orange-500" />
+                  <span className="text-sm font-bold text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">{loc.city}</span>
+                  <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                </Link>
+              ))}
             </div>
           </div>
         </section>

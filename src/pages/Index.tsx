@@ -323,44 +323,57 @@ const Index = () => {
       keywords="PTL freight Rourkela, LTL transport East India, shared truck Ranchi Burdwan, part load Jharkhand Odisha, freight marketplace India, truck booking Rourkela"
       jsonLd={{
         "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "LoadSaathi",
-        "alternateName": ["Load Saathi", "LoadSaathi Logistics", "LoadSaathi App", "Load Saathi Freight"],
-        "url": "https://loadsaathi.in",
-        "logo": "https://loadsaathi.in/icons/icon.svg",
-        "description": "India's AI-powered shared freight marketplace for PTL/LTL loads on East India industrial corridors. Connects shippers and truckers with AI matching, GPS tracking, and digital credit scores.",
-        "foundingDate": "2025",
-        "numberOfEmployees": { "@type": "QuantitativeValue", "value": "10-50" },
-        "industry": "Logistics & Freight Technology",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Rourkela",
-          "addressRegion": "Odisha",
-          "postalCode": "769001",
-          "addressCountry": "IN"
-        },
-        "areaServed": [
-          { "@type": "City", "name": "Rourkela" },
-          { "@type": "City", "name": "Ranchi" },
-          { "@type": "City", "name": "Burdwan" },
-          { "@type": "State", "name": "Jharkhand" },
-          { "@type": "State", "name": "Odisha" },
-          { "@type": "State", "name": "West Bengal" }
-        ],
-        "sameAs": [
-          "https://x.com/LoadSaathi",
-          "https://www.facebook.com/people/Load-Saathi/61590859902405/",
-          "https://www.instagram.com/loadsaathi/",
-          "https://www.reddit.com/user/Loadsaathi/",
-          "https://www.threads.com/@loadsaathi",
-          "https://www.linkedin.com/in/load-saathi-119867422/"
-        ],
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "contactType": "customer service",
-          "email": "support@loadsaathi.in",
-          "availableLanguage": ["English", "Hindi"]
-        }
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is LoadSaathi and how does it work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "LoadSaathi is an AI-powered shared freight marketplace connecting shippers and truckers for PTL and LTL loads across East India. Shippers post their loads, AI matches them with the best available trucks based on route, capacity, price, and reliability — and both sides track the shipment in real time with GPS."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much does it cost to use LoadSaathi?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "LoadSaathi is free to join for both shippers and truckers. We charge a small transaction fee of 2–5% per completed shipment, which varies by role, volume, and credit score. There are no subscriptions, no hidden fees, and no minimum commitments."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which cities and routes does LoadSaathi cover?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "LoadSaathi currently operates across East India with the Rourkela–Ranchi–Burdwan corridor as our primary route. We also cover Bhubaneswar, Kolkata, Jamshedpur, and 50+ cities across Odisha, Jharkhand, and West Bengal with 25+ active freight corridors."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the credit score system work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Every user on LoadSaathi has a digital freight credit score ranging from 300 to 900. The score is based on completion rate, on-time performance, bidirectional reviews, and tenure on the platform. Higher scores unlock better loads and preferential matching."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is my payment secure on LoadSaathi?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. LoadSaathi uses an escrow-backed payment system. Funds are held securely and released in milestones as delivery progresses. Digital settlements mean faster, transparent payouts compared to traditional 30–60 day credit cycles."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who can use LoadSaathi — shippers or truckers?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Both. Shippers (MSMEs, manufacturers, traders) can post loads and find truck space. Truckers (independent operators, fleet owners) can browse available loads, fill empty capacity, and earn on return trips."
+            }
+          }
+        ]
       }}
     />
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
@@ -565,6 +578,33 @@ const Index = () => {
           </div>
         </section>
 
+        {/* WHAT IS LOADSAATHI */}
+        <section className="fade-section py-24 relative">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="max-w-3xl mx-auto text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-black mb-6 text-foreground dark:text-white">What is LoadSaathi?</h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                LoadSaathi is India's AI-powered shared freight marketplace that connects shippers and truckers for Partial Truckload (PTL) and Less Than Truckload (LTL) loads across East India. Built for MSMEs in Tier 2 and 3 cities, LoadSaathi eliminates empty return trips, reduces freight costs by up to 40%, and brings digital trust to an industry that has operated on phone calls and brokers for decades.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { title: 'PTL & LTL Freight', desc: 'Share truck capacity across multiple shippers. Pay only for the space you use — no more paying for a full truck when your load is 3 tons.', icon: Package },
+                { title: 'AI-Matched Logistics', desc: 'Our neural matching engine finds the perfect truck for your route, cargo, and timeline in seconds — not days of calling brokers.', icon: Brain },
+                { title: 'East India Focused', desc: 'Starting with the Rourkela–Ranchi–Burdwan corridor, we are building the freight network for Odisha, Jharkhand, West Bengal, and beyond.', icon: Map },
+              ].map((item, i) => (
+                <div key={i} className="glass-card p-8 rounded-xl border border-border hover:border-orange-500/30 transition-all duration-300 group text-center">
+                  <div className="bg-orange-100 dark:bg-orange-900/20 w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <item.icon className="h-7 w-7 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* HOW IT WORKS */}
         <section className="fade-section py-24 relative">
           <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full opacity-[0.06] dark:opacity-[0.10] pointer-events-none"
@@ -630,6 +670,74 @@ const Index = () => {
                   See Full Walkthrough <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* WHY SHIP / WHY DRIVE */}
+        <section className="fade-section py-24 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-[0.08] dark:opacity-[0.12] pointer-events-none"
+            style={{ background: 'radial-gradient(circle, #f97316 0%, transparent 70%)', filter: 'blur(60px)' }} />
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">Why LoadSaathi?</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Whether you are shipping goods or hauling loads, LoadSaathi solves the problems that have plagued East India's freight industry for decades.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="glass-card p-8 rounded-xl border border-blue-500/20">
+                <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-3">
+                  <Package className="h-5 w-5 text-blue-400" /> Why Ship on LoadSaathi?
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    { title: 'Up to 40% Cost Reduction', desc: 'AI-optimized pricing and shared truck capacity mean you pay less per ton — PTL and LTL rates that brokers cannot match.' },
+                    { title: 'No More Broker Dependency', desc: 'Direct access to verified truckers. Transparent pricing. No hidden commissions eating into your margins.' },
+                    { title: 'Real-Time Visibility', desc: 'GPS tracking from pickup to delivery. Share live ETAs with your customers. No more "where is my shipment?" calls.' },
+                    { title: 'Trusted Truckers', desc: 'Every trucker has a credit score (300-900), verified profile, and bidirectional reviews. Choose with confidence.' },
+                    { title: 'Flexible PTL/LTL', desc: 'Ship 1 kg or 10 tons. Share truck space with other shippers. Pay only for what you use.' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-900/20 border border-blue-700/30 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-blue-400">{i + 1}</span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground text-sm">{item.title}</h4>
+                        <p className="text-xs text-muted-foreground">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link to="/solutions/shippers" className="inline-flex items-center gap-1 text-sm font-semibold text-blue-500 hover:text-blue-400 mt-6">
+                  Start Shipping <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="glass-card p-8 rounded-xl border border-orange-500/20">
+                <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-3">
+                  <Truck className="h-5 w-5 text-orange-400" /> Why Drive on LoadSaathi?
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    { title: 'Zero Empty Return Trips', desc: 'AI finds return loads for every route. Fill your truck both ways and earn on every kilometer — not just half the journey.' },
+                    { title: 'Higher Earnings', desc: 'Direct shipper access means no broker commissions. AI price prediction helps you bid competitively and win more loads.' },
+                    { title: 'Build Your Digital Reputation', desc: 'Credit score, reviews, completion rate — your track record follows you. Higher scores unlock premium, higher-paying loads.' },
+                    { title: 'Instant Payments', desc: 'Escrow-backed digital settlements. No more chasing payments for weeks. Get paid as soon as delivery is confirmed.' },
+                    { title: 'Smart Route Optimization', desc: 'AI suggests the best routes, loads, and pricing for your vehicle type and location. Maximize fleet utilization effortlessly.' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-3">
+                      <div className="w-6 h-6 rounded-full bg-orange-900/20 border border-orange-700/30 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-orange-400">{i + 1}</span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground text-sm">{item.title}</h4>
+                        <p className="text-xs text-muted-foreground">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link to="/solutions/truckers" className="inline-flex items-center gap-1 text-sm font-semibold text-orange-500 hover:text-orange-400 mt-6">
+                  Start Driving <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -779,6 +887,47 @@ const Index = () => {
           </div>
         </section>
 
+        {/* TRUSTED ACROSS EAST INDIA */}
+        <section className="fade-section py-24 relative">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">Trusted Across East India</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">From Rourkela's steel plants to Kolkata's ports, LoadSaathi is building the freight network for India's fastest-growing industrial corridor.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {[
+                { city: 'Rourkela', state: 'Odisha', desc: 'Steel City hub — primary origin for industrial and manufacturing freight.', routes: '12 corridors' },
+                { city: 'Ranchi', state: 'Jharkhand', desc: 'Mineral belt — mining, heavy machinery, and construction materials.', routes: '8 corridors' },
+                { city: 'Kolkata', state: 'West Bengal', desc: 'Port city — container, FMCG, and distribution freight to eastern India.', routes: '10 corridors' },
+                { city: 'Bhubaneswar', state: 'Odisha', desc: 'Capital corridor — IT, pharma, and commercial freight.', routes: '6 corridors' },
+              ].map((city, i) => (
+                <Link key={i} to={`/location/${city.city.toLowerCase()}`} className="glass-card p-6 rounded-xl border border-border hover:border-orange-500/30 transition-all duration-300 group">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPin className="h-4 w-4 text-orange-500" />
+                    <h3 className="font-bold text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">{city.city}</h3>
+                    <span className="text-xs text-muted-foreground">{city.state}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">{city.desc}</p>
+                  <span className="text-xs font-semibold text-orange-500">{city.routes} →</span>
+                </Link>
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-center gap-8 text-center">
+              {[
+                { value: '500+', label: 'Verified Truckers' },
+                { value: '25+', label: 'Active Corridors' },
+                { value: '50+', label: 'Cities Connected' },
+                { value: '10K+', label: 'Loads Completed' },
+              ].map((stat, i) => (
+                <div key={i}>
+                  <div className="text-3xl font-black text-orange-600 dark:text-orange-400">{stat.value}</div>
+                  <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* VISION SECTION */}
         <section id="vision" className="fade-section min-h-[716px] flex items-center justify-center relative bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 py-24 overflow-hidden">
           <div className="absolute inset-0 opacity-30"
@@ -870,6 +1019,34 @@ const Index = () => {
                   Learn About Safety & Trust <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="fade-section py-24 relative">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-12 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">Frequently Asked Questions</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Answers to the most common questions from shippers and truckers.</p>
+            </div>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {[
+                { q: 'What is LoadSaathi and how does it work?', a: 'LoadSaathi is an AI-powered shared freight marketplace connecting shippers and truckers for PTL (Partial Truckload) and LTL (Less Than Truckload) loads across East India. Shippers post their loads, AI matches them with the best available trucks based on route, capacity, price, and reliability — and both sides track the shipment in real time with GPS.' },
+                { q: 'How much does it cost to use LoadSaathi?', a: 'LoadSaathi is free to join for both shippers and truckers. We charge a small transaction fee of 2–5% per completed shipment, which varies by role, volume, and credit score. There are no subscriptions, no hidden fees, and no minimum commitments.' },
+                { q: 'Which cities and routes does LoadSaathi cover?', a: 'LoadSaathi currently operates across East India with the Rourkela–Ranchi–Burdwan corridor as our primary route. We also cover Bhubaneswar, Kolkata, Jamshedpur, and 50+ cities across Odisha, Jharkhand, and West Bengal with 25+ active freight corridors.' },
+                { q: 'How does the credit score system work?', a: 'Every user on LoadSaathi has a digital freight credit score ranging from 300 to 900. The score is based on completion rate, on-time performance, bidirectional reviews, and tenure on the platform. Higher scores unlock better loads and preferential matching for truckers, and attract premium truckers for shippers.' },
+                { q: 'Is my payment secure on LoadSaathi?', a: 'Yes. LoadSaathi uses an escrow-backed payment system. Funds are held securely and released in milestones as delivery progresses. Disputes are resolved through our built-in resolution system, and digital settlements mean faster, transparent payouts compared to traditional 30–60 day credit cycles.' },
+                { q: 'Who can use LoadSaathi — shippers or truckers?', a: 'Both. Shippers (MSMEs, manufacturers, traders) can post loads and find truck space. Truckers (independent operators, fleet owners) can browse available loads, fill empty capacity, and earn on return trips. The platform is designed to eliminate empty kilometers for truckers and reduce freight costs for shippers.' },
+              ].map((item, i) => (
+                <details key={i} className="glass-card rounded-xl border border-border group" open={i === 0}>
+                  <summary className="p-6 cursor-pointer font-bold text-foreground hover:text-orange-600 dark:hover:text-orange-400 transition-colors list-none flex items-center justify-between">
+                    {item.q}
+                    <ChevronRight className="h-4 w-4 text-muted-foreground group-open:rotate-90 transition-transform shrink-0 ml-4" />
+                  </summary>
+                  <div className="px-6 pb-6 text-sm text-muted-foreground leading-relaxed">{item.a}</div>
+                </details>
+              ))}
             </div>
           </div>
         </section>
