@@ -157,7 +157,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const resetPassword = useCallback(async (email: string) => {
     try {
-      await clerk.client?.signIn.create({
+      if (!clerk.client) throw new Error('Clerk client not ready');
+      await clerk.client.signIn.create({
         strategy: 'reset_password_email_code',
         identifier: email,
       });

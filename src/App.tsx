@@ -71,7 +71,15 @@ const Favorites = lazy(() => import("./pages/Favorites"));
 const CreditScore = lazy(() => import("./pages/CreditScore"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -95,7 +103,12 @@ function App() {
   return (
     <ErrorBoundary>
       <PostHogProvider>
-      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} allowedRedirectOrigins={['https://localhost']}>
+      <ClerkProvider
+        publishableKey={CLERK_PUBLISHABLE_KEY}
+        allowedRedirectOrigins={['https://localhost', 'https://in.loadsaathi.app', 'capacitor://localhost', 'https://clerk.loadsaathi.in']}
+        signUpFallbackRedirectUrl="/register"
+        signInFallbackRedirectUrl="/auth-sync"
+      >
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
           <AuthProvider>

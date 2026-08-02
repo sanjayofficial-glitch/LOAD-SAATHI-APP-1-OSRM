@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
-  VITE_CLERK_PUBLISHABLE_KEY: z.string().min(1, 'Clerk publishable key is required'),
+  VITE_CLERK_PUBLISHABLE_KEY: z.string().regex(/^pk_(test|live)_/, 'Invalid Clerk publishable key format'),
   VITE_SUPABASE_URL: z.string().url('Supabase URL must be a valid URL'),
   VITE_SUPABASE_ANON_KEY: z.string().min(1, 'Supabase anon key is required'),
   VITE_POSTHOG_API_KEY: z.string().min(1, 'PostHog API key is required'),

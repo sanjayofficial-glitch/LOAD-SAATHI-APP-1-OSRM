@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
+import { useAuth as useClerkAuth } from '@clerk/clerk-react'
 import type { CreditScore, CreditInsights } from '@/types'
 
 export function useCreditScore(userId?: string) {
   const { userProfile } = useAuth()
+  const { getToken } = useClerkAuth()
   const targetUserId = userId || userProfile?.id
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
@@ -12,10 +14,14 @@ export function useCreditScore(userId?: string) {
     queryFn: async () => {
       if (!targetUserId || !supabaseUrl) return null
 
+      const token = await getToken({ template: 'supabase' })
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
       const response = await fetch(
         `${supabaseUrl}/functions/v1/credit-score?userId=${encodeURIComponent(targetUserId)}`,
         {
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           signal: AbortSignal.timeout(8000),
         },
       )
@@ -31,6 +37,7 @@ export function useCreditScore(userId?: string) {
 
 export function useCreditInsights(creditScore: CreditScore | null | undefined) {
   const { userProfile } = useAuth()
+  const { getToken } = useClerkAuth()
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
   return useQuery<CreditInsights | null>({
@@ -38,11 +45,15 @@ export function useCreditInsights(creditScore: CreditScore | null | undefined) {
     queryFn: async () => {
       if (!creditScore || !userProfile || !supabaseUrl) return null
 
+      const token = await getToken({ template: 'supabase' })
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
       const response = await fetch(
         `${supabaseUrl}/functions/v1/credit-insights`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             score: creditScore.score,
             factors: creditScore.factors,

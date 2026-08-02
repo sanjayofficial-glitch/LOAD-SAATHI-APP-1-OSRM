@@ -1,5 +1,3 @@
-"use client";
-
 import { useAuth as useClerkAuth } from "@clerk/clerk-react";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
 import { useCallback } from "react";

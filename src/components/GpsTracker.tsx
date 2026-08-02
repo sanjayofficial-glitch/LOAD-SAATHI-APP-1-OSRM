@@ -28,7 +28,7 @@ export default function GpsTracker({
   onPositionUpdate,
   className = '',
 }: GpsTrackerProps) {
-  const isOnline = useNetworkStatus();
+  const { isOnline } = useNetworkStatus();
   const { getToken } = useAuth();
   const [isTracking, setIsTracking] = useState(false);
   const [currentPosition, setCurrentPosition] = useState<GpsPosition | null>(null);

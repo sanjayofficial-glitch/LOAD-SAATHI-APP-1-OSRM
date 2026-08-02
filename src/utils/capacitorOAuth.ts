@@ -1,0 +1,54 @@
+import { Capacitor } from "@capacitor/core";
+
+/**
+ * Initialize Capacitor OAuth handler for Clerk + Google sign-in.
+ *
+ * In a Capacitor Android app, after Google OAuth completes, Clerk redirects
+ * to a URL like https://in.loadsaathi.app/auth-sync or /?__clerk_oauth_redirect=...
+ * This handler intercepts those redirects and ensures the SPA handles them
+ * instead of the system browser opening a broken page.
+ */
+export function initCapacitorOAuth() {
+  if (!Capacitor.isNativePlatform()) return;
+
+  // Listen for the app being opened via a URL (OAuth callback)
+  import("@capacitor/app").then(({ App }) => {
+    App.addListener("appUrlOpen", (event) => {
+      const url = event.url;
+      console.log("[CapacitorOAuth] App opened via URL:", url);
+
+      // Clerk OAuth callbacks contain these patterns
+      if (
+        url.includes("__clerk_oauth_redirect") ||
+        url.includes("__clerk_ticket") ||
+        url.includes("/auth-sync") ||
+        url.includes("clerk.shared.lcl.dev") ||
+        url.includes("clerk.loadsaathi.in")
+      ) {
+        // Extract the path after the hostname/scheme
+        let path = "/auth-sync";
+
+        if (url.includes("/auth-sync")) {
+          path = "/auth-sync";
+        } else if (url.includes("__clerk_oauth_redirect")) {
+          // Keep the full query string for Clerk to process
+          const urlObj = new URL(url);
+          path = urlObj.pathname + urlObj.search;
+        }
+
+        console.log("[CapacitorOAuth] Navigating to:", path);
+
+        // Navigate the SPA to handle the OAuth callback
+        // Use replace to avoid back-button loop
+        window.location.replace(path);
+      }
+    });
+
+    // Also handle when the app is restored from background
+    App.addListener("resume", () => {
+      console.log("[CapacitorOAuth] App resumed");
+    });
+  }).catch((err) => {
+    console.warn("[CapacitorOAuth] Could not load @capacitor/app:", err);
+  });
+}

@@ -7,6 +7,10 @@ import "./globals.css";
 // Validate environment variables at startup
 import "./config/env";
 
+// Initialize Capacitor OAuth handler for Android APK sign-in/sign-up
+import { initCapacitorOAuth } from "./utils/capacitorOAuth";
+initCapacitorOAuth();
+
 // Preconnect to frequently-used API origins so their TLS + DNS work
 // starts early (maps, geocoding, Supabase). Maps import leaflet CSS
 // locally, so it's no longer loaded globally for every page.

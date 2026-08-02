@@ -99,10 +99,32 @@
     <script>
       window.addEventListener('error', function(e) {
         var root = document.getElementById('root');
-        // Show the fallback error UI only when the boot loader is still visible
-        // (i.e. React never mounted successfully).
         if (root && document.getElementById('boot-loader')) {
-          root.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f9fafb;padding:24px;font-family:system-ui,sans-serif;"><div style="max-width:480px;background:white;padding:32px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.12);text-align:center;"><div style="font-size:48px;margin-bottom:16px;">⚠️</div><h1 style="font-size:20px;font-weight:700;color:#dc2626;margin:0 0 8px;">Failed to Load App</h1><p style="color:#6b7280;font-size:14px;margin:0 0 16px;line-height:1.5;">' + (e.message || 'Unknown error') + '</p><button onclick="location.reload()" style="background:#ea580c;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Reload Page</button></div></div>';
+          var msg = document.createElement('span');
+          msg.textContent = e.message || 'Unknown error';
+          var container = document.createElement('div');
+          container.style.cssText = 'min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f9fafb;padding:24px;font-family:system-ui,sans-serif;';
+          var card = document.createElement('div');
+          card.style.cssText = 'max-width:480px;background:white;padding:32px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.12);text-align:center;';
+          var icon = document.createElement('div');
+          icon.style.cssText = 'font-size:48px;margin-bottom:16px;';
+          icon.textContent = '\u26A0\uFE0F';
+          var h1 = document.createElement('h1');
+          h1.style.cssText = 'font-size:20px;font-weight:700;color:#dc2626;margin:0 0 8px;';
+          h1.textContent = 'Failed to Load App';
+          var p = document.createElement('p');
+          p.style.cssText = 'color:#6b7280;font-size:14px;margin:0 0 16px;line-height:1.5;';
+          p.appendChild(msg);
+          var btn = document.createElement('button');
+          btn.textContent = 'Reload Page';
+          btn.style.cssText = 'background:#ea580c;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;';
+          btn.onclick = function() { location.reload(); };
+          card.appendChild(icon);
+          card.appendChild(h1);
+          card.appendChild(p);
+          card.appendChild(btn);
+          container.appendChild(card);
+          root.appendChild(container);
         }
       });
     </script>

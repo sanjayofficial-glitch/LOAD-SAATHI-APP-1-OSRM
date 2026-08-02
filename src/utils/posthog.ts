@@ -13,12 +13,14 @@ if (POSTHOG_API_KEY && POSTHOG_HOST) {
     capture_exceptions: true,
     persistence: 'localStorage+cookie',
     loaded: (ph) => {
-      ph.loadToolbar({
-        token: POSTHOG_API_KEY,
-        toolbarVersion: 'toolbar',
-        instrument: true,
-        dataAttributes: ['data-attr'],
-      })
+      if (import.meta.env.DEV) {
+        ph.loadToolbar({
+          token: POSTHOG_API_KEY,
+          toolbarVersion: 'toolbar',
+          instrument: true,
+          dataAttributes: ['data-attr'],
+        })
+      }
     },
   })
 }

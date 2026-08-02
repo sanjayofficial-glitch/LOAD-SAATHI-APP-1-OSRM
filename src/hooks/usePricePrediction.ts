@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useAuth as useClerkAuth } from '@clerk/clerk-react'
 
 export interface PricePredictionInput {
   originCity: string
@@ -40,6 +41,7 @@ function useDebounce<T>(value: T, delay: number): T {
 export function usePricePrediction(input: PricePredictionInput) {
   const debouncedInput = useDebounce(input, 800)
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+  const { getToken } = useClerkAuth()
 
   return useQuery<PricePrediction | null>({
     queryKey: ['pricePredict', debouncedInput],
@@ -55,11 +57,15 @@ export function usePricePrediction(input: PricePredictionInput) {
 
       if (!supabaseUrl) return null
 
+      const token = await getToken({ template: 'supabase' })
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
       const response = await fetch(
         `${supabaseUrl}/functions/v1/price-predict`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify(debouncedInput),
           signal: AbortSignal.timeout(8000),
         },

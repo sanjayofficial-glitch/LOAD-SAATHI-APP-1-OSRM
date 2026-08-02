@@ -6,10 +6,21 @@ const config: CapacitorConfig = {
   webDir: "dist",
   server: {
     androidScheme: "https",
+    hostname: "in.loadsaathi.app",
+    allowNavigation: [
+      "clerk.shared.lcl.dev",
+      "accounts.google.com",
+      "*.clerk.accounts.dev",
+      "localhost",
+      "in.loadsaathi.app",
+      "clerk.loadsaathi.in",
+      "loadsaathi.in",
+    ],
   },
   android: {
-    allowMixedContent: false,
+    allowMixedContent: true,
     backgroundColor: "#ffffff",
+    captureInput: true,
   },
   plugins: {},
 };

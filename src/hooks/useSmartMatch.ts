@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
+import { useAuth as useClerkAuth } from '@clerk/clerk-react'
 
 export interface AIMatchResult {
   aiScore: number
@@ -19,6 +20,7 @@ export function useSmartMatch<T extends { id: string }>(
   const [scores, setScores] = useState<Record<string, AIMatchResult>>({})
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+  const { getToken } = useClerkAuth()
   const fetchedRef = useRef<Set<string>>(new Set())
   const prevItemsRef = useRef<string>('')
 
@@ -28,9 +30,13 @@ export function useSmartMatch<T extends { id: string }>(
 
     setLoadingId(item.id)
     try {
+      const token = await getToken({ template: 'supabase' })
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
       const response = await fetch(`${supabaseUrl}/functions/v1/match-ml`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(params),
         signal: AbortSignal.timeout(6000),
       })
@@ -44,7 +50,7 @@ export function useSmartMatch<T extends { id: string }>(
     } finally {
       setLoadingId(null)
     }
-  }, [getParams, supabaseUrl])
+  }, [getParams, supabaseUrl, getToken])
 
   useEffect(() => {
     const top = items.slice(0, maxItems)
