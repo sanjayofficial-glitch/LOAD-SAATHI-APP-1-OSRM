@@ -209,7 +209,15 @@ function HeatmapLayer({ points }: { points: [number, number, number][] }) {
   return null;
 }
 
-// ── Auto-fit bounds ──────────────────────────────────────────────────────────
+// ── Force Leaflet resize after container stabilizes ──────────────────────────
+function InvalidateSize() {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 300);
+    return () => clearTimeout(t);
+  }, [map]);
+  return null;
+}
 function FitBounds({ locations }: { locations: UserLocation[] }) {
   const map = useMap();
   useEffect(() => {
@@ -319,7 +327,7 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
   };
 
   return (
-    <div className="absolute inset-0 bg-slate-900 overflow-hidden" style={{ minHeight: 0 }}>
+    <div className="absolute inset-0 bg-slate-900 overflow-hidden">
       <MapContainer
         center={[22.5, 84.0]}
         zoom={7}
@@ -327,6 +335,7 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
         style={{ background: '#020617' }}
         scrollWheelZoom={true}
       >
+        <InvalidateSize />
         <TileLayer
           attribution='&copy; OSM'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"

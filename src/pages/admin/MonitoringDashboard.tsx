@@ -297,7 +297,7 @@ const MonitoringDashboard = () => {
       <main className="flex-grow overflow-hidden" style={{ minHeight: 0 }}>
         <ResizablePanelGroup direction="vertical" className="h-full" style={{ minHeight: 0 }}>
           <ResizablePanel defaultSize={45} minSize={30}>
-            <div className="relative bg-slate-900" style={{ minHeight: 0, height: '100%' }}>
+            <div className="relative bg-slate-900 h-full w-full">
               <CommandCenterMap
                 locations={locations}
                 trips={trips}
