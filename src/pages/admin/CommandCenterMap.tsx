@@ -319,11 +319,12 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
   };
 
   return (
-    <div className="h-full w-full bg-slate-900 overflow-hidden relative">
+    <div className="absolute inset-0 bg-slate-900 overflow-hidden" style={{ minHeight: 0 }}>
       <MapContainer
         center={[22.5, 84.0]}
         zoom={7}
-        style={{ height: '100%', width: '100%', background: '#020617' }}
+        className="absolute inset-0"
+        style={{ background: '#020617' }}
         scrollWheelZoom={true}
       >
         <TileLayer
