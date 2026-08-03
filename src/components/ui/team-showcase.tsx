@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Linkedin, Twitter, Instagram } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { supabase } from '../../integrations/supabase/client';
 
 export interface TeamMember {
   id: string;
   name: string;
   role: string;
   image: string;
+  phone?: string;
   social?: {
     twitter?: string;
     linkedin?: string;
@@ -14,35 +16,50 @@ export interface TeamMember {
   };
 }
 
-const LOADSAATHI_MEMBERS: TeamMember[] = [
-  {
-    id: '1',
-    name: 'Sanjaya Sahu',
-    role: 'Founder & CEO',
-    image: 'https://i.pravatar.cc/400?img=11',
-    social: { linkedin: 'https://www.linkedin.com/in/sanjaya-sahu-253315305/' },
-  },
-  {
-    id: '2',
-    name: 'Prince Mallik',
-    role: 'Co-Founder & COO',
-    image: 'https://i.pravatar.cc/400?img=12',
-    social: { linkedin: 'https://www.linkedin.com/in/prince-mallik-177a472a0/' },
-  },
-  {
-    id: '3',
-    name: 'Customer Executive',
-    role: 'Customer Executive',
-    image: 'https://i.pravatar.cc/400?img=16',
-    social: {},
-  },
-];
+function useTeamMembers() {
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
 
-interface TeamShowcaseProps {
-  members?: TeamMember[];
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('team_members')
+          .select('*')
+          .order('sort_order', { ascending: true });
+        if (error) throw error;
+        const mapped: TeamMember[] = (data || []).map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          role: m.role,
+          image: m.photo_url || `https://i.pravatar.cc/400?u=${m.id}`,
+          phone: m.phone,
+          social: {
+            linkedin: m.linkedin || undefined,
+            twitter: m.twitter || undefined,
+            instagram: m.instagram || undefined,
+          },
+        }));
+        setMembers(mapped);
+      } catch {
+        // Fallback to hardcoded data if Supabase is unavailable
+        setMembers([
+          { id: '1', name: 'Sanjaya Sahu', role: 'Founder & CEO', image: 'https://i.pravatar.cc/400?img=11', phone: '+918328998031', social: { linkedin: 'https://www.linkedin.com/in/sanjaya-sahu-253315305/' } },
+          { id: '2', name: 'Prince Mallik', role: 'Co-Founder & COO', image: 'https://i.pravatar.cc/400?img=12', phone: '+91 76848 43985', social: { linkedin: 'https://www.linkedin.com/in/prince-mallik-177a472a0/' } },
+          { id: '3', name: 'Customer Executive', role: 'Customer Executive', image: 'https://i.pravatar.cc/400?img=16', social: {} },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMembers();
+  }, []);
+
+  return { members, loading };
 }
 
-export default function TeamShowcase({ members = LOADSAATHI_MEMBERS }: TeamShowcaseProps) {
+export default function TeamShowcase() {
+  const { members, loading } = useTeamMembers();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const col1 = members.filter((_, i) => i % 3 === 0);

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import SeoMeta from "@/components/SeoMeta";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const supportInfo = [
   { icon: Mail, label: "Email Us", value: "support@loadsaathi.com", detail: "We respond within 2-4 hours" },
@@ -206,9 +207,10 @@ const Contact = () => {
               {/* CEO */}
               <div className="glass-card p-8 rounded-xl border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300 group">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                    <span className="text-2xl font-black text-orange-600 dark:text-orange-400">SS</span>
-                  </div>
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage src={undefined} alt="Sanjaya Sahu" />
+                    <AvatarFallback className="bg-orange-100 dark:bg-orange-900/30 text-2xl font-black text-orange-600 dark:text-orange-400">SS</AvatarFallback>
+                  </Avatar>
                   <div>
                     <h3 className="text-xl font-bold text-foreground">Sanjaya Sahu</h3>
                     <p className="text-sm text-muted-foreground">Founder & CEO</p>
@@ -232,9 +234,10 @@ const Contact = () => {
               {/* COO */}
               <div className="glass-card p-8 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all duration-300 group">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <span className="text-2xl font-black text-blue-600 dark:text-blue-400">PM</span>
-                  </div>
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage src={undefined} alt="Prince Mallik" />
+                    <AvatarFallback className="bg-blue-100 dark:bg-blue-900/30 text-2xl font-black text-blue-600 dark:text-blue-400">PM</AvatarFallback>
+                  </Avatar>
                   <div>
                     <h3 className="text-xl font-bold text-foreground">Prince Mallik</h3>
                     <p className="text-sm text-muted-foreground">Co-Founder & COO</p>

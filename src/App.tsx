@@ -71,6 +71,9 @@ const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const Moderation = lazy(() => import("./pages/admin/Moderation"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const CreditScore = lazy(() => import("./pages/CreditScore"));
+const Gallery = lazy(() => import("./pages/public/Gallery"));
+const GalleryManager = lazy(() => import("./pages/admin/GalleryManager"));
+const TeamManager = lazy(() => import("./pages/admin/TeamManager"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -165,6 +168,9 @@ function App() {
 
                     {/* Guide Pages */}
                     <Route path="/guide/:slug" element={<GuidePage />} />
+
+                    {/* Gallery */}
+                    <Route path="/gallery" element={<Gallery />} />
                   </Route>
 
                   {/* Authenticated routes wrapped with Layout */}
@@ -196,6 +202,17 @@ function App() {
                     <Route path="/admin/moderation" element={
                       <RoleProtectedRoute allowedRole="admin">
                         <Moderation />
+                      </RoleProtectedRoute>
+                    } />
+                    {/* Admin gallery + team routes */}
+                    <Route path="/admin/gallery" element={
+                      <RoleProtectedRoute allowedRole="admin">
+                        <GalleryManager />
+                      </RoleProtectedRoute>
+                    } />
+                    <Route path="/admin/team" element={
+                      <RoleProtectedRoute allowedRole="admin">
+                        <TeamManager />
                       </RoleProtectedRoute>
                     } />
                     {/* Trucker routes */}

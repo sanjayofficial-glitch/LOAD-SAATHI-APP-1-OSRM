@@ -27,6 +27,7 @@ import {
   Home,
   LayoutDashboard,
   Heart,
+  ImageIcon,
 } from "lucide-react";
 import LogoMark from "./LogoMark";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         { label: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
         { label: "Users", path: "/admin/users", icon: <Users className="h-4 w-4" /> },
         { label: "Moderation", path: "/admin/moderation", icon: <Shield className="h-4 w-4" /> },
+        { label: "Gallery", path: "/admin/gallery", icon: <ImageIcon className="h-4 w-4" /> },
+        { label: "Team", path: "/admin/team", icon: <Users className="h-4 w-4" /> },
         { label: "Messages", path: "/messages", icon: <MessageSquare className="h-4 w-4" /> },
       ];
     }
