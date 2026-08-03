@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.heat';
 import { Loader2, Navigation } from 'lucide-react';
 import MapControls, { type MapFilters } from '@/components/MapControls';
 import { cn } from '@/lib/utils';
@@ -154,10 +153,10 @@ interface CommandCenterMapProps {
   loading?: boolean;
 }
 
-// ── Heatmap layer component ─────────────────────────────────────────────────
+// ── Heatmap layer (canvas circles — no external dependency) ─────────────────
 function HeatmapLayer({ points }: { points: [number, number, number][] }) {
   const map = useMap();
-  const layerRef = useRef<L.Layer | null>(null);
+  const layerRef = useRef<L.LayerGroup | null>(null);
 
   useEffect(() => {
     if (layerRef.current) {
@@ -166,25 +165,38 @@ function HeatmapLayer({ points }: { points: [number, number, number][] }) {
     }
     if (points.length === 0) return;
 
-    const heat = (L as unknown as { heatLayer: (pts: [number, number, number][], opts: Record<string, unknown>) => L.Layer }).heatLayer(
-      points,
-      {
-        radius: 35,
-        blur: 25,
-        maxZoom: 10,
-        max: 1.0,
-        gradient: {
-          0.0: '#0a0a2e',
-          0.2: '#1e3a8a',
-          0.4: '#3b82f6',
-          0.6: '#f59e0b',
-          0.8: '#f97316',
-          1.0: '#ef4444',
-        },
-      }
-    );
-    heat.addTo(map);
-    layerRef.current = heat;
+    const group = L.layerGroup();
+    points.forEach(([lat, lng]) => {
+      L.circleMarker([lat, lng], {
+        renderer: L.canvas(),
+        radius: 22,
+        color: 'transparent',
+        fillColor: '#f97316',
+        fillOpacity: 0.12,
+        interactive: false,
+      }).addTo(group);
+
+      L.circleMarker([lat, lng], {
+        renderer: L.canvas(),
+        radius: 14,
+        color: 'transparent',
+        fillColor: '#f97316',
+        fillOpacity: 0.22,
+        interactive: false,
+      }).addTo(group);
+
+      L.circleMarker([lat, lng], {
+        renderer: L.canvas(),
+        radius: 7,
+        color: 'transparent',
+        fillColor: '#fb923c',
+        fillOpacity: 0.45,
+        interactive: false,
+      }).addTo(group);
+    });
+
+    group.addTo(map);
+    layerRef.current = group;
 
     return () => {
       if (layerRef.current) {
