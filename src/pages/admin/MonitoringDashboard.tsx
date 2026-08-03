@@ -8,17 +8,17 @@ import {
 } from "@/components/ui/resizable";
 import { 
   Activity, 
-  Map as MapIcon, 
   BarChart3, 
   RefreshCw, 
   ShieldCheck,
   Briefcase,
   Terminal,
+  Navigation,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import UserActivityTable from './UserActivityTable';
-import TripMapComponent from './TripMapComponent';
+import CommandCenterMap, { type UserLocation } from './CommandCenterMap';
 import SystemMetricsPanel from './SystemMetricsPanel';
 import BusinessMetricsPanel from './BusinessMetricsPanel';
 import LiveEventFeed from './LiveEventFeed';
@@ -38,6 +38,7 @@ const MonitoringDashboard = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [locations, setLocations] = useState<UserLocation[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [metrics, setMetrics] = useState({ 
     active_connections: 0, 
@@ -96,6 +97,63 @@ const MonitoringDashboard = () => {
       queryTimes.push(performance.now() - qs);
       
       if (shipmentData) setShipments(shipmentData);
+
+      // Fetch live driver locations with user info
+      qs = performance.now();
+      const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { data: locationData } = await supabaseClient
+        .from('driver_locations' as any)
+        .select('driver_id, user_type, lat, lng, heading, speed, updated_at')
+        .gte('updated_at', fiveMinAgo)
+        .order('updated_at', { ascending: false });
+      queryTimes.push(performance.now() - qs);
+
+      // Enrich locations with user names from the users table
+      if (locationData && locationData.length > 0) {
+        const driverIds = locationData.map((l: any) => l.driver_id);
+        const { data: locationUsers } = await supabaseClient
+          .from('users')
+          .select('id, full_name')
+          .in('id', driverIds);
+
+        const userNameMap = new Map<string, string>();
+        locationUsers?.forEach((u: any) => userNameMap.set(u.id, u.full_name));
+
+        const enrichedLocations: UserLocation[] = locationData.map((loc: any) => ({
+          driver_id: loc.driver_id,
+          user_type: loc.user_type || 'trucker',
+          lat: loc.lat,
+          lng: loc.lng,
+          heading: loc.heading,
+          speed: loc.speed,
+          updated_at: loc.updated_at,
+          full_name: userNameMap.get(loc.driver_id) || 'Unknown',
+        }));
+
+        // Cross-reference with active trips/shipments for on-trip status
+        const activeTripTruckers = new Map<string, { origin_city: string; destination_city: string }>();
+        trips.forEach(t => { if (t.trucker_id) activeTripTruckers.set(t.trucker_id, { origin_city: t.origin_city, destination_city: t.destination_city }); });
+        const activeShipShippers = new Map<string, { origin_city: string; destination_city: string }>();
+        if (shipmentData) shipmentData.forEach(s => { if (s.shipper_id) activeShipShippers.set(s.shipper_id, { origin_city: s.origin_city, destination_city: s.destination_city }); });
+
+        enrichedLocations.forEach(loc => {
+          if (loc.user_type === 'trucker' && activeTripTruckers.has(loc.driver_id)) {
+            const trip = activeTripTruckers.get(loc.driver_id)!;
+            loc.trip_id = 'active';
+            loc.origin_city = trip.origin_city;
+            loc.destination_city = trip.destination_city;
+          } else if (loc.user_type === 'shipper' && activeShipShippers.has(loc.driver_id)) {
+            const ship = activeShipShippers.get(loc.driver_id)!;
+            loc.trip_id = 'active';
+            loc.origin_city = ship.origin_city;
+            loc.destination_city = ship.destination_city;
+          }
+        });
+
+        setLocations(enrichedLocations);
+      } else {
+        setLocations([]);
+      }
 
       // Calculate Business Metrics
       qs = performance.now();
@@ -184,6 +242,7 @@ const MonitoringDashboard = () => {
         .on('postgres_changes', { event: '*', schema: 'public', table: 'trips' }, () => fetchData())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => fetchData())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => fetchData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'driver_locations' as any }, () => fetchData())
         .subscribe();
     });
 
@@ -239,11 +298,12 @@ const MonitoringDashboard = () => {
         <ResizablePanelGroup direction="vertical">
           <ResizablePanel defaultSize={45} minSize={30}>
             <div className="h-full relative bg-slate-900">
-              <TripMapComponent trips={trips} shipments={shipments} />
-              <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-slate-950/80 border border-slate-800 p-2 rounded-lg backdrop-blur-md shadow-2xl">
-                <MapIcon className="h-4 w-4 text-green-400" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-200">Global Logistics Flow</span>
-              </div>
+              <CommandCenterMap
+                locations={locations}
+                trips={trips}
+                shipments={shipments}
+                loading={loading}
+              />
             </div>
           </ResizablePanel>
 
@@ -296,10 +356,11 @@ const MonitoringDashboard = () => {
                   <div className="flex items-center justify-between mb-4 shrink-0">
                     <div className="flex items-center gap-2">
                       <Activity className="h-4 w-4 text-orange-400" />
-                      <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Live Traffic</h2>
+                      <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Online Now</h2>
                     </div>
-                    <Badge variant="outline" className="border-slate-800 bg-slate-900 text-slate-500 font-mono text-[9px] px-1.5 py-0">
-                      {users.length} OPS
+                    <Badge variant="outline" className="border-green-800 bg-green-900/20 text-green-400 font-mono text-[9px] px-1.5 py-0 flex items-center gap-1">
+                      <Navigation className="h-2.5 w-2.5" />
+                      {locations.length} LIVE
                     </Badge>
                   </div>
                   <UserActivityTable users={users} />

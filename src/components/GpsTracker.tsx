@@ -18,6 +18,7 @@ export interface GpsPosition {
 interface GpsTrackerProps {
   tripId?: string;
   driverId?: string;
+  userType?: 'trucker' | 'shipper';
   onPositionUpdate?: (position: GpsPosition) => void;
   className?: string;
 }
@@ -25,6 +26,7 @@ interface GpsTrackerProps {
 export default function GpsTracker({
   tripId,
   driverId,
+  userType = 'trucker',
   onPositionUpdate,
   className = '',
 }: GpsTrackerProps) {
@@ -65,6 +67,7 @@ export default function GpsTracker({
           .upsert(
             {
               driver_id: driverId,
+              user_type: userType,
               trip_id: tripId || null,
               lat: gpsPos.lat,
               lng: gpsPos.lng,
@@ -82,7 +85,7 @@ export default function GpsTracker({
         console.warn('[GpsTracker] Error persisting location:', err);
       }
     },
-    [driverId, tripId, getToken]
+    [driverId, tripId, userType, getToken]
   );
 
   const handlePosition = useCallback(

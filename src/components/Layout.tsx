@@ -35,6 +35,7 @@ import NotificationBell from "./NotificationBell";
 import OfflineBanner from "./OfflineBanner";
 import ThemeToggle from "./ThemeToggle";
 import VerificationBadge from "./VerificationBadge";
+import AutoGpsTracker from "./AutoGpsTracker";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
@@ -157,6 +158,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col transition-colors duration-300">
       <OfflineBanner />
+      
+      {/* Auto GPS tracking for truckers and shippers */}
+      {userProfile?.user_type !== 'admin' && <AutoGpsTracker />}
       
       {/* Top Navbar */}
       <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 shadow-sm">
