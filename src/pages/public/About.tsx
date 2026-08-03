@@ -1,9 +1,10 @@
 
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Target, Eye, Heart, Shield, Zap, Users, Globe, ArrowRight, MapPin, Truck, Phone, Linkedin } from "lucide-react";
+import { Target, Eye, Heart, Shield, Zap, Users, Globe, ArrowRight, MapPin, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SeoMeta from "@/components/SeoMeta";
+import TeamShowcase from "@/components/ui/team-showcase";
 
 const values = [
   { icon: Target, title: "Purpose-Driven Innovation", desc: "Every feature we build directly targets India's 40% empty kilometer problem. We don't add fluff — we solve real logistics inefficiencies." },
@@ -240,75 +241,7 @@ const About = () => {
             <h2 className="text-3xl sm:text-4xl font-black mb-4 text-foreground dark:text-white">The Team Behind LoadSaathi</h2>
             <p className="text-lg text-muted-foreground">Meet the people building India&apos;s smart freight network.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* CEO */}
-            <div className="glass-card p-10 rounded-xl border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-20 h-20 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                  <span className="text-3xl font-black text-orange-600 dark:text-orange-400">SS</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground">Sanjaya Sahu</h3>
-                  <p className="text-sm text-muted-foreground">Founder & CEO</p>
-                </div>
-              </div>
-              <blockquote className="text-muted-foreground leading-relaxed italic border-l-4 border-orange-500/30 pl-6 mb-6">
-                &quot;Having worked in the logistics space, I saw firsthand how MSMEs in Tier 2 and Tier 3 cities were paying more for freight than they should — not because of a lack of trucks, but because of a lack of connection. LoadSaathi exists to bridge that gap with technology, not intermediaries.&quot;
-              </blockquote>
-              <div className="space-y-3 mb-6">
-                <a href="tel:+918328998031" className="flex items-center gap-3 text-sm text-foreground hover:text-orange-500 transition-colors">
-                  <Phone className="h-4 w-4 text-orange-500 shrink-0" />
-                  <span>+91 83289 98031</span>
-                </a>
-                <a href="https://www.linkedin.com/in/sanjaya-sahu-253315305/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-foreground hover:text-orange-500 transition-colors">
-                  <Linkedin className="h-4 w-4 text-orange-500 shrink-0" />
-                  <span>LinkedIn Profile</span>
-                </a>
-              </div>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <Link to="/contact" className="inline-flex items-center gap-1 text-orange-500 hover:text-orange-400 font-semibold">
-                  Get in Touch <ArrowRight className="h-3 w-3" />
-                </Link>
-                <Link to="/routes" className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground font-semibold">
-                  View Our Corridors <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-            </div>
-
-            {/* COO */}
-            <div className="glass-card p-10 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <span className="text-3xl font-black text-blue-600 dark:text-blue-400">PM</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground">Prince Mallik</h3>
-                  <p className="text-sm text-muted-foreground">Co-Founder & COO</p>
-                </div>
-              </div>
-              <blockquote className="text-muted-foreground leading-relaxed italic border-l-4 border-blue-500/30 pl-6 mb-6">
-                &quot;We&apos;re building more than a platform — we&apos;re building trust in a market that runs on phone calls and cash. Every feature we ship is designed to make a trucker&apos;s life easier and a shipper&apos;s logistics predictable.&quot;
-              </blockquote>
-              <div className="space-y-3 mb-6">
-                <a href="tel:+917684843985" className="flex items-center gap-3 text-sm text-foreground hover:text-blue-500 transition-colors">
-                  <Phone className="h-4 w-4 text-blue-500 shrink-0" />
-                  <span>+91 76848 43985</span>
-                </a>
-                <a href="https://www.linkedin.com/in/prince-mallik-177a472a0/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-foreground hover:text-blue-500 transition-colors">
-                  <Linkedin className="h-4 w-4 text-blue-500 shrink-0" />
-                  <span>LinkedIn Profile</span>
-                </a>
-              </div>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <Link to="/contact" className="inline-flex items-center gap-1 text-blue-500 hover:text-blue-400 font-semibold">
-                  Get in Touch <ArrowRight className="h-3 w-3" />
-                </Link>
-                <Link to="/routes" className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground font-semibold">
-                  View Our Corridors <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-            </div>
-          </div>
+          <TeamShowcase />
         </div>
       </section>
 
