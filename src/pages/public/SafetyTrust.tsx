@@ -120,12 +120,110 @@ const SafetyTrust = () => {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>Safety &amp; Trust — LoadSaathi Verified Freight Network</h1>
+          <p>LoadSaathi ensures safe, verified, and trusted freight operations through KYC verification, freight credit scoring, secure payments, real-time tracking, and AI fraud detection.</p>
+          <h2>Multi-Layered Verification System</h2>
+          <h3>For Transporters</h3>
+          <ul>
+            <li><strong>KYC Verification:</strong> Aadhaar and PAN verification with database checks.</li>
+            <li><strong>Transport License:</strong> Commercial driving license and permit verification.</li>
+            <li><strong>Vehicle Documentation:</strong> RC, insurance, and fitness certificate validation.</li>
+            <li><strong>Background Checks:</strong> Criminal records and fraud history screening.</li>
+          </ul>
+          <h3>For Shippers</h3>
+          <ul>
+            <li><strong>Business Verification:</strong> GST registration and business PAN validation.</li>
+            <li><strong>Company Registration:</strong> ROC and Ministry of Corporate Affairs verification.</li>
+            <li><strong>Trade License:</strong> State and local trade license confirmation.</li>
+            <li><strong>Payment History:</strong> Credit history and payment reliability assessment.</li>
+          </ul>
+          <h2>Digital Freight Credit Score</h2>
+          <p>A 300-900 score evaluating completion rate (30%), on-time delivery (25%), review ratings (20%), communication quality (15%), and account tenure (10%). Higher scores unlock better loads, lower fees, and priority support.</p>
+          <h2>Payment Protection</h2>
+          <ul>
+            <li>Escrow-backed transactions</li>
+            <li>Milestone-based payments</li>
+            <li>Instant payment release after delivery confirmation</li>
+            <li>UPI, net banking, cards, NEFT, RTGS supported</li>
+          </ul>
+          <h2>Real-Time Monitoring</h2>
+          <ul>
+            <li>GPS tracking with geofencing</li>
+            <li>Route deviation detection</li>
+            <li>Speed monitoring and harsh braking alerts</li>
+            <li>Automated delay notifications</li>
+          </ul>
+          <h2>Dispute Resolution</h2>
+          <ul>
+            <li>AI-powered anomaly detection</li>
+            <li>Evidence submission portal</li>
+            <li>24-48 hour resolution</li>
+            <li>Mediation by LoadSaathi team</li>
+          </ul>
+          <h2>Insurance Coverage</h2>
+          <ul>
+            <li>Goods insurance up to ₹50,00,000</li>
+            <li>Vehicle damage coverage</li>
+            <li>Third-party liability insurance</li>
+          </ul>
+          <h2>Trusted by Leading Companies</h2>
+          <p>Tata Steel, JSW, Adani Ports, Amazon India, Flipkart, Reliance Retail, ITC, Dabur, HUL, Maruti Suzuki, Mahindra Logistics, Delhivery — among others.</p>
+        </div>
+      </noscript>
       <SeoMeta
         title="Safety & Trust — Verified Freight Network"
         description="LoadSaathi's multi-layer trust system: ID verification, escrow payments, GPS tracking, bidirectional reviews, and fraud detection. Safe freight for everyone."
         keywords="freight safety India, trucking trust system, verified shippers truckers, secure freight payments"
         canonical="/safety-trust"
         breadcrumbs={[{ name: "Safety & Trust", url: "/safety-trust" }]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "How does LoadSaathi verify transporters?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Every transporter undergoes KYC verification (Aadhaar + PAN), transport license verification, vehicle documentation validation (RC, insurance, fitness certificate), and background checks including criminal records and fraud history screening.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "What is the Digital Freight Credit Score?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "A 300-900 score evaluating completion rate (30%), on-time delivery (25%), review ratings (20%), communication quality (15%), and account tenure (10%). Higher scores unlock better loads, lower fees, and priority support.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "How are payments protected?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "All transactions are escrow-backed with milestone-based payments. Payment is released instantly after GPS + ePOD delivery confirmation. Supports UPI, net banking, cards, NEFT, and RTGS.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "What happens in case of a dispute?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "LoadSaathi provides AI-powered anomaly detection, an evidence submission portal, 24-48 hour resolution, and mediation by the LoadSaathi team. Escrow protection ensures fair handling.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Is cargo insurance available?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. LoadSaathi offers goods insurance up to ₹50,00,000, vehicle damage coverage, and third-party liability insurance for all shipments on the platform.",
+              },
+            },
+          ],
+        }}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

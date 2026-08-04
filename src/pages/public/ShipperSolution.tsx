@@ -88,12 +88,83 @@ export default function ShipperSolution() {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>LoadSaathi for Shippers — AI-Powered Transport Solutions</h1>
+          <p>Ship with confidence using LoadSaathi's AI-powered platform. Instant quotes, verified transporters, real-time tracking, and AI-powered analytics — all in one place.</p>
+          <h2>Why Shippers Choose LoadSaathi</h2>
+          <ul>
+            <li><strong>2-Minute Instant Quotes:</strong> AI-powered pricing with no negotiation delays.</li>
+            <li><strong>Verified Transporters:</strong> KYC-verified with credit scores and performance history.</li>
+            <li><strong>Real-Time Tracking:</strong> Live GPS location, ETA, and route visualization.</li>
+            <li><strong>100% Payment Protection:</strong> Escrow-backed secure transactions.</li>
+            <li><strong>AI Match Accuracy:</strong> 98.5% perfect shipment-vehicle matches.</li>
+            <li><strong>Pan-India Network:</strong> 50+ verified routes across 14 states.</li>
+          </ul>
+          <h2>LoadSaathi Shipper Dashboard</h2>
+          <ul>
+            <li>Post unlimited shipments</li>
+            <li>Real-time bid comparison</li>
+            <li>AI route optimization</li>
+            <li>Track shipments on map</li>
+            <li>View delivery performance</li>
+            <li>Access analytics and reports</li>
+            <li>Manage payments</li>
+            <li>Download ePOD</li>
+          </ul>
+          <h2>How to Start Shipping</h2>
+          <ol>
+            <li>Create account as Shipper</li>
+            <li>Post your first shipment</li>
+            <li>Receive AI-matched bids</li>
+            <li>Select transporter</li>
+            <li>Track and manage delivery</li>
+          </ol>
+          <h2>Frequently Asked Questions</h2>
+          <h3>How fast can I get quotes?</h3>
+          <p>AI-powered quotes in under 2 minutes from multiple verified transporters.</p>
+          <h3>Are all transporters verified?</h3>
+          <p>Yes. Every transporter undergoes KYC, documentation, and background verification.</p>
+          <h3>How does real-time tracking work?</h3>
+          <p>GPS-enabled vehicles provide live location, ETA, and route visualization on your dashboard.</p>
+        </div>
+      </noscript>
       <SeoMeta
         title="For Shippers — Smarter Freight Shipping"
         description="LoadSaathi helps shippers save up to 40% on freight costs. AI-matched trucks, real-time tracking, escrow payments, and zero middlemen on East India corridors."
         keywords="freight shipping India, PTL LTL shipper, book truck online, reduce logistics cost East India"
         canonical="/solutions/shippers"
         breadcrumbs={[{ name: "For Shippers", url: "/solutions/shippers" }]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "How fast can I get quotes?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "AI-powered quotes in under 2 minutes from multiple verified transporters.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Are all transporters verified?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. Every transporter undergoes KYC, documentation, and background verification.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "How does real-time tracking work?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "GPS-enabled vehicles provide live location, ETA, and route visualization on your dashboard.",
+              },
+            },
+          ],
+        }}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
 

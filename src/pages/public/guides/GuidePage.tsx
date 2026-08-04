@@ -111,6 +111,17 @@ export default function GuidePage() {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>{guide.title}</h1>
+          <p>{guide.summary}</p>
+          <p><strong>Author:</strong> {guide.author} | <strong>Read Time:</strong> {guide.readTime}</p>
+          <h2>Guide Content</h2>
+          {guide.content.map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </div>
+      </noscript>
       <SeoMeta
         title={guide.title}
         description={guide.summary.substring(0, 160)}

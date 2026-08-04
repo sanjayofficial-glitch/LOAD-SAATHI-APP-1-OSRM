@@ -38,6 +38,51 @@ const About = () => {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>About LoadSaathi — India's AI Freight Operating System</h1>
+          <p>LoadSaathi is an AI-powered logistics platform founded by Sanjaya Sahu from Rourkela, Odisha. Our mission is to eliminate empty kilometers and build the most efficient freight network in India.</p>
+          <h2>Our Mission</h2>
+          <p>With 1 in 3 trucks returning empty and 67% of India's logistics still unorganized, we leverage AI to create a transparent, efficient, and trusted marketplace where every kilometer carries value.</p>
+          <h2>Our Vision</h2>
+          <p>Building India's most efficient freight network — where every kilometer carries value and empty trucks become a thing of the past.</p>
+          <h2>The Problem We Solve</h2>
+          <ul>
+            <li>Empty trucks return 600+ km on average, wasting ₹10,000–₹25,000 in fuel.</li>
+            <li>Manual processes and phone-based bookings limit truckers to 15-20 loads per month.</li>
+            <li>No real-time tracking or visibility for shippers.</li>
+            <li>Payment delays, disputes, and manual invoicing add 15-20 days overhead.</li>
+            <li>Over 80% of freight brokers charge hidden margins.</li>
+          </ul>
+          <h2>Our Story</h2>
+          <p>Founded by Sanjaya Sahu, an FTBI alumnus from NIT Rourkela. After years in the Indian logistics industry seeing truckers return empty and shippers struggling to find reliable carriers, he realized the problem wasn't trucks — it was disconnection. LoadSaathi was born to bring transparency, trust, and intelligence to Indian freight.</p>
+          <h2>Our Values</h2>
+          <ul>
+            <li><strong>Transparency First:</strong> Every transaction, price, and performance metric is open and visible.</li>
+            <li><strong>Win-Win Model:</strong> Both shippers and truckers must benefit from every match.</li>
+            <li><strong>Community Trust:</strong> Reviews, ratings, and verification build a self-governing ecosystem.</li>
+            <li><strong>AI-Driven Efficiency:</strong> Technology eliminates waste and maximizes output.</li>
+            <li><strong>Trucker Dignity:</strong> Professional tools and respectful treatment of drivers.</li>
+          </ul>
+          <h2>Our Impact</h2>
+          <ul>
+            <li><strong>15,000+ km:</strong> Empty kilometers eliminated every month.</li>
+            <li><strong>2,500+ Tonnes:</strong> Monthly freight movement across 14 states.</li>
+            <li><strong>50+ Route Corridors:</strong> Pan-India network from Kashmir to Kanyakumari.</li>
+            <li><strong>₹30L+:</strong> Monthly savings passed to truckers.</li>
+          </ul>
+          <h2>Leadership</h2>
+          <p><strong>Sanjaya Sahu — Founder &amp; CEO</strong></p>
+          <p>FTBI Alumnus, NIT Rourkela Campus. Former operations and technology leader with deep logistics expertise.</p>
+          <h2>Why LoadSaathi</h2>
+          <ul>
+            <li><strong>For Shippers:</strong> Real-time tracking, transparent pricing, verified fleet, instant booking, guaranteed capacity.</li>
+            <li><strong>For Truckers:</strong> Backhaul loads, zero empty returns, guaranteed payments, AI routing, digital records.</li>
+          </ul>
+          <h2>Media</h2>
+          <p>Recognized in The Hindu, Business Standard, NDTV Profit, Indian Startup News, and other national publications.</p>
+        </div>
+      </noscript>
       <SeoMeta
         title="About Us — India's Smart Freight Network"
         description="LoadSaathi is India's shared freight marketplace connecting shippers and truckers directly. AI-powered matching, zero middlemen, lower costs for East India corridors."

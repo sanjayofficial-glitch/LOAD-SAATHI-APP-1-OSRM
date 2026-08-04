@@ -58,7 +58,7 @@ export default function BlogArticle() {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Article",
+        "@type": "BlogPosting",
         headline: article.title,
         description: article.summary.substring(0, 160),
         author: {

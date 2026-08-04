@@ -89,6 +89,16 @@ export default function LocationPage() {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>{data.name} Freight Transport — LoadSaathi</h1>
+          <p>{data.description}</p>
+          <ul>
+            <li><strong>State:</strong> {data.state}</li>
+            <li><strong>Industries:</strong> {data.industries.join(', ')}</li>
+          </ul>
+        </div>
+      </noscript>
       <SeoMeta
         title={`Freight Transport in ${data.name}, ${data.state} — LoadSaathi`}
         description={data.description.substring(0, 160)}

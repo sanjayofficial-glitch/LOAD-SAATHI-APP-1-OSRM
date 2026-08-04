@@ -44,8 +44,8 @@ function useTeamMembers() {
       } catch {
         // Fallback to hardcoded data if Supabase is unavailable
         setMembers([
-          { id: '1', name: 'Sanjaya Sahu', role: 'Founder & CEO', image: 'https://i.pravatar.cc/400?img=11', phone: '+918328998031', social: { linkedin: 'https://www.linkedin.com/in/sanjaya-sahu-253315305/' } },
-          { id: '2', name: 'Prince Mallik', role: 'Co-Founder & COO', image: 'https://i.pravatar.cc/400?img=12', phone: '+91 76848 43985', social: { linkedin: 'https://www.linkedin.com/in/prince-mallik-177a472a0/' } },
+          { id: '1', name: 'Sanjaya Sahu', role: 'Founder & CEO', image: '/team/sanjaya-sahu.webp', phone: '+918328998031', social: { linkedin: 'https://www.linkedin.com/in/sanjaya-sahu-253315305/' } },
+          { id: '2', name: 'Prince Mallik', role: 'Co-Founder & COO', image: '/team/prince-mallik.webp', phone: '+91 76848 43985', social: { linkedin: 'https://www.linkedin.com/in/prince-mallik-177a472a0/' } },
           { id: '3', name: 'Customer Executive', role: 'Customer Executive', image: 'https://i.pravatar.cc/400?img=16', social: {} },
         ]);
       } finally {
@@ -76,7 +76,7 @@ export default function TeamShowcase() {
             <PhotoCard
               key={member.id}
               member={member}
-              className="w-[110px] h-[120px] sm:w-[130px] sm:h-[140px] md:w-[155px] md:h-[165px]"
+              className="w-[110px] h-[160px] sm:w-[130px] sm:h-[185px] md:w-[155px] md:h-[215px]"
               hoveredId={hoveredId}
               onHover={setHoveredId}
             />
@@ -89,7 +89,7 @@ export default function TeamShowcase() {
             <PhotoCard
               key={member.id}
               member={member}
-              className="w-[122px] h-[132px] sm:w-[145px] sm:h-[155px] md:w-[172px] md:h-[182px]"
+              className="w-[122px] h-[175px] sm:w-[145px] sm:h-[200px] md:w-[172px] md:h-[230px]"
               hoveredId={hoveredId}
               onHover={setHoveredId}
             />
@@ -102,7 +102,7 @@ export default function TeamShowcase() {
             <PhotoCard
               key={member.id}
               member={member}
-              className="w-[115px] h-[125px] sm:w-[136px] sm:h-[146px] md:w-[162px] md:h-[172px]"
+              className="w-[115px] h-[168px] sm:w-[136px] sm:h-[192px] md:w-[162px] md:h-[222px]"
               hoveredId={hoveredId}
               onHover={setHoveredId}
             />

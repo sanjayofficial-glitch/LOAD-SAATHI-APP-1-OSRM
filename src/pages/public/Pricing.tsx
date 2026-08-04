@@ -151,6 +151,45 @@ const Pricing = () => {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>LoadSaathi Pricing — Simple, Transparent, No Hidden Fees</h1>
+          <p>LoadSaathi offers a free platform for shippers and truckers to connect. No subscription fees. Pay only for services you use — AI matching, ePOD verification, advanced analytics, and credit monitoring.</p>
+          <h2>Shipper Plans</h2>
+          <h3>Starter (Free Forever)</h3>
+          <p>For small shippers getting started. Includes unlimited posting, unlimited bids, AI matching, dashboard, payment protection, and 50km free tracking.</p>
+          <h3>Professional (Most Popular)</h3>
+          <p>₹499/month. For growing shippers. Includes unlimited tracking, 20 ePODs/month, advanced analytics, priority support, route optimization, and 3 credit reports.</p>
+          <h3>Enterprise</h3>
+          <p>Custom pricing. For large shippers. Includes dedicated account manager, API integration, bulk operations, custom SLAs, unlimited tracking and ePODs, full analytics, and priority support.</p>
+          <h2>Trucker Plans</h2>
+          <h3>Basic (Free Forever)</h3>
+          <p>For individual truckers. Includes unlimited loads, AI matching, GPS tracking, dashboard, payment protection, and basic analytics.</p>
+          <h3>Professional (Most Popular)</h3>
+          <p>₹299/month. Includes 15% fee cap, 30 ePODs, advanced analytics, load alerts, and priority support.</p>
+          <h3>Fleet</h3>
+          <p>₹999/month. For fleet operators. Includes 10% fee cap, unlimited ePODs, full analytics, API access, and fleet management.</p>
+          <h2>AI Services (Pay Per Use)</h2>
+          <ul>
+            <li>AI Price Predictor: ₹99/analysis</li>
+            <li>ePOD Verification: ₹50/verification</li>
+            <li>Dynamic Credit Monitoring: ₹199/month</li>
+            <li>Advanced Route Optimization: ₹149/trip</li>
+          </ul>
+          <h2>Transaction Fees</h2>
+          <ul>
+            <li>Shipper: 0% on first ₹50,000, then 1.5%</li>
+            <li>Trucker: 10-15% (capped per plan)</li>
+          </ul>
+          <h2>Frequently Asked Questions</h2>
+          <h3>How is LoadSaathi different from other platforms?</h3>
+          <p>We combine AI-powered matching, real-time tracking, freight credit scoring, and secure payments in one platform. No hidden fees, no brokerage.</p>
+          <h3>Can I switch plans anytime?</h3>
+          <p>Yes. All plans are month-to-month with no lock-in contracts.</p>
+          <h3>What payment methods do you accept?</h3>
+          <p>UPI, net banking, debit/credit cards, NEFT, and RTGS.</p>
+        </div>
+      </noscript>
       <SeoMeta
         title="Pricing — Transparent Freight Rates"
         description="LoadSaathi's transparent pricing: free registration, pay only 2-5% on completed shipments. No hidden fees, no subscriptions. Compare plans for shippers and truckers."

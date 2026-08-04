@@ -52,13 +52,81 @@ const HowItWorks = () => {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>How LoadSaathi Works — Complete Logistics Platform Guide</h1>
+          <p>LoadSaathi uses AI to connect shippers and truckers for seamless freight operations.</p>
+          <h2>How LoadSaathi Works for Shippers</h2>
+          <h3>Step 1: Create and List Shipments</h3>
+          <p>Log in, select Post Shipment, and enter pickup location, destination, cargo type, weight, and preferred pickup/delivery times.</p>
+          <h3>Step 2: AI Discovers Perfect Transporters</h3>
+          <p>The AI matching engine analyzes route, availability, and historical data to generate a ranked list of transporters with match scores.</p>
+          <h3>Step 3: Track and Manage in Real-Time</h3>
+          <p>Use the shipper dashboard to view shipments, accept bids, monitor progress with live GPS, and confirm delivery with ePOD.</p>
+          <h2>How LoadSaathi Works for Truckers</h2>
+          <h3>Step 1: Set Up Profile</h3>
+          <p>Sign up, select Trucker, complete KYC verification, and add your truck details and routes.</p>
+          <h3>Step 2: Get AI-Matched Loads</h3>
+          <p>The AI continuously scans for optimal loads based on truck availability, location, and preferences. Get alerts with match scores.</p>
+          <h3>Step 3: Execute and Get Paid</h3>
+          <p>Accept loads, use navigation for route optimization, complete deliveries, and receive payment after confirmed delivery.</p>
+          <h2>Core Features</h2>
+          <ul>
+            <li><strong>Smart AI Matching:</strong> 98%+ accuracy considering route, capacity, pricing, and history.</li>
+            <li><strong>Real-Time GPS Tracking:</strong> Live location, ETA, and route deviation alerts.</li>
+            <li><strong>Freight Credit Score:</strong> 300-900 scoring for trust and eligibility.</li>
+            <li><strong>AI Price Predictor:</strong> Fair market pricing with confidence levels.</li>
+            <li><strong>Secure Payments:</strong> Milestone-based escrow for safety.</li>
+            <li><strong>Verified Network:</strong> KYC-verified transporters only.</li>
+          </ul>
+          <h2>Frequently Asked Questions</h2>
+          <h3>How long does it take to get matched?</h3>
+          <p>The AI matching engine runs in real-time. Shippers typically receive transporter bids within minutes.</p>
+          <h3>Is the platform safe for new truckers?</h3>
+          <p>Yes. Features like KYC verification, freight credit scores, secure payments, and ratings ensure a safe environment.</p>
+          <h3>What happens if there is a dispute?</h3>
+          <p>LoadSaathi provides a dispute resolution system with support teams and secure payment escrow for fair handling.</p>
+        </div>
+      </noscript>
       <SeoMeta
         title="How It Works — Ship or Haul Freight"
         description="Learn how LoadSaathi works for shippers and truckers. Post shipments, find loads, get AI-matched, track in real-time, and get paid — all on one platform."
         keywords="how LoadSaathi works, post shipment online, find truck loads India, digital freight platform guide"
         canonical="/how-it-works"
         breadcrumbs={[{ name: "How It Works", url: "/how-it-works" }]}
-        jsonLd={howToSchema}
+        jsonLd={[
+          howToSchema,
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "How long does it take to get matched?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "The AI matching engine runs in real-time. Shippers typically receive transporter bids within minutes.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Is the platform safe for new truckers?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes. Features like KYC verification, freight credit scores, secure payments, and ratings ensure a safe environment.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What happens if there is a dispute?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "LoadSaathi provides a dispute resolution system with support teams and secure payment escrow for fair handling.",
+                },
+              },
+            ],
+          },
+        ]}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

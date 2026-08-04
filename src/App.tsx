@@ -47,6 +47,7 @@ const LocationPage = lazy(() => import("./pages/public/locations/LocationPage"))
 const GuidePage = lazy(() => import("./pages/public/guides/GuidePage"));
 const RoutesIndex = lazy(() => import("./pages/public/RoutesIndex"));
 const RouteDetail = lazy(() => import("./pages/public/RouteDetail"));
+const Comparison = lazy(() => import("./pages/public/Comparison"));
 const TruckerDashboard = lazy(() => import("./pages/trucker/Dashboard"));
 const PostTrip = lazy(() => import("./pages/trucker/PostTrip"));
 const TruckerHub = lazy(() => import("./pages/trucker/TruckerHub"));
@@ -142,6 +143,7 @@ function App() {
                     <Route path="/share/shipment/:id" element={<SharedShipment />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/safety-trust" element={<SafetyTrust />} />
+                    <Route path="/compare" element={<Comparison />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/solutions/shippers" element={<ShipperSolution />} />

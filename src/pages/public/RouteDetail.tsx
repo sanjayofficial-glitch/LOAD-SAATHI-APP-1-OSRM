@@ -152,6 +152,20 @@ export default function RouteDetail() {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>{route.from} to {route.to} Freight Route — LoadSaathi</h1>
+          <p>{route.description}</p>
+          <ul>
+            <li><strong>Distance:</strong> {route.distanceKm} km</li>
+            <li><strong>Transit Time:</strong> {route.transitTime} hours</li>
+            <li><strong>From:</strong> {route.from}, {route.fromState}</li>
+            <li><strong>To:</strong> {route.to}, {route.toState}</li>
+          </ul>
+          <h2>Route Details</h2>
+          <p>{route.metaDescription}</p>
+        </div>
+      </noscript>
       <SeoMeta
         title={`PTL Freight ${route.from} to ${route.to} | Book Trucks Online`}
         description={route.metaDescription}

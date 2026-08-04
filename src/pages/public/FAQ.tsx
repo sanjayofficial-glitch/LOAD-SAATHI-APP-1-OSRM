@@ -180,7 +180,43 @@ const FAQ = () => {
 
   return (
     <>
-    <SeoMeta
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>Frequently Asked Questions — LoadSaathi AI Freight Platform</h1>
+          <h2>Getting Started</h2>
+          <h3>What is LoadSaathi?</h3>
+          <p>LoadSaathi is India's AI-powered freight operating system that connects shippers with verified truckers. We use AI matching, real-time tracking, credit scoring, and secure payments to make logistics simple and transparent.</p>
+          <h3>Who can use LoadSaathi?</h3>
+          <p>Any business shipping goods (manufacturers, traders, exporters, e-commerce) and any trucker looking for loads — solo operators or fleets of any size.</p>
+          <h3>How do I sign up?</h3>
+          <p>Click Sign Up, select your role (Shipper or Trucker), complete verification, and start posting or browsing immediately. Trucker KYC takes 24-48 hours.</p>
+          <h2>AI &amp; Technology</h2>
+          <h3>How does the AI matching engine work?</h3>
+          <p>It considers route compatibility, vehicle type, pricing history, on-time performance, cargo type, and real-time availability to generate ranked matches with compatibility scores.</p>
+          <h3>What is the AI Price Predictor?</h3>
+          <p>An analysis tool that provides fair market pricing based on route, weight, vehicle type, current market rates, and demand. It shows recommended, minimum, and maximum rates with confidence levels.</p>
+          <h3>What is the Freight Credit Score?</h3>
+          <p>A 300-900 scoring system evaluating completion rates, on-time delivery, ratings, communication, and account tenure. Higher scores unlock better loads and lower fees.</p>
+          <h2>Pricing &amp; Payments</h2>
+          <h3>Are there hidden fees?</h3>
+          <p>No. Pricing is transparent. Basic services are free. Pay only for premium features like advanced analytics, ePOD verification, or credit monitoring.</p>
+          <h3>How does payment protection work?</h3>
+          <p>Payments are held in escrow and released after shipment delivery is confirmed via GPS tracking and ePOD verification. Both parties receive instant notifications.</p>
+          <h2>Operations</h2>
+          <h3>How do I post a shipment?</h3>
+          <p>Log in, click Post Shipment, enter pickup/destination addresses, select vehicle type, enter cargo details, and set your budget or let the AI suggest a price.</p>
+          <h3>How do I track shipments?</h3>
+          <p>From your dashboard, view the shipment detail page with a live map, vehicle location, ETA, and route. You can also share tracking with customers.</p>
+          <h2>Support &amp; Trust</h2>
+          <h3>How does LoadSaathi verify truckers?</h3>
+          <p>Every trucker undergoes a 4-step verification: KYC (Aadhaar + PAN), vehicle documentation, transport license, and background checks. Verified badges are displayed on profiles.</p>
+          <h3>What if there is a dispute?</h3>
+          <p>Our AI system flags anomalies and notifies the support team. Both parties provide evidence, and the team mediates within 24-48 hours with fair resolution.</p>
+          <h3>How can I contact support?</h3>
+          <p>Live chat in-app (24/7), email at support@loadsaathi.in, or call the helpline from your dashboard.</p>
+        </div>
+      </noscript>
+      <SeoMeta
       title="FAQ — Frequently Asked Questions"
       description="Find answers to common questions about LoadSaathi's freight marketplace — how it works, pricing, payments, trust & safety, and technical support for shippers and truckers."
       keywords="LoadSaathi FAQ, freight marketplace questions, how LoadSaathi works, trucking platform help, logistics support India"

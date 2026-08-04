@@ -88,12 +88,82 @@ export default function TruckerSolution() {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>LoadSaathi for Truckers — AI-Powered Load Discovery</h1>
+          <p>Transform your trucking business with LoadSaathi. Get AI-matched loads, optimize routes, maximize earnings, and eliminate empty returns with India's leading freight platform.</p>
+          <h2>Why Truckers Choose LoadSaathi</h2>
+          <ul>
+            <li><strong>Backhaul Loads:</strong> AI finds loads on your return route to eliminate empty kilometers.</li>
+            <li><strong>Zero Empty Returns:</strong> Intelligent matching ensures every trip generates revenue.</li>
+            <li><strong>Guaranteed Payments:</strong> Escrow-backed instant payments after delivery.</li>
+            <li><strong>AI Route Optimization:</strong> Saves fuel and maximizes trips per month.</li>
+            <li><strong>Digital Records:</strong> Complete digital trip history for compliance.</li>
+            <li><strong>Performance Tracking:</strong> AI monitors safety, speed, and efficiency.</li>
+          </ul>
+          <h2>LoadSaathi Trucker Dashboard</h2>
+          <ul>
+            <li>AI-matched load recommendations</li>
+            <li>Route optimization and navigation</li>
+            <li>Real-time trip tracking</li>
+            <li>Earnings and payment history</li>
+            <li>Load filtering by type, route, weight</li>
+            <li>Smart alerts for new loads</li>
+            <li>Trip analytics and insights</li>
+          </ul>
+          <h2>How to Get Started</h2>
+          <ol>
+            <li>Create account as Trucker</li>
+            <li>Complete KYC verification</li>
+            <li>Add truck details</li>
+            <li>Browse AI-matched loads</li>
+            <li>Accept and start earning</li>
+          </ol>
+          <h2>Frequently Asked Questions</h2>
+          <h3>How does LoadSaathi eliminate empty returns?</h3>
+          <p>The AI matches backhaul loads on your return route based on location, timing, and truck capacity.</p>
+          <h3>When do I get paid?</h3>
+          <p>Payments are released instantly after GPS + ePOD delivery confirmation.</p>
+          <h3>What fees does LoadSaathi charge?</h3>
+          <p>10-15% per load (capped per plan). No hidden charges, fuel surcharges, or commissions.</p>
+        </div>
+      </noscript>
       <SeoMeta
         title="For Truckers — Find Loads & Earn More"
         description="Join LoadSaathi to find return loads, reduce empty kilometers, get paid faster, and build your digital credit score. India's trucker-friendly freight platform."
         keywords="find truck loads India, return load for truck, trucker app, reduce empty kilometers, freight platform for truckers"
         canonical="/solutions/truckers"
         breadcrumbs={[{ name: "For Truckers", url: "/solutions/truckers" }]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "How does LoadSaathi eliminate empty returns?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "The AI matches backhaul loads on your return route based on location, timing, and truck capacity.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "When do I get paid?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Payments are released instantly after GPS + ePOD delivery confirmation.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "What fees does LoadSaathi charge?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "10-15% per load (capped per plan). No hidden charges, fuel surcharges, or commissions.",
+              },
+            },
+          ],
+        }}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
 

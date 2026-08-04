@@ -41,6 +41,44 @@ const Contact = () => {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>Contact LoadSaathi — Get in Touch</h1>
+          <p>Have questions or need support? Contact LoadSaathi's team for demos, technical support, partnerships, or general inquiries.</p>
+          <h2>General Inquiries</h2>
+          <p><strong>Email:</strong> hello@loadsaathi.in</p>
+          <p><strong>Phone:</strong> +91-XXXXXXXXXX</p>
+          <p><strong>Hours:</strong> Monday to Saturday, 9:00 AM - 7:00 PM IST</p>
+          <h2>Head Office</h2>
+          <p><strong>Address:</strong> LoadSaathi Technologies Pvt. Ltd., Near NIT Rourkela, Rourkela, Odisha 769008, India</p>
+          <h2>Regional Offices</h2>
+          <ul>
+            <li><strong>Delhi NCR:</strong> Plot No. 15, Sector 44, Gurugram, Haryana 122003</li>
+            <li><strong>Mumbai:</strong> 701, 7th Floor, Ackruti Cosmos, MIDC, Andheri East, Mumbai 400093</li>
+            <li><strong>Bengaluru:</strong> 3rd Floor, Prestige Towers, Residency Road, Bengaluru 560025</li>
+          </ul>
+          <h2>Specialized Contacts</h2>
+          <ul>
+            <li><strong>Technical Support:</strong> support@loadsaathi.in</li>
+            <li><strong>Sales &amp; Demos:</strong> sales@loadsaathi.in</li>
+            <li><strong>Partnerships:</strong> partnerships@loadsaathi.in</li>
+            <li><strong>Media &amp; PR:</strong> press@loadsaathi.in</li>
+            <li><strong>Careers:</strong> careers@loadsaathi.in</li>
+          </ul>
+          <h2>Connect on Social Media</h2>
+          <ul>
+            <li>LinkedIn, Twitter, YouTube, Facebook — @LoadSaathi</li>
+          </ul>
+          <h2>What You Can Contact Us About</h2>
+          <ul>
+            <li>Product demos and walkthroughs</li>
+            <li>Account or technical support</li>
+            <li>Partnership inquiries</li>
+            <li>Media requests and interviews</li>
+            <li>Career opportunities</li>
+          </ul>
+        </div>
+      </noscript>
       <SeoMeta
         title="Contact Us — Get in Touch"
         description="Reach out to LoadSaathi's support team. We're available 24/7 via email, phone, or our contact form. Get help with shipments, account issues, or partnership inquiries."
@@ -208,7 +246,7 @@ const Contact = () => {
               <div className="glass-card p-8 rounded-xl border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300 group">
                 <div className="flex items-center gap-4 mb-6">
                   <Avatar className="w-16 h-16">
-                    <AvatarImage src={undefined} alt="Sanjaya Sahu" />
+                    <AvatarImage src="/team/sanjaya-sahu.webp" alt="Sanjaya Sahu" />
                     <AvatarFallback className="bg-orange-100 dark:bg-orange-900/30 text-2xl font-black text-orange-600 dark:text-orange-400">SS</AvatarFallback>
                   </Avatar>
                   <div>
@@ -235,7 +273,7 @@ const Contact = () => {
               <div className="glass-card p-8 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all duration-300 group">
                 <div className="flex items-center gap-4 mb-6">
                   <Avatar className="w-16 h-16">
-                    <AvatarImage src={undefined} alt="Prince Mallik" />
+                    <AvatarImage src="/team/prince-mallik.webp" alt="Prince Mallik" />
                     <AvatarFallback className="bg-blue-100 dark:bg-blue-900/30 text-2xl font-black text-blue-600 dark:text-blue-400">PM</AvatarFallback>
                   </Avatar>
                   <div>

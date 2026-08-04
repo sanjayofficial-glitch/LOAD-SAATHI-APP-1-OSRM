@@ -21,6 +21,47 @@ const uniqueCorridors = getStatePairs();
 export default function RoutesIndex() {
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>India's Major Freight Routes — Popular Trucking Routes</h1>
+          <p>Discover India's most important freight corridors, key highways, and strategic trucking routes connecting major industrial hubs, ports, and commercial centers.</p>
+          <h2>Route Corridors</h2>
+          <ul>
+            <li><strong>Delhi-Mumbai Industrial Corridor:</strong> Noida to Mumbai, 1,400 km. Top manufacturing and consumption hub connection.</li>
+            <li><strong>Chennai-Bengaluru Industrial Corridor:</strong> Chennai to Bengaluru, 350 km. Automotive, electronics, and textile corridor.</li>
+            <li><strong>Amritsar-Kolkata Corridor:</strong> Amritsar to Kolkata, 1,800 km. Major east-west trade route.</li>
+            <li><strong>North-South Corridor:</strong> Srinagar to Kanyakumari, 4,000 km. National highway connecting north to south India.</li>
+            <li><strong>East-West Corridor:</strong> Porbandar to Silchar, 3,300 km. National highway connecting west to east India.</li>
+          </ul>
+          <h2>Key Highways</h2>
+          <ul>
+            <li><strong>NH 48:</strong> Delhi to Mumbai, 1,400 km. India's busiest freight highway.</li>
+            <li><strong>NH 44:</strong> Srinagar to Kanyakumari, 4,000 km. Longest highway in India.</li>
+            <li><strong>NH 16:</strong> Kolkata to Chennai, 1,600 km. Major east coast corridor.</li>
+            <li><strong>NH 7:</strong> Varanasi to Kanyakumari, 2,350 km. National highway connecting north to south India.</li>
+            <li><strong>NH 2:</strong> Delhi to Kolkata, 1,450 km. Major east-west highway.</li>
+          </ul>
+          <h2>Strategic Trade Routes</h2>
+          <ul>
+            <li><strong>Kandla Port to Delhi:</strong> Major import-export corridor, 1,200 km. High demand for containerized cargo.</li>
+            <li><strong>Mumbai Port to Pune:</strong> Short-haul high-frequency corridor, 150 km. Daily shipments.</li>
+            <li><strong>Chennai Port to Bengaluru:</strong> Southern industrial corridor, 350 km. High-frequency route.</li>
+            <li><strong>Kolkata Port to Delhi:</strong> Eastern gateway, 1,450 km. High volume industrial route.</li>
+          </ul>
+          <h2>Regional Hubs</h2>
+          <ul>
+            <li><strong>Delhi NCR:</strong> Logistics capital of India. 150+ daily trips to various destinations.</li>
+            <li><strong>Mumbai:</strong> Financial and logistics hub. 120+ daily trips to various destinations.</li>
+            <li><strong>Bengaluru:</strong> Tech and manufacturing hub. 90+ daily trips to various destinations.</li>
+            <li><strong>Chennai:</strong> Southern gateway. 75+ daily trips to various destinations.</li>
+          </ul>
+          <h2>Frequently Asked Questions</h2>
+          <h3>Which is the busiest freight route in India?</h3>
+          <p>The Delhi-Mumbai corridor (NH 48) handles the highest volume of freight traffic, with thousands of trucks plying daily.</p>
+          <h3>Are there toll costs I should know about?</h3>
+          <p>Most national highways have toll plazas. LoadSaathi's route optimizer factors in toll costs when calculating fair pricing.</p>
+        </div>
+      </noscript>
       <SeoMeta
         title="PTL & LTL Freight Routes — East India"
         description="Browse PTL and LTL freight routes across East India. Book shared truck loads from Rourkela, Ranchi, Jamshedpur, Bhubaneswar, Kolkata, and more. Save up to 40% on shipping."

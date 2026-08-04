@@ -114,7 +114,42 @@ export default function FareCalculator() {
 
   return (
     <>
-    <SeoMeta
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>AI Fare Calculator — Get Instant Freight Estimates</h1>
+          <p>LoadSaathi's AI-powered fare calculator provides accurate freight cost estimates in real-time. Enter your route and cargo details to get instant pricing with market intelligence, historical trends, and a fairness index.</p>
+          <h2>How to Use the Fare Calculator</h2>
+          <ol>
+            <li><strong>Select Route:</strong> Choose origin and destination states and cities from the dropdown menus.</li>
+            <li><strong>Enter Cargo Details:</strong> Provide weight in kilograms and select your vehicle type.</li>
+            <li><strong>Click Calculate:</strong> Get instant AI-powered price estimate with fair price range, rate per kilogram, and market intelligence.</li>
+          </ol>
+          <h2>What the Estimate Includes</h2>
+          <ul>
+            <li>Fair price estimate based on market rates and historical data</li>
+            <li>Confidence level (Low, Medium, High, Very High)</li>
+            <li>Fairness index showing how the price compares to market averages</li>
+            <li>Rate per kilometer and rate per kilogram</li>
+            <li>Current market demand indicator</li>
+            <li>Historical price trends for the route</li>
+            <li>AI-powered recommendations for optimal pricing</li>
+          </ul>
+          <h2>Vehicle Types Supported</h2>
+          <ul>
+            <li>Open Body — General goods transport</li>
+            <li>Container — Secured, weather-protected cargo</li>
+            <li>Tanker — Liquid and bulk transport</li>
+            <li>Flatbed — Oversized and heavy cargo</li>
+            <li>Refrigerated — Temperature-sensitive goods</li>
+          </ul>
+          <h2>Frequently Asked Questions</h2>
+          <h3>How accurate is the AI fare estimate?</h3>
+          <p>Our AI analyzes market rates, fuel costs, seasonal demand, and historical data. The accuracy level is indicated in the results.</p>
+          <h3>Is the fare calculator free?</h3>
+          <p>Yes. The AI fare calculator is completely free to use. No registration required.</p>
+        </div>
+      </noscript>
+      <SeoMeta
       title="Freight Fare Calculator — Estimate PTL/LTL Rates"
       description="Calculate estimated freight rates for PTL and LTL shipments across East India. AI-powered fare estimates for Rourkela, Ranchi, Burdwan, and more."
       keywords="freight fare calculator India, PTL LTL rate calculator, truck freight cost estimation, Rourkela Ranchi transport rate"

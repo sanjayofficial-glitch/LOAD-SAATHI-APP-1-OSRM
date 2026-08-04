@@ -544,6 +544,7 @@ const Index = () => {
                 <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-2">{stat.label}</div>
               </div>
             ))}
+            <p className="w-full text-center text-[10px] text-muted-foreground/60 mt-2">Sources: Ministry of Road Transport &amp; Highways 2025, IBEF Logistics Report 2026</p>
           </div>
         </section>
 

@@ -47,12 +47,89 @@ const Features = () => {
 
   return (
     <>
+      <noscript>
+        <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
+          <h1>LoadSaathi Features — AI-Powered Freight Platform</h1>
+          <p>LoadSaathi combines AI-powered matching, real-time tracking, predictive pricing, and a trusted network to eliminate empty kilometers and transform logistics profitability.</p>
+          <h2>Shipper Operating System</h2>
+          <ul>
+            <li><strong>Shipment Management:</strong> Post, track, and manage all your shipments from a single dashboard.</li>
+            <li><strong>AI-Powered Transporter Discovery:</strong> Matching engine analyzes thousands of active trucks to find the perfect carrier.</li>
+            <li><strong>Smart Notifications:</strong> Instant alerts on bid responses, tracking updates, delivery confirmations.</li>
+            <li><strong>Real-Time Tracking:</strong> Live GPS tracking with ETAs, route visualization, and geofencing.</li>
+            <li><strong>Verified Transporter Network:</strong> Every transporter is verified with credentials, credit scores, and reviews.</li>
+            <li><strong>Analytics and Insights:</strong> Comprehensive dashboards with trends, performance metrics, and AI recommendations.</li>
+          </ul>
+          <h2>Transporter Operating System</h2>
+          <ul>
+            <li><strong>Load Discovery:</strong> Browse AI-matched shipments matching your truck type, route, and schedule.</li>
+            <li><strong>Route Optimization:</strong> Intelligent route planning considering pickups, drop-offs, fuel, and tolls.</li>
+            <li><strong>Smart Match Alerts:</strong> Real-time notifications for loads matching your capacity and routes.</li>
+            <li><strong>Earnings Dashboard:</strong> Track income, completed trips, kilometers, and utilization rates.</li>
+            <li><strong>Payment Protection:</strong> Secure milestone-based payments with escrow backing.</li>
+            <li><strong>Trip History:</strong> Detailed logs of all completed trips including routes, times, and reviews.</li>
+          </ul>
+          <h2>AI Command Center</h2>
+          <ul>
+            <li><strong>AI Match Scoring:</strong> Proprietary algorithm evaluating route compatibility, pricing, performance with 98%+ accuracy.</li>
+            <li><strong>Price Prediction Engine:</strong> Real-time fair pricing based on market rates, fuel costs, and demand.</li>
+            <li><strong>Digital Freight Credit Scoring:</strong> 300-900 score for every participant factoring completion, performance, and feedback.</li>
+          </ul>
+          <h2>Frequently Asked Questions</h2>
+          <h3>How does AI matching work on LoadSaathi?</h3>
+          <p>Our matching engine analyzes route compatibility, vehicle capacity, pricing history, on-time performance, cargo type, and real-time availability. It ranks the best matches with a compatibility score.</p>
+          <h3>What is the Digital Freight Credit Score?</h3>
+          <p>Every participant receives a score between 300 and 900 based on completion rates, on-time performance, reviews, communication, and tenure. Higher scores unlock better loads, lower fees, and faster payments.</p>
+          <h3>Is real-time GPS tracking included?</h3>
+          <p>Yes. Every shipment and trip includes live GPS tracking with ETAs, route visualization, and geofence alerts.</p>
+          <h3>How does the AI Price Predictor work?</h3>
+          <p>The system uses a multi-provider AI chain to analyze route, weight, vehicle type, and historical data. It recommends a fair market rate with confidence level and trend indicator.</p>
+        </div>
+      </noscript>
       <SeoMeta
         title="Features — AI-Powered Freight Platform"
         description="Explore LoadSaathi's features: AI-powered matching, real-time GPS tracking, digital credit scores, bidirection reviews, and smart fare calculator for shippers and truckers."
         keywords="freight platform features, AI load matching, GPS tracking India, digital freight credit score, logistics platform India"
         canonical="/features"
         breadcrumbs={[{ name: "Features", url: "/features" }]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "How does AI matching work on LoadSaathi?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Our matching engine analyzes route compatibility, vehicle capacity, pricing history, on-time performance, cargo type, and real-time availability. It ranks the best matches with a compatibility score.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "What is the Digital Freight Credit Score?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Every participant receives a score between 300 and 900 based on completion rates, on-time performance, reviews, communication, and tenure. Higher scores unlock better loads, lower fees, and faster payments.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Is real-time GPS tracking included?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. Every shipment and trip includes live GPS tracking with ETAs, route visualization, and geofence alerts.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "How does the AI Price Predictor work?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "The system uses a multi-provider AI chain to analyze route, weight, vehicle type, and historical data. It recommends a fair market rate with confidence level and trend indicator.",
+              },
+            },
+          ],
+        }}
       />
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}

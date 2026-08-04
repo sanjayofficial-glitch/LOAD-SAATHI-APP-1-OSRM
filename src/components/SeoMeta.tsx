@@ -13,6 +13,7 @@ interface SeoMetaProps {
   image?: string;
   type?: string;
   publishedTime?: string;
+  dateModified?: string;
   author?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   breadcrumbs?: BreadcrumbItem[];
@@ -29,6 +30,7 @@ export default function SeoMeta({
   image = DEFAULT_IMAGE,
   type = "website",
   publishedTime,
+  dateModified = "2026-08-04",
   author,
   jsonLd,
   breadcrumbs,
@@ -80,6 +82,7 @@ export default function SeoMeta({
       <meta name="twitter:image" content={image} />
 
       {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+      <meta property="article:modified_time" content={dateModified} />
       {author && <meta name="author" content={author} />}
 
       {jsonLd && (
