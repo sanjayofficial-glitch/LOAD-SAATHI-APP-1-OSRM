@@ -46,7 +46,7 @@ function useTeamMembers() {
         setMembers([
           { id: '1', name: 'Sanjaya Sahu', role: 'Founder & CEO', image: '/team/sanjaya-sahu.webp', phone: '+918328998031', social: { linkedin: 'https://www.linkedin.com/in/sanjaya-sahu-253315305/' } },
           { id: '2', name: 'Prince Mallik', role: 'Co-Founder & COO', image: '/team/prince-mallik.webp', phone: '+91 76848 43985', social: { linkedin: 'https://www.linkedin.com/in/prince-mallik-177a472a0/' } },
-          { id: '3', name: 'Customer Executive', role: 'Customer Executive', image: 'https://i.pravatar.cc/400?img=16', social: {} },
+          { id: '3', name: 'Jaydev Suna', role: 'Customer Executive', image: '/team/jaydev-suna.webp', social: { linkedin: 'https://www.linkedin.com/in/jaydev-suna-658802414/' } },
         ]);
       } finally {
         setLoading(false);
