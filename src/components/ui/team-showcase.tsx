@@ -16,6 +16,13 @@ export interface TeamMember {
   };
 }
 
+const TEAM_PHOTOS: Record<string, string> = {
+  'Sanjaya Sahu': '/team/sanjaya-sahu.webp',
+  'Prince Mallik': '/team/prince-mallik.webp',
+  'Jaydev Suna': '/team/jaydev-suna.webp',
+  TBD: '/team/jaydev-suna.webp',
+};
+
 function useTeamMembers() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +39,7 @@ function useTeamMembers() {
           id: m.id,
           name: m.name,
           role: m.role,
-          image: m.photo_url || `https://i.pravatar.cc/400?u=${m.id}`,
+          image: TEAM_PHOTOS[m.name] ?? `https://i.pravatar.cc/400?u=${m.id}`,
           phone: m.phone,
           social: {
             linkedin: m.linkedin || undefined,
@@ -181,7 +188,7 @@ function PhotoCard({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-xl cursor-pointer flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative',
+        'overflow-hidden rounded-xl cursor-pointer flex-shrink-0 transition-all duration-500 ease-smooth relative',
         isExpanded ? expandedClass : defaultClass,
         isDimmed && !isExpanded && 'opacity-50 scale-[0.88]',
         !isDimmed && !isExpanded && 'opacity-100 scale-100',
@@ -194,7 +201,7 @@ function PhotoCard({
       <img
         src={member.image}
         alt={member.name}
-        className="w-full h-full object-cover transition-[filter] duration-500"
+        className="w-full h-full object-cover object-top transition-[filter] duration-500"
         style={{
           filter: isActive ? 'grayscale(0) brightness(1)' : 'grayscale(1) brightness(0.77)',
         }}

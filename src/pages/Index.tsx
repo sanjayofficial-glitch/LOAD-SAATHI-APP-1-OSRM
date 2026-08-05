@@ -21,6 +21,8 @@ import AppPreview from '@/components/home/AppPreview';
 import SafetyTrust from '@/components/home/SafetyTrust';
 import FaqSection from '@/components/home/FaqSection';
 import CtaSection from '@/components/home/CtaSection';
+import MobileMenu from '@/components/MobileMenu';
+import MobileBottomNav, { publicBottomNavItems } from '@/components/MobileBottomNav';
 
 const Index = () => {
   const [ready, setReady] = useState(false);
@@ -361,13 +363,13 @@ const Index = () => {
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       <OfflineBanner />
 
-      <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-20">
+      <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-16">
         <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-full">
           <Link to="/" className="flex items-center gap-2">
-            <LogoMark size="h-10 w-10" />
+            <LogoMark size="h-11 w-11" />
             <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
           </Link>
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-5">
             <Link to="/features" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Features</Link>
             <Link to="/fare-calculator" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Fare Calculator</Link>
             <Link to="/how-it-works" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">How It Works</Link>
@@ -398,35 +400,9 @@ const Index = () => {
         </div>
       </nav>
 
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-xl md:hidden flex flex-col items-center justify-center gap-8">
-          <button
-            type="button"
-            className="absolute top-6 right-6 p-2 text-muted-foreground hover:text-foreground"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close menu"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x h-8 w-8"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-          </button>
-          <Link to="/features" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-bold text-foreground hover:text-orange-500">Features</Link>
-          <Link to="/fare-calculator" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-bold text-foreground hover:text-orange-500">Fare Calculator</Link>
-          <Link to="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-bold text-foreground hover:text-orange-500">How It Works</Link>
-          <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-bold text-foreground hover:text-orange-500">Pricing</Link>
-          <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-bold text-foreground hover:text-orange-500">About</Link>
-          <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-bold text-foreground hover:text-orange-500">FAQ</Link>
-          <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="text-2xl font-bold text-foreground hover:text-orange-500">Contact</Link>
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="outline" className="text-sm font-bold tracking-wider uppercase px-8 py-3 h-auto rounded-lg">Sign In</Button>
-            </Link>
-            <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-3 h-auto rounded-lg shadow-lg">Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      )}
+      <MobileMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
-      <main>
+      <main className="pb-16 lg:pb-0">
         <HeroSection />
         <ProofBar />
         <BentoGrid />
@@ -489,6 +465,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      <MobileBottomNav items={publicBottomNavItems} />
     </div>
     </>
   );

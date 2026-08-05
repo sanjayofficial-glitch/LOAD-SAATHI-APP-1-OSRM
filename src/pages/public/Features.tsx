@@ -19,7 +19,7 @@ const truckerFeatures = [
   { icon: Route, title: "Route Optimization", desc: "Intelligent route planning that considers load pickups, drop-offs, fuel stops, rest periods, and toll costs to maximize your operational efficiency." },
   { icon: Bell, title: "Smart Match Alerts", desc: "Receive real-time notifications when new loads match your truck's capacity, current location, and preferred routes. Never miss a lucrative opportunity." },
   { icon: TrendingUp, title: "Earnings Dashboard", desc: "Track your income, completed trips, kilometers driven, and utilization rates. Get insights on how to optimize your operations for higher profitability." },
-  { icon: Shield, title: "Payment Protection", desc: "Secure payment processing with milestone-based releases. Get paid promptly for completed deliveries with our escrow-backed payment system." },
+  { icon: Shield, title: "Payment Protection", desc: "Secure payment processing with milestone-based releases. Get paid promptly for completed deliveries with our escrow-backed payment system.", comingSoon: true },
   { icon: Clock, title: "Trip History & Reports", desc: "Detailed logs of all completed trips including routes, times, earnings, and customer reviews. Build your reputation with a verified performance history." },
 ];
 
@@ -203,7 +203,14 @@ const Features = () => {
                 <div className="w-12 h-12 rounded-lg bg-blue-600/10 dark:bg-blue-500/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
                   <feature.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="text-lg font-bold text-foreground mb-3">{feature.title}</h3>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <h3 className="text-lg font-bold text-foreground">{feature.title}</h3>
+                  {feature.comingSoon && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shrink-0">
+                      Coming soon
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
               </div>
             ))}

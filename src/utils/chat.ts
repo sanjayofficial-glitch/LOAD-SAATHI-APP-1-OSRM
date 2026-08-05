@@ -9,6 +9,16 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 const MAX_MESSAGE_LENGTH = 2000;
 
 /**
+ * A conversation is either backed by a `requests` row (shipper → trip) or a
+ * `shipment_requests` row (trucker → shipment). The column used to associate
+ * messages changes accordingly.
+ */
+export type ChatKind = 'request' | 'shipment_request';
+
+const chatColumn = (kind: ChatKind): 'request_id' | 'shipment_request_id' =>
+  kind === 'shipment_request' ? 'shipment_request_id' : 'request_id';
+
+/**
  * Sanitize message content — strip HTML tags and trim whitespace.
  * Prevents XSS if messages are ever rendered as HTML.
  */
@@ -28,8 +38,9 @@ export const sendMessage = async (payload: {
   requestId?: string;
   getToken: () => Promise<string | null>;
   userId: string;
+  kind?: ChatKind;
 }): Promise<Message> => {
-  const { recipientId, content, requestId, getToken, userId } = payload;
+  const { recipientId, content, requestId, getToken, userId, kind = 'request' } = payload;
 
   if (!recipientId || !content) {
     throw new Error('Recipient ID and message content are required');
@@ -54,10 +65,10 @@ export const sendMessage = async (payload: {
         sender_id: userId,
         recipient_id: recipientId,
         content: sanitized,
-        request_id: requestId,
+        [chatColumn(kind)]: requestId,
         is_read: false,
       })
-      .select('id, sender_id, recipient_id, content, created_at, is_read, request_id')
+      .select('id, sender_id, recipient_id, content, created_at, is_read, request_id, shipment_request_id')
       .single();
 
     if (error) {
@@ -74,7 +85,11 @@ export const sendMessage = async (payload: {
 /**
  * Fetch all messages for a specific request using an authenticated client.
  */
-export const fetchMessages = async (requestId: string, getToken: () => Promise<string | null>): Promise<Message[]> => {
+export const fetchMessages = async (
+  requestId: string,
+  getToken: () => Promise<string | null>,
+  kind: ChatKind = 'request'
+): Promise<Message[]> => {
   try {
     const token = await getToken();
     if (!token) throw new Error('No token');
@@ -82,8 +97,8 @@ export const fetchMessages = async (requestId: string, getToken: () => Promise<s
 
     const { data, error } = await supabaseClient
       .from('messages')
-      .select('id, sender_id, recipient_id, content, created_at, is_read, request_id')
-      .eq('request_id', requestId)
+      .select('id, sender_id, recipient_id, content, created_at, is_read, request_id, shipment_request_id')
+      .eq(chatColumn(kind), requestId)
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -100,7 +115,12 @@ export const fetchMessages = async (requestId: string, getToken: () => Promise<s
 /**
  * Mark messages as read for a specific user in a chat using an authenticated client.
  */
-export const markMessagesAsRead = async (requestId: string, userId: string, getToken: () => Promise<string | null>): Promise<void> => {
+export const markMessagesAsRead = async (
+  requestId: string,
+  userId: string,
+  getToken: () => Promise<string | null>,
+  kind: ChatKind = 'request'
+): Promise<void> => {
   try {
     const token = await getToken();
     if (!token) return;
@@ -109,7 +129,7 @@ export const markMessagesAsRead = async (requestId: string, userId: string, getT
     await supabaseClient
       .from('messages')
       .update({ is_read: true })
-      .eq('request_id', requestId)
+      .eq(chatColumn(kind), requestId)
       .eq('recipient_id', userId)
       .eq('is_read', false);
   } catch (err: unknown) {
@@ -122,7 +142,8 @@ export const markMessagesAsRead = async (requestId: string, userId: string, getT
  */
 export const subscribeToMessages = (
   requestId: string,
-  onNewMessage: (message: Message) => void
+  onNewMessage: (message: Message) => void,
+  kind: ChatKind = 'request'
 ): RealtimeChannel => {
   const channelName = `chat:${requestId}`;
 
@@ -143,7 +164,7 @@ export const subscribeToMessages = (
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
-        filter: `request_id=eq.${requestId}`,
+        filter: `${chatColumn(kind)}=eq.${requestId}`,
       },
       (payload) => {
         onNewMessage(payload.new as Message);

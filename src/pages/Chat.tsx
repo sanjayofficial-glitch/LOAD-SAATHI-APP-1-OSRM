@@ -6,7 +6,7 @@ import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { Message } from '@/types/chat';
-import { fetchMessages, sendMessage, subscribeToMessages, markMessagesAsRead } from '@/utils/chat';
+import { fetchMessages, sendMessage, subscribeToMessages, markMessagesAsRead, ChatKind } from '@/utils/chat';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +30,7 @@ const Chat = () => {
   const [recipient, setRecipient] = useState<{ id: string; full_name: string; phone?: string } | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatKindRef = useRef<ChatKind>('request');
 
   // Memoize getToken to prevent unnecessary re-renders of the effect
   const getTokenRef = useRef(getToken);
@@ -49,26 +50,30 @@ const Chat = () => {
         const supabaseClient = createClerkSupabaseClient(supabaseToken);
 
         const [reqRes, sReqRes] = await Promise.all([
-          supabaseClient.from('requests').select('*, trip:trips(*, trucker:users!trips_trucker_id_fkey(*)), shipper:users!requests_shipper_id_fkey(*)').eq('id', requestId).maybeSingle(),
-          supabaseClient.from('shipment_requests').select('*, shipment:shipments(*, shipper:users!shipments_shipper_id_fkey(*)), trucker:users!shipment_requests_trucker_id_fkey(*)').eq('id', requestId).maybeSingle()
+          supabaseClient.from('requests').select('*, trip:trips(*, trucker:users!trips_trucker_id_fkey(*)), shipper:users!requests_shipper_id_fkey(*), receiver:users!requests_receiver_id_fkey(*)').eq('id', requestId).maybeSingle(),
+          supabaseClient.from('shipment_requests').select('*, shipment:shipments(*, shipper:users!shipments_shipper_id_fkey(*)), trucker:users!shipment_requests_trucker_id_fkey(*), shipper:users!shipment_requests_shipper_id_fkey(*)').eq('id', requestId).maybeSingle()
         ]);
 
         if (cancelled) return;
 
         let otherUser = null;
         if (reqRes.data) {
-          otherUser = userProfile.user_type === 'trucker' ? reqRes.data.shipper : reqRes.data.trip?.trucker;
+          chatKindRef.current = 'request';
+          const r = reqRes.data;
+          otherUser = userProfile.id === r.shipper?.id ? r.receiver ?? r.trip?.trucker : r.shipper;
         } else if (sReqRes.data) {
-          otherUser = userProfile.user_type === 'trucker' ? sReqRes.data.shipment?.shipper : sReqRes.data.trucker;
+          chatKindRef.current = 'shipment_request';
+          const sr = sReqRes.data;
+          otherUser = userProfile.id === sr.trucker?.id ? sr.shipper ?? sr.shipment?.shipper : sr.trucker;
         }
 
         if (!otherUser) throw new Error('Chat partner not found');
         setRecipient(otherUser);
 
-        const initialMessages = await fetchMessages(requestId, () => getTokenRef.current({ template: 'supabase' }));
+        const initialMessages = await fetchMessages(requestId, () => getTokenRef.current({ template: 'supabase' }), chatKindRef.current);
         if (cancelled) return;
         setMessages(initialMessages);
-        markMessagesAsRead(requestId, userProfile.id, () => getTokenRef.current({ template: 'supabase' }));
+        markMessagesAsRead(requestId, userProfile.id, () => getTokenRef.current({ template: 'supabase' }), chatKindRef.current);
 
         // Remove any existing channel with this name before creating a new one
         const channelName = `chat:${requestId}`;
@@ -83,8 +88,8 @@ const Chat = () => {
 
         channel = subscribeToMessages(requestId, (msg) => {
           setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
-          if (msg.recipient_id === userProfile.id) markMessagesAsRead(requestId, userProfile.id, () => getTokenRef.current({ template: 'supabase' }));
-        });
+          if (msg.recipient_id === userProfile.id) markMessagesAsRead(requestId, userProfile.id, () => getTokenRef.current({ template: 'supabase' }), chatKindRef.current);
+        }, chatKindRef.current);
 
         setLoading(false);
       } catch (err: unknown) {
@@ -113,7 +118,7 @@ const Chat = () => {
     }
     setSending(true);
     try {
-      const sentMsg = await sendMessage({ recipientId: recipient.id, content: newMessage, requestId, getToken: () => getToken({ template: 'supabase' }), userId: userProfile!.id });
+      const sentMsg = await sendMessage({ recipientId: recipient.id, content: newMessage, requestId, kind: chatKindRef.current, getToken: () => getToken({ template: 'supabase' }), userId: userProfile!.id });
       setMessages(prev => [...prev, sentMsg]);
       posthog.capture('message_sent', {
         request_id: requestId,

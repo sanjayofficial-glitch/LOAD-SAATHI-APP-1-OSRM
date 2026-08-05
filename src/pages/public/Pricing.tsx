@@ -264,7 +264,14 @@ const Pricing = () => {
                     {plan.features.map((feat, i) => (
                       <li key={i} className="flex items-start gap-3 text-sm">
                         <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                        <span className="text-muted-foreground">{feat}</span>
+                        <span className="text-muted-foreground">
+                          {feat}
+                          {feat === "Escrow-backed payment protection" && (
+                            <span className="ml-2 inline-block align-middle text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                              Coming soon
+                            </span>
+                          )}
+                        </span>
                       </li>
                     ))}
                   </ul>

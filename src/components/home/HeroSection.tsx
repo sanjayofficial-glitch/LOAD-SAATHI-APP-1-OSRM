@@ -11,7 +11,7 @@ const HeroSection = React.memo(() => {
   ];
 
   return (
-    <section className="min-h-[95vh] flex items-center relative overflow-hidden pt-20 sm:pt-0">
+    <section className="min-h-[95vh] flex items-center relative overflow-hidden pt-16 sm:pt-0">
       <div className="absolute inset-0 z-0">
         <img
           src="/hero-bg.jpg"

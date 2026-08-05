@@ -1,10 +1,13 @@
 
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Menu } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import OfflineBanner from "./OfflineBanner";
 import { Button } from "./ui/button";
 import LogoMark from "./LogoMark";
+import MobileMenu from "./MobileMenu";
+import MobileBottomNav, { publicBottomNavItems } from "./MobileBottomNav";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./ui/tooltip";
 import { socialLinks } from "@/data/socialLinks";
 
@@ -41,16 +44,17 @@ const footerLinks = {
 };
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       <OfflineBanner />
-      <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-20">
+      <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-16">
         <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-full">
           <Link to="/" className="flex items-center gap-2">
-            <LogoMark size="h-10 w-10" />
+            <LogoMark size="h-11 w-11" />
             <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
           </Link>
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-5">
             <Link to="/features" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Features</Link>
             <Link to="/fare-calculator" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Fare Calculator</Link>
             <Link to="/how-it-works" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">How It Works</Link>
@@ -64,15 +68,23 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <Link to="/login" className="hidden sm:inline-block text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
               Sign In
             </Link>
-            <Link to="/register">
+            <Link to="/register" className="hidden sm:inline-block">
               <Button className="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold tracking-wider uppercase px-5 py-2 h-auto shadow-lg">
                 Get Started
               </Button>
             </Link>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-lg text-foreground hover:bg-accent transition-all"
+              aria-label="Open menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
           </div>
         </div>
       </nav>
-      <main className="pt-20 min-h-screen">
+      <main className="pt-16 min-h-screen pb-16 lg:pb-0">
         {children}
       </main>
       <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full py-16">
@@ -106,7 +118,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         </div>
         <div className="border-t border-border dark:border-white/5 mt-12 pt-8">
           <TooltipProvider>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 px-6 sm:px-12 max-w-[1440px] mx-auto mb-6">
+          <div className="flex flex-row flex-wrap items-center justify-center gap-3 px-6 sm:px-12 max-w-[1440px] mx-auto mb-6">
             {socialLinks.map((social) => (
               <Tooltip key={social.name}>
                 <TooltipTrigger asChild>
@@ -130,6 +142,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
       </footer>
+      <MobileMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      <MobileBottomNav items={publicBottomNavItems} />
     </div>
   );
 }

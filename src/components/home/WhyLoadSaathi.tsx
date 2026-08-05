@@ -14,9 +14,9 @@ const truckerBenefits = [
   { title: 'Zero Empty Return Trips', desc: 'AI finds return loads for every route. Fill your truck both ways and earn on every kilometer — not just half the journey.' },
   { title: 'Higher Earnings', desc: 'Direct shipper access means no broker commissions. AI price prediction helps you bid competitively and win more loads.' },
   { title: 'Build Your Digital Reputation', desc: 'Credit score, reviews, completion rate — your track record follows you. Higher scores unlock premium, higher-paying loads.' },
-  { title: 'Instant Payments', desc: 'Escrow-backed digital settlements. No more chasing payments for weeks. Get paid as soon as delivery is confirmed.' },
+  { title: 'Instant Payments', desc: 'Escrow-backed digital settlements. No more chasing payments for weeks. Get paid as soon as delivery is confirmed.', comingSoon: true },
   { title: 'Smart Route Optimization', desc: 'AI suggests the best routes, loads, and pricing for your vehicle type and location. Maximize fleet utilization effortlessly.' },
-] as const;
+];
 
 const WhyLoadSaathi = React.memo(() => (
   <section className="fade-section py-24 bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 relative overflow-hidden">
@@ -60,7 +60,14 @@ const WhyLoadSaathi = React.memo(() => (
                   <span className="text-xs font-bold text-orange-400">{i + 1}</span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-foreground text-sm">{item.title}</h4>
+                  <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+                    {item.title}
+                    {'comingSoon' in item && item.comingSoon && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                        Coming soon
+                      </span>
+                    )}
+                  </h4>
                   <p className="text-xs text-muted-foreground">{item.desc}</p>
                 </div>
               </div>

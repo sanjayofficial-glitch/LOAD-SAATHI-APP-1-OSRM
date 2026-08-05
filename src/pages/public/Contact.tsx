@@ -246,7 +246,7 @@ const Contact = () => {
               <div className="glass-card p-8 rounded-xl border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300 group">
                 <div className="flex items-center gap-4 mb-6">
                   <Avatar className="w-16 h-16">
-                    <AvatarImage src="/team/sanjaya-sahu.webp" alt="Sanjaya Sahu" />
+                    <AvatarImage className="object-cover object-top" src="/team/sanjaya-sahu.webp" alt="Sanjaya Sahu" />
                     <AvatarFallback className="bg-orange-100 dark:bg-orange-900/30 text-2xl font-black text-orange-600 dark:text-orange-400">SS</AvatarFallback>
                   </Avatar>
                   <div>
@@ -273,7 +273,7 @@ const Contact = () => {
               <div className="glass-card p-8 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all duration-300 group">
                 <div className="flex items-center gap-4 mb-6">
                   <Avatar className="w-16 h-16">
-                    <AvatarImage src="/team/prince-mallik.webp" alt="Prince Mallik" />
+                    <AvatarImage className="object-cover object-top" src="/team/prince-mallik.webp" alt="Prince Mallik" />
                     <AvatarFallback className="bg-blue-100 dark:bg-blue-900/30 text-2xl font-black text-blue-600 dark:text-blue-400">PM</AvatarFallback>
                   </Avatar>
                   <div>

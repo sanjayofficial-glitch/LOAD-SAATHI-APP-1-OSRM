@@ -141,13 +141,13 @@ export default function SharedTrip() {
                 <div className="text-center">
                   <MapPin className="h-5 w-5 text-orange-500 mx-auto mb-1" />
                   <p className="text-lg font-black text-gray-900 dark:text-white">{trip.origin_city}</p>
-                  {trip.origin_state && <p className="text-xs text-gray-400">{trip.origin_state}</p>}
+                  {trip.origin_state && <p className="text-xs text-gray-400 dark:text-gray-500">{trip.origin_state}</p>}
                 </div>
                 <ArrowRight className="h-5 w-5 text-gray-300 dark:text-gray-600 shrink-0" />
                 <div className="text-center">
                   <MapPin className="h-5 w-5 text-blue-500 mx-auto mb-1" />
                   <p className="text-lg font-black text-gray-900 dark:text-white">{trip.destination_city}</p>
-                  {trip.destination_state && <p className="text-xs text-gray-400">{trip.destination_state}</p>}
+                  {trip.destination_state && <p className="text-xs text-gray-400 dark:text-gray-500">{trip.destination_state}</p>}
                 </div>
               </div>
             </div>
@@ -226,7 +226,7 @@ function DetailItem({ icon: Icon, label, value, highlight = false }: { icon: Rea
   return (
     <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">
       <div className="flex items-center gap-1.5 mb-1">
-        <Icon className="h-3.5 w-3.5 text-gray-400" />
+        <Icon className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
         <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{label}</span>
       </div>
       <p className={`text-sm font-bold ${highlight ? "text-orange-600 dark:text-orange-400" : "text-gray-900 dark:text-white"}`}>

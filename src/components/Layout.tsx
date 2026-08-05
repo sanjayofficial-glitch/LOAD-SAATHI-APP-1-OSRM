@@ -36,6 +36,7 @@ import OfflineBanner from "./OfflineBanner";
 import ThemeToggle from "./ThemeToggle";
 import VerificationBadge from "./VerificationBadge";
 import AutoGpsTracker from "./AutoGpsTracker";
+import MobileBottomNav from "./MobileBottomNav";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
@@ -73,48 +74,6 @@ const NavLinks = React.memo(({ navItems, currentPath, onClick, mobile }: { navIt
   </>
 ));
 NavLinks.displayName = "NavLinks";
-
-const MobileBottomNav = React.memo(({ navItems, currentPath, visible }: { navItems: NavItem[]; currentPath: string; visible: boolean }) => {
-  if (visible) return null;
-  const mainItems = navItems.slice(0, 4);
-  return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 safe-area-bottom">
-      <div className="flex items-center justify-around py-1">
-        {mainItems.map((item) => {
-          const active = item.path === '/trucker/dashboard' || item.path === '/shipper/dashboard'
-            ? currentPath === item.path
-            : currentPath.startsWith(item.path);
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex flex-col items-center py-2 px-3 rounded-lg transition-all min-w-0",
-                active ? "text-orange-600 dark:text-orange-400" : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-              )}
-            >
-              <div className={cn("transition-transform", active && "scale-110")}>
-                {item.icon}
-              </div>
-              <span className="text-[10px] font-medium mt-0.5 truncate max-w-full">{item.label}</span>
-            </Link>
-          );
-        })}
-        <Link
-          to="/messages"
-          className={cn(
-            "flex flex-col items-center py-2 px-3 rounded-lg transition-all min-w-0",
-            currentPath === '/messages' ? "text-orange-600 dark:text-orange-400" : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-          )}
-        >
-          <MessageSquare className="h-4 w-4" />
-          <span className="text-[10px] font-medium mt-0.5">Chat</span>
-        </Link>
-      </div>
-    </nav>
-  );
-});
-MobileBottomNav.displayName = "MobileBottomNav";
 
 const FooterSocialLinks = React.memo(() => (
   <TooltipProvider>
@@ -309,7 +268,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <MobileBottomNav navItems={navItems} currentPath={currentPath} visible={mobileNavOpen} />
+      <MobileBottomNav
+        items={navItems.slice(0, 4)}
+        visible={mobileNavOpen}
+        extra={
+          <Link
+            to="/messages"
+            className={cn(
+              "flex flex-col items-center py-2 px-3 rounded-lg transition-all min-w-0 flex-1",
+              currentPath === '/messages' ? "text-orange-600 dark:text-orange-400" : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+            )}
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span className="text-[10px] font-medium mt-0.5">Chat</span>
+          </Link>
+        }
+      />
 
       <footer className="hidden lg:block bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 sm:py-8 mt-auto">
         <div className="container mx-auto px-4 text-center">

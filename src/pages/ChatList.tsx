@@ -47,17 +47,13 @@ const ChatList = () => {
             *,
             request:requests(
               id,
-              trip:trips(
-                id,
-                origin_city,
-                destination_city
-              ),
-              shipper:users!requests_shipper_id_fkey(
-                id,
-                full_name,
-                user_type
-              ),
-              trip:trip_id
+              shipper:users!requests_shipper_id_fkey(id, full_name, user_type),
+              receiver:users!requests_receiver_id_fkey(id, full_name, user_type)
+            ),
+            shipment_request:shipment_requests(
+              id,
+              shipper:users!shipment_requests_shipper_id_fkey(id, full_name, user_type),
+              trucker:users!shipment_requests_trucker_id_fkey(id, full_name, user_type)
             )
           `)
           .or(`sender_id.eq.${userProfile.id},recipient_id.eq.${userProfile.id}`)
@@ -68,20 +64,30 @@ const ChatList = () => {
         const conversationMap = new Map<string, ChatConversation>();
         
         messages?.forEach(msg => {
-          const requestId = msg.request_id;
-          if (!requestId) return;
+          const conversationId = msg.request_id ?? msg.shipment_request_id;
+          if (!conversationId) return;
 
-          const existing = conversationMap.get(requestId);
+          const existing = conversationMap.get(conversationId);
           const isFromMe = msg.sender_id === userProfile.id;
           const otherUserId = isFromMe ? msg.recipient_id : msg.sender_id;
-          
-          const request = msg.request as { shipper?: { id: string; full_name: string; user_type: string } };
-          const otherUser = request?.shipper || { id: otherUserId, full_name: 'Unknown', user_type: '' };
+
+          const request = msg.request as { shipper?: { id: string; full_name: string; user_type: string }; receiver?: { id: string; full_name: string; user_type: string } } | null;
+          const shipmentRequest = msg.shipment_request as { shipper?: { id: string; full_name: string; user_type: string }; trucker?: { id: string; full_name: string; user_type: string } } | null;
+
+          let otherUser: { id: string; full_name: string; user_type: string } | undefined;
+          if (request?.shipper) {
+            otherUser = userProfile.id === request.shipper.id ? request.receiver : request.shipper;
+          } else if (shipmentRequest) {
+            otherUser = userProfile.id === shipmentRequest.trucker?.id ? shipmentRequest.shipper : shipmentRequest.trucker;
+          }
+          if (!otherUser) {
+            otherUser = { id: otherUserId, full_name: 'Unknown', user_type: '' };
+          }
 
           if (!existing) {
-            conversationMap.set(requestId, {
-              id: requestId,
-              request_id: requestId,
+            conversationMap.set(conversationId, {
+              id: conversationId,
+              request_id: conversationId,
               other_user: otherUser,
               last_message: msg.content,
               last_message_time: msg.created_at,
