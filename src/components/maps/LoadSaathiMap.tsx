@@ -129,7 +129,7 @@ export default React.memo(function LoadSaathiMap({
         center={center}
         zoom={zoom}
         style={{ height: '100%', width: '100%' }}
-        scrollWheelZoom={true}
+        scrollWheelZoom={false}
         click={onMapClick}
       >
         <MapSizeHandler />

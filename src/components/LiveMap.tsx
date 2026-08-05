@@ -76,7 +76,7 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
         center={[20.5937, 78.9629]}
         zoom={5}
         style={{ height: "100%", width: "100%" }}
-        scrollWheelZoom={true}
+        scrollWheelZoom={false}
       >
         <MapSizeHandler />
         <TileLayer
