@@ -11,7 +11,7 @@
  *             distanceKm={1400} durationMin={1200} />
  */
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +25,16 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
+
+// Fix 0×0 map pane: invalidateSize on mount
+function MapSizeHandler() {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 150);
+    return () => clearTimeout(t);
+  }, [map]);
+  return null;
+}
 
 const originIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -140,6 +150,7 @@ const RouteMap = React.memo(({
     <div>
       <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style={{ height }}>
         <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
+          <MapSizeHandler />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

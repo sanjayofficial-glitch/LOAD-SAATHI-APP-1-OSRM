@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -9,10 +9,20 @@ import RoutePolyline from './RoutePolyline';
 import MapLegend from './MapLegend';
 import { cn } from '@/lib/utils';
 
+// ── Fix 0×0 map pane: invalidateSize on mount ──────────────────────────────
+function MapSizeHandler() {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 150);
+    return () => clearTimeout(t);
+  }, [map]);
+  return null;
+}
+
 // ── Auto-fit bounds ──────────────────────────────────────────────────────────
 function FitBounds({ positions }: { positions: [number, number][] }) {
   const map = useMap();
-  React.useEffect(() => {
+  useEffect(() => {
     if (positions.length === 0) return;
     if (positions.length === 1) {
       map.setView(positions[0], 12);
@@ -122,6 +132,7 @@ export default React.memo(function LoadSaathiMap({
         scrollWheelZoom={true}
         click={onMapClick}
       >
+        <MapSizeHandler />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

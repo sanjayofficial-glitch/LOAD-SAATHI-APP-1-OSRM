@@ -10,6 +10,16 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+// Fix 0×0 map pane: invalidateSize on mount
+function MapSizeHandler() {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 150);
+    return () => clearTimeout(t);
+  }, [map]);
+  return null;
+}
+
 export interface TruckLocation {
   id: string;
   driverId: string;
@@ -68,6 +78,7 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
         style={{ height: "100%", width: "100%" }}
         scrollWheelZoom={true}
       >
+        <MapSizeHandler />
         <TileLayer
           attribution="&copy; OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -286,7 +286,9 @@ const BrowseShipments = () => {
       setIsOfferDialogOpen(false);
       navigate('/trucker/my-trips?tab=sent');
     } catch (err) {
-      showError(err instanceof Error ? err.message : 'Failed to send offer');
+      const detail = err && typeof err === 'object' ? JSON.stringify(err) : String(err);
+      console.error('[submitOffer] Full error:', detail);
+      showError(`Failed to send offer${err instanceof Error ? `: ${err.message}` : ''}`);
     } finally {
       setSendingOffer(false);
     }
