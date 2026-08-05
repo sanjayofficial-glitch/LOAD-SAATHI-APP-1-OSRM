@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +32,7 @@ const EMPTY_MEMBER: Partial<TeamMember> = {
 };
 
 export default function TeamManager() {
-  const { getToken } = useAuth();
+  const { getToken } = useClerkAuth();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [editing, setEditing] = useState<Partial<TeamMember> | null>(null);
   const [isNew, setIsNew] = useState(false);
@@ -153,6 +153,7 @@ export default function TeamManager() {
 
     const a = sorted[idx];
     const b = sorted[swapIdx];
+    if (!a || !b) return;
     const client = await getClient();
     await client.from('team_members').update({ sort_order: b.sort_order }).eq('id', a.id);
     await client.from('team_members').update({ sort_order: a.sort_order }).eq('id', b.id);

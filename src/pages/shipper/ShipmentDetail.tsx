@@ -176,7 +176,7 @@ const ShipmentDetail = () => {
     }
   };
 
-  useEffect(() => { fetchData(); }, [id, userProfile?.id]);
+  useEffect(() => { fetchData(); /* eslint-disable-line react-hooks/exhaustive-deps */ }, [id, userProfile?.id]);
 
   // Real-time subscription for trucker's live location
   const trackedDriverRef = useRef<string | null>(null);
@@ -218,7 +218,7 @@ const ShipmentDetail = () => {
       supabase.removeChannel(channel);
       trackedDriverRef.current = null;
     };
-  }, [reviewTruckerId, shipment?.status, linkedTripStatus]);
+  }, [reviewTruckerId, shipment?.status, linkedTripStatus, acceptedTrucker?.full_name, reviewTripId, shipment]);
 
   const handleSendOffer = async () => {
     if (!userProfile || !shipment) return;

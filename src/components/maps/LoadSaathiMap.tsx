@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -8,6 +8,14 @@ import LoadMarker, { type LoadLocation } from './LoadMarker';
 import RoutePolyline from './RoutePolyline';
 import MapLegend from './MapLegend';
 import { cn } from '@/lib/utils';
+
+// ── Map click events (react-leaflet has no eventHandlers on MapContainer) ────
+function MapClickHandler({ onClick }: { onClick?: (e: L.LeafletMouseEvent) => void }) {
+  useMapEvents({
+    click: (e) => onClick?.(e),
+  });
+  return null;
+}
 
 // ── Fix 0×0 map pane: invalidateSize on mount ──────────────────────────────
 function MapSizeHandler() {
@@ -25,7 +33,8 @@ function FitBounds({ positions }: { positions: [number, number][] }) {
   useEffect(() => {
     if (positions.length === 0) return;
     if (positions.length === 1) {
-      map.setView(positions[0], 12);
+      const only = positions[0];
+      if (only) map.setView(only, 12);
       return;
     }
     map.fitBounds(L.latLngBounds(positions), { padding: [40, 40] });
@@ -63,8 +72,6 @@ export interface LoadSaathiMapProps {
 export default React.memo(function LoadSaathiMap({
   trucks = [],
   loads = [],
-  selectedTruckId,
-  selectedLoadId,
   onTruckClick,
   onLoadClick,
   showRouteFor,
@@ -130,9 +137,9 @@ export default React.memo(function LoadSaathiMap({
         zoom={zoom}
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={false}
-        click={onMapClick}
       >
         <MapSizeHandler />
+        <MapClickHandler onClick={onMapClick} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

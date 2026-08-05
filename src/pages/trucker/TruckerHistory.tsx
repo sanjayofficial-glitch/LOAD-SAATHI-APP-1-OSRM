@@ -38,14 +38,12 @@ interface ActivityItem {
   relatedId: string;
 }
 
-const statCards: { label: string; key: keyof typeof defaultStats; icon: LucideIcon; color: string; bg: string }[] = [
+const statCards: { label: string; key: 'total' | 'completed' | 'pending' | 'thisMonth'; icon: LucideIcon; color: string; bg: string }[] = [
   { label: 'Total', key: 'total', icon: TrendingUp, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/50' },
   { label: 'Completed', key: 'completed', icon: CheckCircle, color: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-950/50' },
   { label: 'Pending', key: 'pending', icon: Clock, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-950/50' },
   { label: 'This Month', key: 'thisMonth', icon: Calendar, color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/50' }
 ];
-
-const defaultStats = { total: 0, completed: 0, pending: 0, thisMonth: 0 };
 
 const TruckerHistory = () => {
   const { userProfile } = useAuth();

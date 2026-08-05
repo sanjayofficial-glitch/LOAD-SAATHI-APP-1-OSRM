@@ -23,17 +23,6 @@ interface TruckMarkerProps {
   onClick?: (truck: TruckLocation) => void;
 }
 
-function formatTime(iso: string): string {
-  try {
-    return new Date(iso).toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    return '--';
-  }
-}
-
 function formatTimeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);

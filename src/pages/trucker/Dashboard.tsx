@@ -31,6 +31,16 @@ import LogoMark from '@/components/LogoMark';
 import type { TruckLocation } from '@/components/LiveMap';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+interface DriverLocationRow {
+  driver_id: string;
+  lat: number;
+  lng: number;
+  heading: number | null;
+  speed: number | null;
+  updated_at: string;
+  trip_id: string | null;
+}
+
 const TruckerDashboard = () => {
   const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
@@ -127,7 +137,7 @@ const TruckerDashboard = () => {
 
         const driverMap = new Map(drivers?.map((d: { id: string; full_name: string }) => [d.id, d.full_name]) || []);
 
-        const truckLocations: TruckLocation[] = locations.map((loc: any, i: number) => ({
+        const truckLocations: TruckLocation[] = locations.map((loc: DriverLocationRow, i: number) => ({
           id: `loc-${i}`,
           driverId: loc.driver_id,
           driverName: driverMap.get(loc.driver_id) || 'Unknown',
@@ -393,7 +403,7 @@ const TruckerDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
-                  <Tooltip formatter={(value: any) => `₹${Number(value).toLocaleString('en-IN')}`} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 12 }} />
+                  <Tooltip formatter={(value) => `₹${Number(value).toLocaleString('en-IN')}`} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 12 }} />
                   <Bar dataKey="earnings" fill="url(#orangeGradient)" radius={[6, 6, 0, 0]} maxBarSize={48} />
                   <defs>
                     <linearGradient id="orangeGradient" x1="0" y1="0" x2="0" y2="1">

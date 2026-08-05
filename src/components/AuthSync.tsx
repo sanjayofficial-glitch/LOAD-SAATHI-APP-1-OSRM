@@ -69,7 +69,7 @@ const AuthSync = () => {
     handleAuthSync();
 
     return () => clearTimeout(timeout);
-  }, [isLoaded, isSignedIn, user, navigate]);
+  }, [isLoaded, isSignedIn, user, session, navigate]);
 
   if (checking) {
     return (

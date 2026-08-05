@@ -28,6 +28,7 @@ export function ExpandableGallery({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const visibleImages = images.slice(0, maxVisible);
+  const currentImage = selectedIndex !== null ? visibleImages[selectedIndex] : undefined;
 
   const openImage = (index: number) => setSelectedIndex(index);
   const closeImage = () => setSelectedIndex(null);
@@ -137,8 +138,8 @@ export function ExpandableGallery({
               <AnimatePresence mode="wait">
                 <motion.img
                   key={selectedIndex}
-                  src={getImageUrl(visibleImages[selectedIndex].storage_path)}
-                  alt={visibleImages[selectedIndex].title || `Gallery image ${selectedIndex + 1}`}
+                  src={currentImage ? getImageUrl(currentImage.storage_path) : undefined}
+                  alt={currentImage?.title || `Gallery image ${selectedIndex + 1}`}
                   className="w-full h-full object-contain rounded-lg"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -147,18 +148,18 @@ export function ExpandableGallery({
                 />
               </AnimatePresence>
               {/* Title + caption in lightbox */}
-              {(visibleImages[selectedIndex].title || visibleImages[selectedIndex].caption) && (
+              {(currentImage?.title || currentImage?.caption) && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                   className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent rounded-b-lg"
                 >
-                  {visibleImages[selectedIndex].title && (
-                    <p className="text-white font-semibold">{visibleImages[selectedIndex].title}</p>
+                  {currentImage?.title && (
+                    <p className="text-white font-semibold">{currentImage.title}</p>
                   )}
-                  {visibleImages[selectedIndex].caption && (
-                    <p className="text-white/70 text-sm mt-0.5">{visibleImages[selectedIndex].caption}</p>
+                  {currentImage?.caption && (
+                    <p className="text-white/70 text-sm mt-0.5">{currentImage.caption}</p>
                   )}
                 </motion.div>
               )}

@@ -41,7 +41,7 @@ import FavoriteButton from '@/components/FavoriteButton';
 import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
 import { useSmartMatch } from '@/hooks/useSmartMatch';
 import { useLiveDriverLocations } from '@/hooks/useLiveDriverLocations';
-import { LoadSaathiMap, type TruckLocation } from '@/components/maps';
+import { LoadSaathiMap } from '@/components/maps';
 import { formatDuration } from '@/utils/format';
 import type { Trip } from '@/types';
 import {

@@ -57,7 +57,7 @@ const Register = () => {
         redirectUrl: `${redirectBase}/auth-sync`,
         redirectUrlComplete: `${redirectBase}/auth-sync`,
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error("Google sign-up error:", err);
       setError("Google sign-up failed. Please try again.");
       setLoading(false);
@@ -78,9 +78,10 @@ const Register = () => {
       });
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setVerifying(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Email sign-up error:", err);
-      setError(err?.errors?.[0]?.message || "Sign up failed. Please try again.");
+      const signUpErr = err as { errors?: { message?: string }[] } | undefined;
+      setError(signUpErr?.errors?.[0]?.message || "Sign up failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -99,9 +100,10 @@ const Register = () => {
       } else {
         setError("Invalid verification code.");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Verification error:", err);
-      setError(err?.errors?.[0]?.message || "Verification failed.");
+      const verifyErr = err as { errors?: { message?: string }[] } | undefined;
+      setError(verifyErr?.errors?.[0]?.message || "Verification failed.");
     } finally {
       setLoading(false);
     }

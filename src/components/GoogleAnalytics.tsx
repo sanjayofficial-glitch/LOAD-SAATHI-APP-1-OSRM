@@ -1,14 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-    dataLayer?: any[];
-  }
-}
-
-export const GA_MEASUREMENT_ID = "G-GEFWPQNHT6";
+import { GA_MEASUREMENT_ID } from "@/utils/analytics";
 
 /**
  * Custom hook / component to track SPA page views in Google Analytics 4
@@ -26,12 +19,3 @@ export function GoogleAnalyticsTracker() {
 
   return null;
 }
-
-/**
- * Utility function to send custom conversion or interaction events to Google Analytics
- */
-export const trackGAEvent = (eventName: string, eventParams?: Record<string, any>) => {
-  if (typeof window !== "undefined" && typeof window.gtag === "function") {
-    window.gtag("event", eventName, eventParams);
-  }
-};

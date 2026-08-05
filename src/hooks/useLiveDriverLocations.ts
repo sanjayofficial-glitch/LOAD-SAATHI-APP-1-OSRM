@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
-import type { TruckLocation } from '../maps/TruckMarker';
+import type { TruckLocation } from '@/components/maps/TruckMarker';
 
 /**
  * useLiveDriverLocations - Subscribe to real-time driver positions.

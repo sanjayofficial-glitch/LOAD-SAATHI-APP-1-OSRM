@@ -46,6 +46,14 @@ interface UpcomingShipment {
   status: string;
 }
 
+interface PriceHistoryEntry {
+  price_per_tonne: number | null;
+  weight_tonnes: number | null;
+  created_at: string;
+  origin_city: string;
+  destination_city: string;
+}
+
 const ShipperDashboard = () => {
   const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
@@ -113,7 +121,7 @@ const ShipperDashboard = () => {
             .map(([, v]) => ({ month: v.display, spending: v.total }))
         );
 
-        const last5 = monthlySpending.slice(-5).reverse().map((entry: any) => ({
+        const last5 = monthlySpending.slice(-5).reverse().map((entry: PriceHistoryEntry) => ({
           route: `${entry.origin_city} → ${entry.destination_city}`,
           cost: (entry.price_per_tonne || 0) * (entry.weight_tonnes || 0),
           date: new Date(entry.created_at).toLocaleDateString(),

@@ -34,7 +34,7 @@ const Login = () => {
         redirectUrl: `${redirectBase}/auth-sync`,
         redirectUrlComplete: `${redirectBase}/auth-sync`,
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error("Google sign-in error:", err);
       setError("Google sign-in failed. Please try again.");
       setLoading(false);
@@ -54,9 +54,10 @@ const Login = () => {
       } else {
         setError("Additional verification required.");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Email sign-in error:", err);
-      setError(err?.errors?.[0]?.message || "Invalid email or password.");
+      const emailErr = err as { errors?: { message?: string }[] } | undefined;
+      setError(emailErr?.errors?.[0]?.message || "Invalid email or password.");
     } finally {
       setLoading(false);
     }

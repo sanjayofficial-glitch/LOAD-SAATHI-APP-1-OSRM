@@ -98,7 +98,7 @@ const TruckerTripDetail = () => {
         .order('created_at', { ascending: false });
 
       if (!requestsError) setBookingRequests(requests || []);
-    } catch (err) {
+    } catch (_err) {
       showError('Failed to load trip details');
     } finally {
       setLoading(false);
@@ -150,7 +150,7 @@ const TruckerTripDetail = () => {
       });
       showSuccess('Trip started! Shippers have been notified.');
       fetchData();
-    } catch (err) {
+    } catch (_err) {
       showError('Failed to start trip');
     } finally {
       setActionLoading(null);
@@ -190,7 +190,7 @@ const TruckerTripDetail = () => {
       });
       showSuccess('Marked as delivered! Shippers have been notified.');
       fetchData();
-    } catch (err) {
+    } catch (_err) {
       showError('Failed to mark delivered');
     } finally {
       setActionLoading(null);
@@ -234,7 +234,7 @@ const TruckerTripDetail = () => {
       });
       showSuccess('Trip marked as completed! Shippers have been notified.');
       fetchData();
-    } catch (err) {
+    } catch (_err) {
       showError('Failed to complete trip');
     } finally {
       setActionLoading(null);

@@ -126,7 +126,7 @@ const TruckerHub = () => {
       setTrips(tripsData || []);
       setSentOffers(mappedSent);
       setIncomingRequests(mappedIncoming);
-    } catch (err) {
+    } catch (_err) {
       showError('Failed to fetch data');
     } finally {
       setLoading(false);
@@ -142,7 +142,7 @@ const TruckerHub = () => {
       if (error) throw error;
       showSuccess('Trip deleted successfully');
       fetchData();
-    } catch (err) {
+    } catch (_err) {
       showError('Failed to delete trip');
     }
   };
@@ -159,7 +159,7 @@ const TruckerHub = () => {
       if (error) throw error;
       showSuccess('Trip marked as completed!');
       fetchData();
-    } catch (err) {
+    } catch (_err) {
       showError('Failed to complete trip');
     } finally {
       setActionLoading(null);

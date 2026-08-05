@@ -153,7 +153,7 @@ export default function ReviewsPreview() {
                     <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                     <select
                       value={sortBy}
-                      onChange={e => setSortBy(e.target.value as any)}
+                      onChange={e => setSortBy(e.target.value as 'recent' | 'highest' | 'lowest')}
                       className="pl-8 pr-6 py-1.5 bg-card border border-border rounded-lg text-xs text-foreground appearance-none focus:outline-none focus:border-yellow-500/50"
                     >
                       <option value="recent">Most Recent</option>

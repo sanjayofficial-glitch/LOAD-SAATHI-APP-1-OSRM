@@ -77,23 +77,23 @@ const MonitoringDashboard = () => {
       qs = performance.now();
       const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
       const { data: locationData } = await supabaseClient
-        .from('driver_locations' as any)
+        .from('driver_locations')
         .select('driver_id, user_type, lat, lng, heading, speed, updated_at')
         .gte('updated_at', fiveMinAgo)
         .order('updated_at', { ascending: false });
       queryTimes.push(performance.now() - qs);
 
       if (locationData && locationData.length > 0) {
-        const driverIds = locationData.map((l: any) => l.driver_id);
+        const driverIds = locationData.map((l) => l.driver_id);
         const { data: locationUsers } = await supabaseClient
           .from('users')
           .select('id, full_name')
           .in('id', driverIds);
 
         const userNameMap = new Map<string, string>();
-        locationUsers?.forEach((u: any) => userNameMap.set(u.id, u.full_name));
+        locationUsers?.forEach((u) => userNameMap.set(u.id, u.full_name));
 
-        const enrichedLocations: UserLocation[] = locationData.map((loc: any) => ({
+        const enrichedLocations: UserLocation[] = locationData.map((loc) => ({
           driver_id: loc.driver_id,
           user_type: loc.user_type || 'trucker',
           lat: loc.lat,
@@ -105,7 +105,7 @@ const MonitoringDashboard = () => {
         }));
 
         const activeTripTruckers = new Map<string, { origin_city: string; destination_city: string }>();
-        trips.forEach(t => { if (t.trucker_id) activeTripTruckers.set(t.trucker_id, { origin_city: t.origin_city, destination_city: t.destination_city }); });
+        tripData?.forEach(t => { if (t.trucker_id) activeTripTruckers.set(t.trucker_id, { origin_city: t.origin_city, destination_city: t.destination_city }); });
         const activeShipShippers = new Map<string, { origin_city: string; destination_city: string }>();
         if (shipmentData) shipmentData.forEach(s => { if (s.shipper_id) activeShipShippers.set(s.shipper_id, { origin_city: s.origin_city, destination_city: s.destination_city }); });
 
@@ -214,7 +214,7 @@ const MonitoringDashboard = () => {
         .on('postgres_changes', { event: '*', schema: 'public', table: 'trips' }, () => fetchData())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => fetchData())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => fetchData())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'driver_locations' as any }, () => fetchData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'driver_locations' }, () => fetchData())
         .subscribe();
     });
 

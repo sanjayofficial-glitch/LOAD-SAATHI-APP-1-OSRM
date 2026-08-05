@@ -39,7 +39,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
 import { useSmartMatch } from '@/hooks/useSmartMatch';
 import { useLiveDriverLocations } from '@/hooks/useLiveDriverLocations';
-import { LoadSaathiMap } from '@/components/maps';
+import { LoadSaathiMap, type LoadLocation } from '@/components/maps';
 import {
   Tooltip,
   TooltipContent,
@@ -62,6 +62,23 @@ import type { Shipment } from '@/types';
 const INDIAN_STATES = [
   "Any", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
 ];
+
+const toLoadLocation = (s: Shipment): LoadLocation => ({
+  id: s.id,
+  shipper_id: s.shipper_id,
+  shipment_id: s.id,
+  origin_city: s.origin_city,
+  dest_city: s.destination_city,
+  origin_lat: null,
+  origin_lng: null,
+  dest_lat: null,
+  dest_lng: null,
+  weight_tonnes: s.weight_tonnes,
+  budget_per_tonne: s.budget_per_tonne,
+  goods_description: s.goods_description,
+  status: s.status,
+  created_at: s.created_at,
+});
 
 const BrowseShipments = () => {
   const { userProfile } = useAuth();
@@ -234,7 +251,7 @@ const BrowseShipments = () => {
       if (parsedFilters.weight) setFilters(f => ({ ...f, minWeight: parsedFilters.weight!.toString() }));
       if (parsedFilters.date) setFilters(f => ({ ...f, departureDate: parsedFilters.date! }));
       showSuccess('AI parsed your search!');
-    } catch (err) {
+    } catch (_err) {
       showError('AI search failed');
     } finally {
       setAiLoading(false);
@@ -424,15 +441,16 @@ const BrowseShipments = () => {
               {/* Map */}
               <div className="flex-1 min-h-[300px] lg:min-h-0">
                 <LoadSaathiMap
-                  loads={filteredShipments}
+                  loads={filteredShipments.map(toLoadLocation)}
                   trucks={driverLocations}
                   height="100%"
                   showClusters
-                  onTruckClick={(truck) => {
+                  onTruckClick={() => {
                     navigate('/trucker/post-trip');
                   }}
                   onLoadClick={(load) => {
-                    openOfferDialog(load as Shipment);
+                    const shipment = filteredShipments.find((s) => s.id === load.id);
+                    if (shipment) openOfferDialog(shipment);
                   }}
                 />
               </div>

@@ -26,21 +26,17 @@ const Index = () => {
   const [ready, setReady] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const scrollToSection = (id: string) => {
-    setMobileMenuOpen(false);
-    setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    }, 150);
-  };
   const globeRef = useRef<HTMLDivElement>(null);
   const globeInited = useRef(false);
   const { isDark } = useTheme();
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const globeMatRef = useRef<any>(null);
   const innerMatRef = useRef<any>(null);
   const pointsMatRef = useRef<any>(null);
   const arcMatsRef = useRef<any[]>([]);
   const ambientRef = useRef<any>(null);
+  /* eslint-enable @typescript-eslint/no-explicit-any */
   const globeObserverRef = useRef<IntersectionObserver | null>(null);
   const cleanupFnsRef = useRef<(() => void)[]>([]);
 
@@ -277,6 +273,7 @@ const Index = () => {
       }
     };
     /* eslint-enable @typescript-eslint/no-explicit-any */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
   useEffect(() => {
@@ -288,7 +285,7 @@ const Index = () => {
     innerMatRef.current.opacity = lightMode ? 0.25 : 0.4;
     pointsMatRef.current.color.setHex(lightMode ? 0xE8620C : 0xFF6B00);
     pointsMatRef.current.opacity = lightMode ? 0.5 : 0.8;
-    arcMatsRef.current.forEach((mat: any) => {
+    arcMatsRef.current.forEach((mat) => {
       mat.color.setHex(lightMode ? 0xE8620C : 0xFF6B00);
       mat.opacity = lightMode ? 0.2 : 0.3;
     });

@@ -76,7 +76,7 @@ export default function FareCalculator() {
         historical_loads: data.historicalLoads || 0,
         estimate_source: "market_data",
       });
-    } catch (err) {
+    } catch (_err) {
       // Fallback: simple distance-based estimate
       setError(null);
       const weightNum = Number(weight);

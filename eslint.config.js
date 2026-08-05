@@ -29,4 +29,10 @@ export default tseslint.config(
       "no-empty": ["error", { "allowEmptyCatch": true }],
     },
   },
+  {
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 );

@@ -144,7 +144,7 @@ const TripDetail = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [trip?.status, trip?.trucker_id, trip?.id]);
+  }, [trip?.status, trip?.trucker_id, trip?.id, trip]);
 
   const handleRequest = async () => {
     if (!userProfile) return navigate('/login');

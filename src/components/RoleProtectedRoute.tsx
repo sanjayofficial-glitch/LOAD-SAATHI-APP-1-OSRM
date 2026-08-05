@@ -29,7 +29,7 @@ const RoleProtectedRoute = ({ children, allowedRole }: RoleProtectedRouteProps) 
   }
 
   // Whitelist check: reject unknown/malformed user_type (RBAC bypass guard)
-  if (userProfile.user_type && !VALID_USER_TYPES.includes(userProfile.user_type as any)) {
+  if (userProfile.user_type && !(VALID_USER_TYPES as readonly string[]).includes(userProfile.user_type)) {
     console.warn(`[Security] Invalid user_type "${userProfile.user_type}" for user ${userProfile.id} — access denied`);
     return <Navigate to="/" replace />;
   }

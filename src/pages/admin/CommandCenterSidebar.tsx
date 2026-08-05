@@ -54,7 +54,7 @@ function QuickStatCard({
     blue: { bg: 'bg-blue-500/10', text: 'text-blue-400', dot: 'bg-blue-500' },
     purple: { bg: 'bg-purple-500/10', text: 'text-purple-400', dot: 'bg-purple-500' },
   };
-  const c = colorMap[color] || colorMap.orange;
+  const c = colorMap[color] ?? colorMap.orange ?? { bg: 'bg-orange-500/10', text: 'text-orange-400', dot: 'bg-orange-500' };
 
   return (
     <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 flex flex-col gap-1">

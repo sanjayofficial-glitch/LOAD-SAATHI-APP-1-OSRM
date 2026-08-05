@@ -28,7 +28,7 @@ function useTeamMembers() {
           .select('*')
           .order('sort_order', { ascending: true });
         if (error) throw error;
-        const mapped: TeamMember[] = (data || []).map((m: any) => ({
+        const mapped: TeamMember[] = (data || []).map((m) => ({
           id: m.id,
           name: m.name,
           role: m.role,
@@ -58,7 +58,7 @@ function useTeamMembers() {
 }
 
 export default function TeamShowcase() {
-  const { members, loading } = useTeamMembers();
+  const { members } = useTeamMembers();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 

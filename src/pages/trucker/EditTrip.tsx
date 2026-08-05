@@ -142,7 +142,7 @@ const EditTrip = () => {
         showSuccess('Trip updated successfully!');  
         navigate('/trucker/my-trips');  
       }  
-    } catch (err) {  
+    } catch (_err) {  
       showError('An unexpected error occurred.');  
     } finally {        setSaving(false);  
     }  

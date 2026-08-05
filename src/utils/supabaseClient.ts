@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('SupabaseClient');
@@ -25,7 +25,7 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 }
 
 /** Map of Clerk JWT token prefix → cached Supabase client instance */
-const clientCache = new Map<string, ReturnType<typeof createClient>>();
+const clientCache = new Map<string, SupabaseClient>();
 const CACHE_MAX = 5;
 
 /**

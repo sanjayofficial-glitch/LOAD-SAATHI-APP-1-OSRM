@@ -99,7 +99,7 @@ const NotificationBell = React.memo(() => {
       await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', userProfile.id);
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
-    } catch (err) {
+    } catch (_err) {
       console.error('Failed to mark read');
     }
   };

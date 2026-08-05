@@ -25,6 +25,34 @@ const trips = [
   { id: 'TRP-884', origin: 'Lucknow, UP', dest: 'Patna, BR', distance: '520km', price: '₹20,000', date: '2026-07-13', match: 54, matchLabel: 'Low', cargo: 'Food Grain', weight: '18T' },
 ];
 
+type MatchItem =
+  | {
+      id: string;
+      origin: string;
+      dest: string;
+      weight: string;
+      type: string;
+      price: string;
+      date: string;
+      match: number;
+      matchLabel: string;
+      driver: string;
+      rating: number;
+      trips: number;
+    }
+  | {
+      id: string;
+      origin: string;
+      dest: string;
+      distance: string;
+      price: string;
+      date: string;
+      match: number;
+      matchLabel: string;
+      cargo: string;
+      weight: string;
+    };
+
 const matchColor = (score: number) => {
   if (score >= 90) return 'bg-green-500/15 text-green-400 border-green-500/30';
   if (score >= 75) return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
@@ -36,7 +64,7 @@ export default function MatchingPreview() {
   const [tab, setTab] = useState<'shipments' | 'trips'>('shipments');
   const [search, setSearch] = useState('');
 
-  const data = tab === 'shipments' ? shipments : trips;
+  const data: MatchItem[] = tab === 'shipments' ? shipments : trips;
   const filtered = data.filter(item =>
     item.origin.toLowerCase().includes(search.toLowerCase()) ||
     item.dest.toLowerCase().includes(search.toLowerCase()) ||
@@ -110,7 +138,7 @@ export default function MatchingPreview() {
 
             {/* Listings */}
             <div className="space-y-3">
-              {filtered.map((item: any) => (
+              {filtered.map((item) => (
                 <div key={item.id} className="glass-card p-4 rounded-xl border-border hover:border-orange-500/20 transition-all duration-200 group">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex items-start gap-4 flex-grow">
@@ -140,7 +168,7 @@ export default function MatchingPreview() {
                             <MapPin className="h-3 w-3 text-blue-400/70" />
                             {item.dest}
                           </span>
-                          {tab === 'shipments' && (
+                          {('type' in item) && (
                             <>
                               <span className="text-muted-foreground/60">·</span>
                               <span>{item.weight}</span>
@@ -148,7 +176,7 @@ export default function MatchingPreview() {
                               <span>{item.type}</span>
                             </>
                           )}
-                          {tab === 'trips' && (
+                          {('distance' in item) && (
                             <>
                               <span className="text-muted-foreground/60">·</span>
                               <span>{item.distance}</span>

@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, MessageSquare, Clock, MapPin, Send, ArrowRight, Truck, Phone, Linkedin, User } from "lucide-react";
+import { Mail, MessageSquare, Clock, MapPin, Send, ArrowRight, Truck, Phone, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

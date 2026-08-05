@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { Trash2, Upload, GripVertical, ArrowUp, ArrowDown, ImageIcon } from 'lucide-react';
+import { Trash2, Upload, ArrowUp, ArrowDown, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const CATEGORIES = [
@@ -30,7 +30,7 @@ interface GalleryImage {
 }
 
 export default function GalleryManager() {
-  const { getToken } = useAuth();
+  const { getToken } = useClerkAuth();
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -172,6 +172,7 @@ export default function GalleryManager() {
 
     const a = sorted[idx];
     const b = sorted[swapIdx];
+    if (!a || !b) return;
     const client = await getClient();
     await client.from('gallery_images').update({ sort_order: b.sort_order }).eq('id', a.id);
     await client.from('gallery_images').update({ sort_order: a.sort_order }).eq('id', b.id);

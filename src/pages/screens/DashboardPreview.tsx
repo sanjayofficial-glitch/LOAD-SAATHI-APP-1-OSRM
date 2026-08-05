@@ -2,7 +2,7 @@
 import SeoMeta from "@/components/SeoMeta";
 import {
   Package, Clock, TrendingUp, BarChart3, Truck, Map, DollarSign,
-  ArrowUp, ArrowDown, Activity
+  ArrowUp, ArrowDown, Activity, type LucideIcon
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer
@@ -35,7 +35,7 @@ const recentTrips = [
 ];
 
 const StatCard = ({ icon: Icon, label, value, change, changeLabel, iconColor }: {
-  icon: any; label: string; value: string; change: string; changeLabel: string; iconColor: string;
+  icon: LucideIcon; label: string; value: string; change: string; changeLabel: string; iconColor: string;
 }) => (
   <div className="glass-card p-5 rounded-xl border-border">
     <div className="flex items-start justify-between mb-3">

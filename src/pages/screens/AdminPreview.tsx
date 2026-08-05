@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import {
   Activity, Users, DollarSign, TrendingUp, Bell,
-  AlertTriangle, CheckCircle, XCircle, Server, Zap, BarChart3
+  AlertTriangle, CheckCircle, XCircle, Server, Zap, BarChart3,
+  type LucideIcon
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip
@@ -46,7 +47,7 @@ const events: Event[] = [
   { id: 10, type: 'error', message: 'Supabase connection pool at 85% capacity', time: '1h ago' },
 ];
 
-const eventIcon: Record<string, any> = {
+const eventIcon: Record<string, LucideIcon> = {
   success: CheckCircle,
   warning: AlertTriangle,
   error: XCircle,
@@ -61,7 +62,7 @@ const eventColor: Record<string, string> = {
 };
 
 const MetricCard = ({ icon: Icon, label, value, sub, iconColor }: {
-  icon: any; label: string; value: string; sub: string; iconColor: string;
+  icon: LucideIcon; label: string; value: string; sub: string; iconColor: string;
 }) => (
   <div className="glass-card p-4 rounded-xl border-border">
     <div className="flex items-start justify-between mb-2">
@@ -210,7 +211,7 @@ export default function AdminPreview() {
                   </div>
                   <div className="space-y-2">
                     {events.map((event) => {
-                      const Icon = eventIcon[event.type];
+                      const Icon = eventIcon[event.type] ?? Activity;
                       return (
                         <div
                           key={event.id}

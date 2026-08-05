@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Polyline, useMap } from 'react-leaflet';
-import { supabase } from '@/integrations/supabase/client';
+import { Polyline } from 'react-leaflet';
 
 interface RoutePolylineProps {
   originLat: number;
