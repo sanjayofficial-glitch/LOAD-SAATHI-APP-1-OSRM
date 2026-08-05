@@ -29,7 +29,7 @@ const headingPrefixes = [
 const sectionImages: Record<number, { icon: React.ReactNode; label: string }> = {
   3: { icon: <FileText className="h-10 w-10 text-orange-500/40" />, label: "e-Way Bill Rule Changes" },
   6: { icon: <Shield className="h-10 w-10 text-blue-500/40" />, label: "Real-Time GST Analytics" },
-  7: { icon: <FileText className="h-10 w-10 text-orange-500/40" />, label: "GST Advisory 668 Rule Status" },
+  7: { icon: <FileText className="h-10 w-10 text-orange-500/40" />, label: "e-Way Bill Rule Status" },
   9: { icon: <TrendingUp className="h-10 w-10 text-green-500/40" />, label: "Industry Trends" },
   14: { icon: <CheckCircle className="h-10 w-10 text-purple-500/40" />, label: "Compliance Checklist" },
   20: { icon: <Shield className="h-10 w-10 text-blue-500/40" />, label: "Real-Time GST Analytics" },
@@ -106,7 +106,7 @@ export default function BlogArticle() {
     ],
   };
 
-  const faqSchemas: Record<string, object> = {
+  const faqSchemas: Record<string, Record<string, unknown>> = {
     "indian-logistics-eway-bill-gst-2026": {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -192,7 +192,7 @@ export default function BlogArticle() {
       ],
     },
   };
-  const faqSchema = faqSchemas[slug] ?? null;
+  const faqSchema = slug ? faqSchemas[slug] ?? null : null;
 
   const relatedRoutes = article.relatedRoutes
     ? routes.filter((r) => article.relatedRoutes?.includes(r.slug))
