@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { useAuth as useClerkAuth } from "@clerk/clerk-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,13 +17,14 @@ interface FavoriteButtonProps {
 
 export default function FavoriteButton({ entityType, entityId, userId, className = "", size = 18 }: FavoriteButtonProps) {
   const { getToken } = useClerkAuth();
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const queryKey = ["favorite", userId, entityType, entityId];
 
-  const checkFavorite = useCallback(async () => {
-    try {
+  const { data: isFavorited = false } = useQuery({
+    queryKey,
+    queryFn: async () => {
       const token = await getToken({ template: "supabase" });
-      if (!token) return;
+      if (!token) return false;
       const supabase = createClerkSupabaseClient(token);
       const { data } = await supabase
         .from("favorites")
@@ -31,28 +33,18 @@ export default function FavoriteButton({ entityType, entityId, userId, className
         .eq("entity_type", entityType)
         .eq("entity_id", entityId)
         .maybeSingle();
-      setIsFavorited(!!data);
-    } catch {
-      // ignore
-    }
-  }, [getToken, userId, entityType, entityId]);
+      return !!data;
+    },
+    staleTime: 30_000,
+  });
 
-  useEffect(() => {
-    checkFavorite();
-  }, [checkFavorite]);
-
-  const toggle = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (loading) return;
-
-    setLoading(true);
-    try {
+  const toggleMutation = useMutation({
+    mutationFn: async (currentlyFavorited: boolean) => {
       const token = await getToken({ template: "supabase" });
       if (!token) throw new Error("Not authenticated");
       const supabase = createClerkSupabaseClient(token);
 
-      if (isFavorited) {
+      if (currentlyFavorited) {
         const { error } = await supabase
           .from("favorites")
           .delete()
@@ -60,8 +52,6 @@ export default function FavoriteButton({ entityType, entityId, userId, className
           .eq("entity_type", entityType)
           .eq("entity_id", entityId);
         if (error) throw error;
-        setIsFavorited(false);
-        posthog.capture("favorite_updated", { entity_type: entityType, action: "removed" });
       } else {
         const { error } = await supabase.from("favorites").insert({
           user_id: userId,
@@ -69,21 +59,36 @@ export default function FavoriteButton({ entityType, entityId, userId, className
           entity_id: entityId,
         });
         if (error) throw error;
-        setIsFavorited(true);
-        posthog.capture("favorite_updated", { entity_type: entityType, action: "added" });
       }
-    } catch (error) {
+    },
+    onSuccess: (_data, currentlyFavorited) => {
+      queryClient.setQueryData(queryKey, !currentlyFavorited);
+      posthog.capture("favorite_updated", {
+        entity_type: entityType,
+        action: currentlyFavorited ? "removed" : "added",
+      });
+    },
+    onError: (error, currentlyFavorited) => {
       posthog.captureException(error, { flow: "update_favorite", entity_type: entityType });
+      queryClient.setQueryData(queryKey, currentlyFavorited);
       showError("Failed to update favorite");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
+
+  const toggle = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (toggleMutation.isPending) return;
+      toggleMutation.mutate(isFavorited);
+    },
+    [isFavorited, toggleMutation]
+  );
 
   return (
     <button
       onClick={toggle}
-      disabled={loading}
+      disabled={toggleMutation.isPending}
       className={cn(
         "p-1.5 rounded-full transition-all hover:bg-gray-100 dark:hover:bg-gray-800",
         isFavorited && "text-red-500",

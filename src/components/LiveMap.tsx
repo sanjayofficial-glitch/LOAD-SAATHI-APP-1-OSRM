@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -56,7 +56,7 @@ function formatTime(iso: string): string {
   }
 }
 
-export default function LiveMap({ trucks, className = "" }: LiveMapProps) {
+export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapProps) {
   return (
     <div
       className={`relative w-full rounded-lg overflow-hidden border ${className}`}
@@ -93,4 +93,4 @@ export default function LiveMap({ trucks, className = "" }: LiveMapProps) {
       </MapContainer>
     </div>
   );
-}
+});

@@ -12,6 +12,7 @@ import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { ThemeProvider, useTheme } from "@/theme/theme";
 import { PostHogProvider } from "./components/PostHogProvider";
 import { GoogleAnalyticsTracker } from "./components/GoogleAnalytics";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -116,6 +117,7 @@ function App() {
         signInFallbackRedirectUrl="/auth-sync"
       >
         <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
           <ThemeProvider>
           <AuthProvider>
             <BrowserRouter>
@@ -305,6 +307,7 @@ function App() {
             <ThemedToaster />
           </AuthProvider>
         </ThemeProvider>
+          </TooltipProvider>
         </QueryClientProvider>
       </ClerkProvider>
       </PostHogProvider>

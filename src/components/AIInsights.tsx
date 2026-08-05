@@ -1,3 +1,4 @@
+import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Lightbulb, TrendingUp, TrendingDown, Minus, Loader2 } from 'lucide-react'
@@ -8,7 +9,7 @@ interface AIInsightsProps {
   loading: boolean
 }
 
-export default function AIInsights({ insights, loading }: AIInsightsProps) {
+export default React.memo(function AIInsights({ insights, loading }: AIInsightsProps) {
   if (loading) {
     return (
       <Card>
@@ -87,4 +88,4 @@ export default function AIInsights({ insights, loading }: AIInsightsProps) {
       </CardContent>
     </Card>
   )
-}
+})

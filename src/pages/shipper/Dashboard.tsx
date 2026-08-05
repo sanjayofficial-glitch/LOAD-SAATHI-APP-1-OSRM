@@ -68,56 +68,34 @@ const ShipperDashboard = () => {
       if (!supabaseToken) throw new Error('No Supabase token');
       const supabase = createClerkSupabaseClient(supabaseToken);
 
-      const { count: activeCount } = await supabase
-        .from('shipments')
-        .select('*', { count: 'exact', head: true })
-        .eq('shipper_id', userProfile.id)
-        .eq('status', 'pending');
-      
-      const { count: completedCount } = await supabase
-        .from('shipments')
-        .select('*', { count: 'exact', head: true })
-        .eq('shipper_id', userProfile.id)
-        .eq('status', 'completed');
-      
-      const { count: pendingOffersCount } = await supabase
-        .from('shipment_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('shipper_id', userProfile.id)
-        .eq('status', 'pending');
+      // Parallel independent queries
+      const [
+        activeResult,
+        completedResult,
+        pendingOffersResult,
+        requestSpentResult,
+        offerSpentResult,
+        upcomingResult,
+        monthlyResult,
+      ] = await Promise.all([
+        supabase.from('shipments').select('*', { count: 'exact', head: true }).eq('shipper_id', userProfile.id).eq('status', 'pending'),
+        supabase.from('shipments').select('*', { count: 'exact', head: true }).eq('shipper_id', userProfile.id).eq('status', 'completed'),
+        supabase.from('shipment_requests').select('*', { count: 'exact', head: true }).eq('shipper_id', userProfile.id).eq('status', 'pending'),
+        supabase.from('requests').select('weight_tonnes, trip:trips(price_per_tonne)').eq('shipper_id', userProfile.id).eq('status', 'accepted'),
+        supabase.from('shipment_requests').select('proposed_price_per_tonne, shipment:shipments(weight_tonnes)').eq('shipper_id', userProfile.id).eq('status', 'accepted'),
+        supabase.from('shipments').select('id, origin_city, destination_city, goods_description, weight_tonnes, departure_date, status').eq('shipper_id', userProfile.id).eq('status', 'pending').order('departure_date', { ascending: true }).limit(3),
+        supabase.from('price_history').select('price_per_tonne, weight_tonnes, created_at, origin_city, destination_city').eq('user_id', userProfile.id).eq('user_type', 'shipper').gte('created_at', new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString()).order('created_at', { ascending: true }),
+      ]);
 
-      const { data: requestSpent } = await supabase
-        .from('requests')
-        .select('weight_tonnes, trip:trips(price_per_tonne)')
-        .eq('shipper_id', userProfile.id)
-        .eq('status', 'accepted');
-
-      const { data: offerSpent } = await supabase
-        .from('shipment_requests')
-        .select('proposed_price_per_tonne, shipment:shipments(weight_tonnes)')
-        .eq('shipper_id', userProfile.id)
-        .eq('status', 'accepted');
-
+      // Process totals
+      const requestSpent = requestSpentResult.data;
+      const offerSpent = offerSpentResult.data;
       const totalSpent = (
         (requestSpent?.reduce((sum: number, r: { weight_tonnes: number; trip: { price_per_tonne: number }[] }) => sum + (r.weight_tonnes * (r.trip?.[0]?.price_per_tonne || 0)), 0) || 0) +
         (offerSpent?.reduce((sum: number, o: { proposed_price_per_tonne: number; shipment: { weight_tonnes: number }[] }) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.[0]?.weight_tonnes || 0)), 0) || 0)
       );
 
-      const { data: upcoming } = await supabase
-        .from('shipments')
-        .select('id, origin_city, destination_city, goods_description, weight_tonnes, departure_date, status')
-        .eq('shipper_id', userProfile.id)
-        .eq('status', 'pending')
-        .order('departure_date', { ascending: true })
-        .limit(3);
-
-      const { data: monthlySpending } = await supabase
-        .from('price_history')
-        .select('price_per_tonne, weight_tonnes, created_at, origin_city, destination_city')
-        .eq('user_id', userProfile.id)
-        .eq('user_type', 'shipper')
-        .gte('created_at', new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString())
-        .order('created_at', { ascending: true });
+      const monthlySpending = monthlyResult.data;
 
       if (monthlySpending && monthlySpending.length > 0) {
         const monthMap: Record<string, { display: string; total: number }> = {};
@@ -144,11 +122,11 @@ const ShipperDashboard = () => {
       }
 
       setStats({ 
-        activeShipments: activeCount || 0, 
-        pendingRequests: pendingOffersCount || 0, 
-        completedShipments: completedCount || 0,
+        activeShipments: activeResult.count || 0, 
+        pendingRequests: pendingOffersResult.count || 0, 
+        completedShipments: completedResult.count || 0,
         totalSpent,
-        upcomingShipments: (upcoming || []) as UpcomingShipment[]
+        upcomingShipments: (upcomingResult.data || []) as UpcomingShipment[]
       });
     } catch (err: unknown) {
       console.error('[ShipperDashboard] Error:', err);

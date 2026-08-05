@@ -1,6 +1,6 @@
 import { useAuth as useClerkAuth } from "@clerk/clerk-react";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 export const useSupabase = () => {
   const { getToken } = useClerkAuth();
@@ -11,5 +11,5 @@ export const useSupabase = () => {
     return createClerkSupabaseClient(token);
   }, [getToken]);
 
-  return { getAuthenticatedClient };
+  return useMemo(() => ({ getAuthenticatedClient }), [getAuthenticatedClient]);
 };

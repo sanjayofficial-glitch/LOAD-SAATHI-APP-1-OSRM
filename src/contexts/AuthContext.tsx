@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useUser, useSession, useClerk } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { User } from '@/types';
@@ -169,17 +169,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [clerk.client]);
 
-  const value: AuthContextType = {
-    user,
-    session,
-    userProfile,
-    loading: !clerkLoaded || loading,
-    signOut,
-    refreshProfile,
-    setProfile,
-    resetPassword,
-    isLoaded: clerkLoaded,
-  };
+  const value = useMemo<AuthContextType>(
+    () => ({
+      user,
+      session,
+      userProfile,
+      loading: !clerkLoaded || loading,
+      signOut,
+      refreshProfile,
+      setProfile,
+      resetPassword,
+      isLoaded: clerkLoaded,
+    }),
+    [
+      user,
+      session,
+      userProfile,
+      clerkLoaded,
+      loading,
+      signOut,
+      refreshProfile,
+      setProfile,
+      resetPassword,
+    ]
+  );
 
   return (
     <AuthContext.Provider value={value}>

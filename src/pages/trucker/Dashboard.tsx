@@ -58,53 +58,38 @@ const TruckerDashboard = () => {
       
       const supabase = createClerkSupabaseClient(supabaseToken);
 
-      const { count: activeCount } = await supabase
-        .from('trips')
-        .select('*', { count: 'exact', head: true })
-        .eq('trucker_id', userProfile.id)
-        .eq('status', 'active');
+      // Parallel independent queries
+      const [
+        activeResult,
+        pendingResult,
+        completedResult,
+        bookingResult,
+        offerResult,
+        monthlyResult,
+        recentResult,
+        locationsResult,
+      ] = await Promise.all([
+        supabase.from('trips').select('*', { count: 'exact', head: true }).eq('trucker_id', userProfile.id).eq('status', 'active'),
+        supabase.from('requests').select('*', { count: 'exact', head: true }).eq('receiver_id', userProfile.id).eq('status', 'pending'),
+        supabase.from('trips').select('*', { count: 'exact', head: true }).eq('trucker_id', userProfile.id).eq('status', 'completed'),
+        supabase.from('requests').select('weight_tonnes, trip:trips(price_per_tonne)').eq('receiver_id', userProfile.id).eq('status', 'accepted'),
+        supabase.from('shipment_requests').select('proposed_price_per_tonne, shipment:shipments(weight_tonnes)').eq('trucker_id', userProfile.id).eq('status', 'accepted'),
+        supabase.from('price_history').select('price_per_tonne, weight_tonnes, created_at').eq('user_id', userProfile.id).eq('user_type', 'trucker').gte('created_at', new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString()).order('created_at', { ascending: true }),
+        supabase.from('price_history').select('origin_city, destination_city, price_per_tonne, weight_tonnes, created_at').eq('user_id', userProfile.id).eq('user_type', 'trucker').order('created_at', { ascending: false }).limit(5),
+        supabase.from('driver_locations').select('driver_id, lat, lng, heading, speed, updated_at, trip_id').gte('updated_at', new Date(Date.now() - 30 * 60 * 1000).toISOString()),
+      ]);
 
-      const { count: pendingBookingCount } = await supabase
-        .from('requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('receiver_id', userProfile.id)
-        .eq('status', 'pending');
-
-      const { count: completedCount } = await supabase
-        .from('trips')
-        .select('*', { count: 'exact', head: true })
-        .eq('trucker_id', userProfile.id)
-        .eq('status', 'completed');
-
-      const { data: bookingEarnings } = await supabase
-        .from('requests')
-        .select('weight_tonnes, trip:trips(price_per_tonne)')
-        .eq('receiver_id', userProfile.id)
-        .eq('status', 'accepted');
-
-      const { data: offerEarnings } = await supabase
-        .from('shipment_requests')
-        .select('proposed_price_per_tonne, shipment:shipments(weight_tonnes)')
-        .eq('trucker_id', userProfile.id)
-        .eq('status', 'accepted');
-
+      // Process stats
       type BookingEarning = { weight_tonnes: number; trip: { price_per_tonne: number } | null };
       type OfferEarning = { proposed_price_per_tonne: number; shipment: { weight_tonnes: number } | null };
       const totalEarnings = (
-        ((bookingEarnings ?? []) as unknown as BookingEarning[]).reduce((sum, r) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0) +
-        ((offerEarnings ?? []) as unknown as OfferEarning[]).reduce((sum, o) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.weight_tonnes || 0)), 0)
+        ((bookingResult.data ?? []) as unknown as BookingEarning[]).reduce((sum, r) => sum + (r.weight_tonnes * (r.trip?.price_per_tonne || 0)), 0) +
+        ((offerResult.data ?? []) as unknown as OfferEarning[]).reduce((sum, o) => sum + ((o.proposed_price_per_tonne || 0) * (o.shipment?.weight_tonnes || 0)), 0)
       );
 
-      const { data: monthlyEarnings } = await supabase
-        .from('price_history')
-        .select('price_per_tonne, weight_tonnes, created_at')
-        .eq('user_id', userProfile.id)
-        .eq('user_type', 'trucker')
-        .gte('created_at', new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString())
-        .order('created_at', { ascending: true });
-
+      // Process monthly data
       const aggregated: Record<string, { display: string; total: number }> = {};
-      for (const entry of (monthlyEarnings ?? []) as { price_per_tonne: number; weight_tonnes: number; created_at: string }[]) {
+      for (const entry of (monthlyResult.data ?? []) as { price_per_tonne: number; weight_tonnes: number; created_at: string }[]) {
         const d = new Date(entry.created_at);
         const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
         const display = d.toLocaleString('default', { month: 'short', year: '2-digit' });
@@ -117,43 +102,32 @@ const TruckerDashboard = () => {
           .map(([, v]) => ({ month: v.display, earnings: v.total }))
       );
 
-      const { data: recentTrips } = await supabase
-        .from('price_history')
-        .select('origin_city, destination_city, price_per_tonne, weight_tonnes, created_at')
-        .eq('user_id', userProfile.id)
-        .eq('user_type', 'trucker')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      setRecentActivity(((recentTrips ?? []) as { origin_city: string; destination_city: string; price_per_tonne: number; weight_tonnes: number; created_at: string }[]).map(t => ({
+      // Process recent activity
+      setRecentActivity(((recentResult.data ?? []) as { origin_city: string; destination_city: string; price_per_tonne: number; weight_tonnes: number; created_at: string }[]).map(t => ({
         route: `${t.origin_city} → ${t.destination_city}`,
         earnings: (t.price_per_tonne || 0) * (t.weight_tonnes || 0),
         date: new Date(t.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       })));
 
       setStats({
-        activeTrips: activeCount || 0,
-        pendingRequests: pendingBookingCount || 0,
-        completedTrips: completedCount || 0,
+        activeTrips: activeResult.count || 0,
+        pendingRequests: pendingResult.count || 0,
+        completedTrips: completedResult.count || 0,
         totalEarnings
       });
 
-      // Fetch active truck locations for LiveMap
-      const { data: locations } = await supabase
-        .from('driver_locations')
-        .select('driver_id, lat, lng, heading, speed, updated_at, trip_id')
-        .gte('updated_at', new Date(Date.now() - 30 * 60 * 1000).toISOString());
-
+      // Process driver locations (depends on locationsResult from parallel batch)
+      const locations = locationsResult.data;
       if (locations && locations.length > 0) {
-        const driverIds = [...new Set(locations.map(l => l.driver_id))];
+        const driverIds = [...new Set(locations.map((l: { driver_id: string }) => l.driver_id))];
         const { data: drivers } = await supabase
           .from('users')
           .select('id, full_name')
           .in('id', driverIds);
 
-        const driverMap = new Map(drivers?.map(d => [d.id, d.full_name]) || []);
+        const driverMap = new Map(drivers?.map((d: { id: string; full_name: string }) => [d.id, d.full_name]) || []);
 
-        const truckLocations: TruckLocation[] = locations.map((loc, i) => ({
+        const truckLocations: TruckLocation[] = locations.map((loc: any, i: number) => ({
           id: `loc-${i}`,
           driverId: loc.driver_id,
           driverName: driverMap.get(loc.driver_id) || 'Unknown',

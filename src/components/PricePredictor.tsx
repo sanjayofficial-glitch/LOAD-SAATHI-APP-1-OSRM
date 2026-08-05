@@ -1,3 +1,4 @@
+import React from 'react'
 import { usePricePrediction } from '@/hooks/usePricePrediction'
 import type { PricePredictionInput } from '@/hooks/usePricePrediction'
 import { Sparkles, Loader2, TrendingUp, TrendingDown, Minus, Database } from 'lucide-react'
@@ -7,7 +8,7 @@ interface PricePredictorProps extends PricePredictionInput {
   onApplyPrice?: (price: number) => void
 }
 
-export function PricePredictor(props: PricePredictorProps) {
+export const PricePredictor = React.memo(function PricePredictor(props: PricePredictorProps) {
   const shouldFetch =
     props.originCity.length > 0 &&
     props.destinationCity.length > 0 &&
@@ -110,4 +111,4 @@ export function PricePredictor(props: PricePredictorProps) {
       </p>
     </div>
   )
-}
+})

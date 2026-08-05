@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   SlidersHorizontal, 
   Truck, 
@@ -29,7 +29,7 @@ interface MapControlsProps {
   className?: string;
 }
 
-export default function MapControls({
+export default React.memo(function MapControls({
   filters,
   onFilterChange,
   onlineCount,
@@ -148,7 +148,7 @@ export default function MapControls({
       )}
     </div>
   );
-}
+})
 
 function FilterToggle({
   active,

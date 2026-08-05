@@ -10,7 +10,7 @@
  *             destLat={28.704} destLng={77.102}
  *             distanceKm={1400} durationMin={1200} />
  */
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -52,7 +52,7 @@ interface RouteMapProps {
   height?: string;
 }
 
-const RouteMap = ({
+const RouteMap = React.memo(({
   originCity,
   destinationCity,
   originLat: propOriginLat,
@@ -178,6 +178,6 @@ const RouteMap = ({
       )}
     </div>
   );
-};
+});
 
 export default RouteMap;

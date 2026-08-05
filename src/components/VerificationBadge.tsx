@@ -1,3 +1,4 @@
+import React from "react";
 import { ShieldCheck } from "lucide-react";
 import {
   Tooltip,
@@ -12,7 +13,7 @@ interface VerificationBadgeProps {
   size?: "sm" | "md";
 }
 
-export default function VerificationBadge({ isVerified, className = "", size = "sm" }: VerificationBadgeProps) {
+export default React.memo(function VerificationBadge({ isVerified, className = "", size = "sm" }: VerificationBadgeProps) {
   if (!isVerified) return null;
 
   const iconSize = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
@@ -32,4 +33,4 @@ export default function VerificationBadge({ isVerified, className = "", size = "
       </Tooltip>
     </TooltipProvider>
   );
-}
+})

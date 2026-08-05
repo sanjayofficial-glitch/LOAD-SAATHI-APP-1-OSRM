@@ -6,12 +6,14 @@
  *   size   – Tailwind size class applied to width/height (default "h-8 w-8")
  *   className – extra classes on the <img> wrapper
  */
+import React from "react";
+
 interface LogoMarkProps {
   size?: string;
   className?: string;
 }
 
-export default function LogoMark({ size = "h-8 w-8", className = "" }: LogoMarkProps) {
+export default React.memo(function LogoMark({ size = "h-8 w-8", className = "" }: LogoMarkProps) {
   return (
     <img
       src="/logo.webp"
@@ -20,4 +22,4 @@ export default function LogoMark({ size = "h-8 w-8", className = "" }: LogoMarkP
       draggable={false}
     />
   );
-}
+});

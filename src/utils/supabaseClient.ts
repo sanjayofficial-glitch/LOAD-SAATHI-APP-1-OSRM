@@ -1,4 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('SupabaseClient');
 
 /**
  * Clerk-authenticated Supabase client factory.
@@ -14,20 +17,28 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn(
-    '[LoadSaathi] Missing Supabase environment variables. '
+  log.warn(
+    'Missing Supabase environment variables. '
     + 'Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY '
     + 'in your Vercel Dashboard → Project Settings → Environment Variables.'
   );
 }
 
+/** Map of Clerk JWT token prefix → cached Supabase client instance */
+const clientCache = new Map<string, ReturnType<typeof createClient>>();
+const CACHE_MAX = 5;
+
 /**
  * Creates a Supabase client configured with a Clerk JWT for authorization.
- * @param clerkToken - The Clerk authentication token to use for Authorization header
- * @returns Supabase client instance with global headers set to include the Clerk token
+ * Caches up to 5 clients keyed by token prefix to avoid recreating on every call.
  */
 export const createClerkSupabaseClient = (clerkToken: string) => {
-  return createClient(
+  const cacheKey = clerkToken.slice(0, 16);
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey)!;
+  }
+
+  const client = createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
     {
@@ -44,4 +55,14 @@ export const createClerkSupabaseClient = (clerkToken: string) => {
       },
     }
   );
+
+  // Evict oldest entry if over limit
+  if (clientCache.size >= CACHE_MAX) {
+    const oldest = clientCache.keys().next().value;
+    if (oldest !== undefined) {
+      clientCache.delete(oldest);
+    }
+  }
+  clientCache.set(cacheKey, client);
+  return client;
 };

@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
@@ -26,7 +26,7 @@ interface Notification {
   created_at: string;
 }
 
-const NotificationBell = () => {
+const NotificationBell = React.memo(() => {
   const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -149,6 +149,6 @@ const NotificationBell = () => {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
+});
 
 export default NotificationBell;
