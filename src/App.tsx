@@ -68,6 +68,7 @@ const Chat = lazy(() => import("./pages/Chat"));
 const ChatList = lazy(() => import("./pages/ChatList"));
 const Profile = lazy(() => import("./pages/Profile"));
 const MonitoringDashboard = lazy(() => import("./pages/admin/MonitoringDashboard"));
+const CommandCenterLive = lazy(() => import("./pages/admin/CommandCenterLive"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const Moderation = lazy(() => import("./pages/admin/Moderation"));
@@ -191,6 +192,11 @@ function App() {
                     <Route path="/admin/monitoring" element={
                       <RoleProtectedRoute allowedRole="admin">
                         <MonitoringDashboard />
+                      </RoleProtectedRoute>
+                    } />
+                    <Route path="/admin/command-center" element={
+                      <RoleProtectedRoute allowedRole="admin">
+                        <CommandCenterLive />
                       </RoleProtectedRoute>
                     } />
                     <Route path="/admin/dashboard" element={

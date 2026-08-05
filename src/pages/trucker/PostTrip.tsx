@@ -141,7 +141,7 @@ const PostTrip = () => {
         vehicle_type: formData.vehicle_type,
       });
       showSuccess('Trip posted successfully!');
-      navigate('/trucker/dashboard');
+      navigate('/trucker/my-trips');
     } catch (err) {
       console.error('[PostTrip] Error:', err);
       posthog.captureException(err, { flow: 'post_trip' });

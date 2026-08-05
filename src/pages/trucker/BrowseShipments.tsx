@@ -22,7 +22,9 @@ import {
    User,
     MapPin,
     Clock,
-    ArrowUpDown
+    ArrowUpDown,
+    Map,
+    List,
   } from 'lucide-react';
 import { 
   Select,
@@ -36,6 +38,8 @@ import FavoriteButton from '@/components/FavoriteButton';
 import { showSuccess, showError } from '@/utils/toast';
 import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
 import { useSmartMatch } from '@/hooks/useSmartMatch';
+import { useLiveDriverLocations } from '@/hooks/useLiveDriverLocations';
+import { LoadSaathiMap } from '@/components/maps';
 import {
   Tooltip,
   TooltipContent,
@@ -78,6 +82,7 @@ const BrowseShipments = () => {
   });
 
   const [sortBy, setSortBy] = useState<'match' | 'budget_asc' | 'budget_desc' | 'date' | 'weight'>('match');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
@@ -212,6 +217,9 @@ const BrowseShipments = () => {
     } : null,
     10,
   );
+
+  // Live driver positions for map overlay
+  const { driverLocations } = useLiveDriverLocations(getToken);
 
   const handleAiSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -367,6 +375,20 @@ const BrowseShipments = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            <div className="flex border rounded-md">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-2 py-1 text-xs ${viewMode === 'list' ? 'bg-orange-500 text-white' : 'bg-background text-muted-foreground'}`}
+              >
+                <List className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`px-2 py-1 text-xs ${viewMode === 'map' ? 'bg-orange-500 text-white' : 'bg-background text-muted-foreground'}`}
+              >
+                <Map className="h-3.5 w-3.5" />
+              </button>
+            </div>
             <div className="w-48">
               <Select value={sortBy} onValueChange={(val) => setSortBy(val as 'match' | 'budget_asc' | 'budget_desc' | 'date' | 'weight')}>
                 <SelectTrigger className="py-6 rounded-xl border-gray-200">
@@ -393,6 +415,65 @@ const BrowseShipments = () => {
               <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">No shipments found</h3>
               <p className="text-gray-500 dark:text-gray-400">Try adjusting your filters or check back later.</p>
+            </div>
+          ) : viewMode === 'map' ? (
+            /* Map View — side-by-side on desktop, stacked on mobile */
+            <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-280px)] min-h-[400px]">
+              {/* Map */}
+              <div className="flex-1 min-h-[300px] lg:min-h-0">
+                <LoadSaathiMap
+                  loads={filteredShipments}
+                  trucks={driverLocations}
+                  height="100%"
+                  showClusters
+                  onTruckClick={(truck) => {
+                    navigate('/trucker/post-trip');
+                  }}
+                  onLoadClick={(load) => {
+                    openOfferDialog(load as Shipment);
+                  }}
+                />
+              </div>
+              {/* Shipment List */}
+              <div className="w-full lg:w-80 overflow-y-auto overflow-x-hidden space-y-2">
+                {filteredShipments.map((shipment) => (
+                  <Card
+                    key={shipment.id}
+                    className="border-orange-100 dark:border-orange-800 hover:shadow-md transition-all duration-200 cursor-pointer"
+                    onClick={() => openOfferDialog(shipment)}
+                  >
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <div className="flex items-center text-xs font-bold text-gray-900 dark:text-white truncate">
+                              <MapPin className="h-3 w-3 text-orange-500 mr-0.5 shrink-0" />
+                              {shipment.origin_city}
+                              <ArrowRight className="h-2.5 w-2.5 mx-0.5 text-gray-300 shrink-0" />
+                              {shipment.destination_city}
+                            </div>
+                            {shipment._matchScore > 0 && (() => {
+                              const { label, color } = getMatchLabel(shipment._matchScore);
+                              return <Badge className={`${color} text-[8px] font-bold shrink-0`}>{label}</Badge>;
+                            })()}
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                            <span>{shipment.weight_tonnes}T</span>
+                            <span className="font-bold text-green-600">₹{shipment.budget_per_tonne.toLocaleString()}/T</span>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          className="ml-1 bg-orange-500 hover:bg-orange-600 text-white h-7 px-2"
+                          onClick={(e) => { e.stopPropagation(); openOfferDialog(shipment); }}
+                        >
+                          Offer
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="grid gap-6">

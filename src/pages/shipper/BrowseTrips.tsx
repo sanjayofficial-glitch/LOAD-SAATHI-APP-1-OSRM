@@ -31,13 +31,17 @@ import {
   Clock,
   Sparkles,
   Loader2,
-  ArrowUpDown
+  ArrowUpDown,
+  Map,
+  List,
 } from 'lucide-react';
 
 import VerificationBadge from '@/components/VerificationBadge';
 import FavoriteButton from '@/components/FavoriteButton';
 import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
 import { useSmartMatch } from '@/hooks/useSmartMatch';
+import { useLiveDriverLocations } from '@/hooks/useLiveDriverLocations';
+import { LoadSaathiMap, type TruckLocation } from '@/components/maps';
 import { formatDuration } from '@/utils/format';
 import type { Trip } from '@/types';
 import {
@@ -53,6 +57,7 @@ const TripList = () => {
   const navigate = useNavigate();
   
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [filters, setFilters] = useState({
     origin: '',
     destination: '',
@@ -215,6 +220,9 @@ const TripList = () => {
     10,
   );
 
+  // Live driver positions for map overlay
+  const { driverLocations } = useLiveDriverLocations(getToken);
+
   if (!userProfile) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -260,6 +268,20 @@ const TripList = () => {
             </div>
             
             <div className="flex gap-2 items-center">
+              <div className="flex border rounded-md">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-2 py-1 text-xs ${viewMode === 'list' ? 'bg-orange-500 text-white' : 'bg-background text-muted-foreground'}`}
+                >
+                  <List className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  className={`px-2 py-1 text-xs ${viewMode === 'map' ? 'bg-orange-500 text-white' : 'bg-background text-muted-foreground'}`}
+                >
+                  <Map className="h-3.5 w-3.5" />
+                </button>
+              </div>
               <Select value={sortBy} onValueChange={(value: 'match' | 'price_asc' | 'price_desc' | 'date' | 'distance') => setSortBy(value)}>
                 <SelectTrigger className="w-[160px] border-gray-200 dark:border-gray-700">
                   <ArrowUpDown className="h-4 w-4 mr-2 text-gray-400" />
@@ -373,6 +395,65 @@ const TripList = () => {
               </div>
             </CardContent>
           </Card>
+        ) : viewMode === 'map' ? (
+          /* Map View — side-by-side on desktop, stacked on mobile */
+          <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-280px)] min-h-[400px]">
+            {/* Map */}
+            <div className="flex-1 min-h-[300px] lg:min-h-0">
+              <LoadSaathiMap
+                trucks={driverLocations.filter((d) =>
+                  filteredTrips.some((t) => t.trucker_id === d.driver_id || t.origin_city === d.origin_city)
+                )}
+                height="100%"
+                showClusters
+                onTruckClick={(truck) => {
+                  const trip = filteredTrips.find((t) => t.trucker_id === truck.driver_id);
+                  if (trip) navigate(`/trips/${trip.id}`);
+                }}
+              />
+            </div>
+            {/* Trip List */}
+            <div className="w-full lg:w-80 overflow-y-auto overflow-x-hidden space-y-2">
+              {filteredTrips.map((trip) => (
+                <Card
+                  key={trip.id}
+                  className="border-orange-100 dark:border-orange-800 hover:shadow-md transition-all duration-200 cursor-pointer"
+                  onClick={() => navigate(`/trips/${trip.id}`)}
+                >
+                  <CardContent className="p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <div className="flex items-center text-xs font-bold text-gray-900 dark:text-white truncate">
+                            <MapPin className="h-3 w-3 text-orange-500 mr-0.5 shrink-0" />
+                            {trip.origin_city}
+                            <ArrowRight className="h-2.5 w-2.5 mx-0.5 text-gray-300 shrink-0" />
+                            {trip.destination_city}
+                          </div>
+                          {trip._matchScore > 0 && (() => {
+                            const { label, color } = getMatchLabel(trip._matchScore);
+                            return <Badge className={`${color} text-[8px] font-bold shrink-0`}>{label}</Badge>;
+                          })()}
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                          <span>{trip.vehicle_type || 'Truck'}</span>
+                          <span>{trip.available_capacity_tonnes}T</span>
+                          <span className="font-bold text-green-600">₹{trip.price_per_tonne.toLocaleString()}/T</span>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="ml-1 bg-orange-500 hover:bg-orange-600 text-white h-7 px-2"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/trips/${trip.id}`); }}
+                      >
+                        View
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         ) : (
           <div className="grid gap-4">
             {filteredTrips.map((trip, i) => (

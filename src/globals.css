@@ -317,3 +317,29 @@
 .cl-internal-1dauvpw {
   display: none !important;
 }
+
+/* Leaflet CSS fixes for Tailwind preflight */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+.leaflet-container img {
+  max-width: none !important;
+}
+.leaflet-container .leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15) !important;
+}
+.leaflet-container .leaflet-control-zoom a {
+  background: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+.leaflet-container .leaflet-control-attribution {
+  background: hsl(var(--card) / 0.8) !important;
+  font-size: 9px !important;
+}
+.leaflet-container .leaflet-popup-content-wrapper {
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
