@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Linkedin, Twitter, Instagram } from 'lucide-react';
+import { Linkedin, Twitter, Instagram, Phone } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { supabase } from '../../integrations/supabase/client';
 
@@ -42,7 +42,6 @@ function useTeamMembers() {
         }));
         setMembers(mapped);
       } catch {
-        // Fallback to hardcoded data if Supabase is unavailable
         setMembers([
           { id: '1', name: 'Sanjaya Sahu', role: 'Founder & CEO', image: '/team/sanjaya-sahu.webp', phone: '+918328998031', social: { linkedin: 'https://www.linkedin.com/in/sanjaya-sahu-253315305/' } },
           { id: '2', name: 'Prince Mallik', role: 'Co-Founder & COO', image: '/team/prince-mallik.webp', phone: '+91 76848 43985', social: { linkedin: 'https://www.linkedin.com/in/prince-mallik-177a472a0/' } },
@@ -61,10 +60,15 @@ function useTeamMembers() {
 export default function TeamShowcase() {
   const { members, loading } = useTeamMembers();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const col1 = members.filter((_, i) => i % 3 === 0);
   const col2 = members.filter((_, i) => i % 3 === 1);
   const col3 = members.filter((_, i) => i % 3 === 2);
+
+  const handleToggle = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
 
   return (
     <div className="flex flex-col md:flex-row items-start gap-6 md:gap-10 lg:gap-14 select-none w-full max-w-5xl mx-auto py-8 px-4 md:px-6 font-sans">
@@ -76,45 +80,57 @@ export default function TeamShowcase() {
             <PhotoCard
               key={member.id}
               member={member}
-              className="w-[100px] h-[140px]"
+              defaultClass="w-[120px] h-[160px]"
+              expandedClass="w-[180px] h-[240px]"
               hoveredId={hoveredId}
+              expandedId={expandedId}
               onHover={setHoveredId}
+              onToggle={handleToggle}
             />
           ))}
         </div>
 
         {/* Desktop: staggered 3-column grid */}
-        <div className="hidden md:flex gap-3">
-          <div className="flex flex-col gap-3">
+        <div className="hidden md:flex gap-4">
+          <div className="flex flex-col gap-4">
             {col1.map((member) => (
               <PhotoCard
                 key={member.id}
                 member={member}
-                className="w-[155px] h-[215px]"
+                defaultClass="w-[190px] h-[260px]"
+                expandedClass="w-[260px] h-[360px]"
                 hoveredId={hoveredId}
+                expandedId={expandedId}
                 onHover={setHoveredId}
+                onToggle={handleToggle}
               />
             ))}
           </div>
-          <div className="flex flex-col gap-3 mt-[68px]">
+          <div className="flex flex-col gap-4 mt-[68px]">
             {col2.map((member) => (
               <PhotoCard
                 key={member.id}
                 member={member}
-                className="w-[172px] h-[230px]"
+                defaultClass="w-[200px] h-[275px]"
+                expandedClass="w-[270px] h-[375px]"
                 hoveredId={hoveredId}
+                expandedId={expandedId}
                 onHover={setHoveredId}
+                onToggle={handleToggle}
               />
             ))}
           </div>
-          <div className="flex flex-col gap-3 mt-[32px]">
+          <div className="flex flex-col gap-4 mt-[32px]">
             {col3.map((member) => (
               <PhotoCard
                 key={member.id}
                 member={member}
-                className="w-[162px] h-[222px]"
+                defaultClass="w-[185px] h-[255px]"
+                expandedClass="w-[255px] h-[350px]"
                 hoveredId={hoveredId}
+                expandedId={expandedId}
                 onHover={setHoveredId}
+                onToggle={handleToggle}
               />
             ))}
           </div>
@@ -128,7 +144,9 @@ export default function TeamShowcase() {
             key={member.id}
             member={member}
             hoveredId={hoveredId}
+            expandedId={expandedId}
             onHover={setHoveredId}
+            onToggle={handleToggle}
           />
         ))}
       </div>
@@ -140,27 +158,38 @@ export default function TeamShowcase() {
 
 function PhotoCard({
   member,
-  className,
+  defaultClass,
+  expandedClass,
   hoveredId,
+  expandedId,
   onHover,
+  onToggle,
 }: {
   member: TeamMember;
-  className: string;
+  defaultClass: string;
+  expandedClass: string;
   hoveredId: string | null;
+  expandedId: string | null;
   onHover: (id: string | null) => void;
+  onToggle: (id: string) => void;
 }) {
-  const isActive = hoveredId === member.id;
-  const isDimmed = hoveredId !== null && !isActive;
+  const isHovered = hoveredId === member.id;
+  const isExpanded = expandedId === member.id;
+  const isActive = isHovered || isExpanded;
+  const isDimmed = hoveredId !== null && !isHovered;
 
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-xl cursor-pointer flex-shrink-0 transition-opacity duration-400',
-        className,
-        isDimmed ? 'opacity-60' : 'opacity-100',
+        'overflow-hidden rounded-xl cursor-pointer flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative',
+        isExpanded ? expandedClass : defaultClass,
+        isDimmed && !isExpanded && 'opacity-50 scale-[0.88]',
+        !isDimmed && !isExpanded && 'opacity-100 scale-100',
+        isExpanded && 'z-10 shadow-2xl',
       )}
       onMouseEnter={() => onHover(member.id)}
       onMouseLeave={() => onHover(null)}
+      onClick={() => onToggle(member.id)}
     >
       <img
         src={member.image}
@@ -170,6 +199,69 @@ function PhotoCard({
           filter: isActive ? 'grayscale(0) brightness(1)' : 'grayscale(1) brightness(0.77)',
         }}
       />
+
+      {/* Contact overlay — only visible when expanded (clicked) */}
+      <div
+        className={cn(
+          'absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-3 pt-10 transition-opacity duration-400',
+          isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        )}
+      >
+        <p className="text-white text-xs font-bold leading-tight truncate">{member.name}</p>
+        <p className="text-white/70 text-[9px] uppercase tracking-wider mt-0.5">{member.role}</p>
+
+        {/* Phone */}
+        {member.phone && (
+          <a
+            href={`tel:${member.phone}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 mt-2 text-white/90 hover:text-white text-[10px] transition-colors"
+          >
+            <Phone className="w-2.5 h-2.5" />
+            <span>{member.phone}</span>
+          </a>
+        )}
+
+        {/* Social icons */}
+        <div className="flex items-center gap-2 mt-1.5">
+          {member.social?.linkedin && (
+            <a
+              href={member.social.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-white/70 hover:text-white transition-colors"
+              title="LinkedIn"
+            >
+              <Linkedin className="w-3 h-3" />
+            </a>
+          )}
+          {member.social?.twitter && (
+            <a
+              href={member.social.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-white/70 hover:text-white transition-colors"
+              title="X / Twitter"
+            >
+              <Twitter className="w-3 h-3" />
+            </a>
+          )}
+          {member.social?.instagram && (
+            <a
+              href={member.social.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-white/70 hover:text-white transition-colors"
+              title="Instagram"
+            >
+              <Instagram className="w-3 h-3" />
+            </a>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -179,14 +271,19 @@ function PhotoCard({
 function MemberRow({
   member,
   hoveredId,
+  expandedId,
   onHover,
+  onToggle,
 }: {
   member: TeamMember;
   hoveredId: string | null;
+  expandedId: string | null;
   onHover: (id: string | null) => void;
+  onToggle: (id: string) => void;
 }) {
-  const isActive = hoveredId === member.id;
-  const isDimmed = hoveredId !== null && !isActive;
+  const isHovered = hoveredId === member.id;
+  const isExpanded = expandedId === member.id;
+  const isDimmed = hoveredId !== null && !isHovered;
   const hasSocial = member.social?.twitter ?? member.social?.linkedin ?? member.social?.instagram;
 
   return (
@@ -197,19 +294,20 @@ function MemberRow({
       )}
       onMouseEnter={() => onHover(member.id)}
       onMouseLeave={() => onHover(null)}
+      onClick={() => onToggle(member.id)}
     >
       {/* Name + social */}
       <div className="flex items-center gap-2.5">
         <span
           className={cn(
             'w-4 h-3 rounded-[5px] flex-shrink-0 transition-all duration-300',
-            isActive ? 'bg-foreground w-5' : 'bg-foreground/25',
+            isHovered || isExpanded ? 'bg-foreground w-5' : 'bg-foreground/25',
           )}
         />
         <span
           className={cn(
             'text-[15px] md:text-[18px] font-semibold leading-none tracking-tight transition-colors duration-300',
-            isActive ? 'text-foreground' : 'text-foreground/80',
+            isHovered || isExpanded ? 'text-foreground' : 'text-foreground/80',
           )}
         >
           {member.name}
@@ -220,7 +318,7 @@ function MemberRow({
           <div
             className={cn(
               'flex items-center gap-1.5 ml-0.5 transition-all duration-200',
-              isActive
+              isHovered || isExpanded
                 ? 'opacity-100 translate-x-0'
                 : 'opacity-0 -translate-x-2 pointer-events-none',
             )}
