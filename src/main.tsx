@@ -4,32 +4,20 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import "./globals.css";
 
-// Validate environment variables at startup
-import "./config/env";
-
-// Initialize Capacitor OAuth handler for Android APK sign-in/sign-up
-import { initCapacitorOAuth } from "./utils/capacitorOAuth";
-initCapacitorOAuth();
-
-// Preconnect to frequently-used API origins so their TLS + DNS work
-// starts early (maps, geocoding, Supabase). Maps import leaflet CSS
-// locally, so it's no longer loaded globally for every page.
-function addPreconnect(href: string, crossOrigin = true) {
-  const link = document.createElement("link");
-  link.rel = "preconnect";
-  link.href = href;
-  if (crossOrigin) link.crossOrigin = "anonymous";
-  document.head.appendChild(link);
-}
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-if (supabaseUrl) {
-  try {
-    addPreconnect(new URL(supabaseUrl).origin);
-  } catch {
-    // ignore malformed env value
+// Defer env validation + Capacitor OAuth to after first paint
+// (they run zod validation + import heavy @capacitor/core)
+function afterPaint(fn: () => void) {
+  if (typeof requestIdleCallback !== 'undefined') {
+    requestIdleCallback(fn, { timeout: 2000 });
+  } else {
+    setTimeout(fn, 0);
   }
 }
+
+afterPaint(() => {
+  import("./config/env");
+  import("./utils/capacitorOAuth").then(({ initCapacitorOAuth }) => initCapacitorOAuth());
+});
 
 async function mountApp() {
   try {

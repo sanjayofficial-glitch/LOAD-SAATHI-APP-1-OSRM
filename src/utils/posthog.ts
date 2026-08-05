@@ -3,7 +3,7 @@ import posthog from 'posthog-js'
 const POSTHOG_API_KEY = import.meta.env.VITE_POSTHOG_API_KEY
 const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST
 
-if (POSTHOG_API_KEY && POSTHOG_HOST) {
+if (POSTHOG_API_KEY && POSTHOG_HOST && !POSTHOG_API_KEY.includes('ROTATE_ME')) {
   posthog.init(POSTHOG_API_KEY, {
     api_host: POSTHOG_HOST,
     ui_host: 'https://us.posthog.com',

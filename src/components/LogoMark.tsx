@@ -14,7 +14,7 @@ interface LogoMarkProps {
 export default function LogoMark({ size = "h-8 w-8", className = "" }: LogoMarkProps) {
   return (
     <img
-      src="/logo.png"
+      src="/logo.webp"
       alt="LoadSaathi logo"
       className={`${size} object-contain select-none ${className}`}
       draggable={false}

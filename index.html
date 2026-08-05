@@ -1,22 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-WTBG3QKC');</script>
-    <!-- End Google Tag Manager -->
-    <!-- Clarity tracking code for https://loadsaathi.in/ -->
-    <script>
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "xv7yg2uwvu");
-    </script>
-    <!-- End Clarity -->
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="manifest" href="/manifest.json" />
@@ -28,14 +12,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="LoadSaathi" />
 
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
-    <link rel="preconnect" href="https://cdn.cookiehub.eu" crossorigin />
-    <link rel="preconnect" href="https://clerk.loadsaathi.in" crossorigin />
+    <!-- Preconnect: only keep OSRM (needed for route calculation on map pages) -->
     <link rel="preconnect" href="https://router.project-osrm.org" crossorigin />
-    <link rel="preconnect" href="https://nominatim.openstreetmap.org" crossorigin />
-    <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin />
-    <link rel="dns-prefetch" href="https://unpkg.com" />
 
     <!-- Primary SEO -->
     <title>LoadSaathi — Shared Freight Marketplace | PTL/LTL East India</title>
@@ -235,23 +213,11 @@
     }
     </script>
 
-    <!-- Google Analytics (gtag.js) -->
+    <!-- Google Analytics (gtag.js) — deferred to after first paint -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEFWPQNHT6"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-GEFWPQNHT6');
-    </script>
 
-    <!-- CookieHub Consent Banner -->
+    <!-- CookieHub Consent Banner — deferred -->
     <script async src="https://cdn.cookiehub.eu/c2/ca96bc89.js"></script>
-    <script type="text/javascript">
-      document.addEventListener("DOMContentLoaded", function(event) {
-        var cpm = {};
-        window.cookiehub.load(cpm);
-      });
-    </script>
 
     <script>
       window.addEventListener('error', function(e) {
@@ -309,5 +275,29 @@
       </style>
     </div>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+    <!-- Third-party scripts: deferred to after first paint -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.addEventListener('load', function() {
+        // GTM
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-WTBG3QKC');
+        // GA config
+        gtag('js', new Date());
+        gtag('config', 'G-GEFWPQNHT6');
+        // Clarity
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "xv7yg2uwvu");
+        // CookieHub
+        if (window.cookiehub) { window.cookiehub.load({}); }
+      });
+    </script>
 </html>

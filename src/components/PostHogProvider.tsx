@@ -11,7 +11,11 @@ import { useEffect, type ReactNode } from 'react'
  */
 export function PostHogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
-    if (!import.meta.env.VITE_POSTHOG_API_KEY || !import.meta.env.VITE_POSTHOG_HOST) {
+    if (
+      !import.meta.env.VITE_POSTHOG_API_KEY ||
+      !import.meta.env.VITE_POSTHOG_HOST ||
+      import.meta.env.VITE_POSTHOG_API_KEY.includes('ROTATE_ME')
+    ) {
       return
     }
 
