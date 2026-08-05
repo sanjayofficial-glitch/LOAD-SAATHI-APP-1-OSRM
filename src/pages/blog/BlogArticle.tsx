@@ -17,13 +17,23 @@ const headingPrefixes = [
   "Action Checklist:",
   "Key Takeaways",
   "Frequently Asked Questions",
+  "Problem Statement:",
+  "Detailed Breakdown:",
+  "Impact on MSME Shared Freight",
+  "Step-by-Step Guide:",
+  "Indian Case Studies:",
+  "Statistical Overview",
+  "Conclusion & Call to Action",
 ];
 
 const sectionImages: Record<number, { icon: React.ReactNode; label: string }> = {
   3: { icon: <FileText className="h-10 w-10 text-orange-500/40" />, label: "e-Way Bill Rule Changes" },
   6: { icon: <Shield className="h-10 w-10 text-blue-500/40" />, label: "Real-Time GST Analytics" },
+  7: { icon: <FileText className="h-10 w-10 text-orange-500/40" />, label: "GST Advisory 668 Rule Status" },
   9: { icon: <TrendingUp className="h-10 w-10 text-green-500/40" />, label: "Industry Trends" },
   14: { icon: <CheckCircle className="h-10 w-10 text-purple-500/40" />, label: "Compliance Checklist" },
+  20: { icon: <Shield className="h-10 w-10 text-blue-500/40" />, label: "Real-Time GST Analytics" },
+  23: { icon: <TrendingUp className="h-10 w-10 text-green-500/40" />, label: "Sourced Market Statistics" },
 };
 
 export default function BlogArticle() {
@@ -96,52 +106,93 @@ export default function BlogArticle() {
     ],
   };
 
-  const faqSchema = slug === "indian-logistics-eway-bill-gst-2026" ? {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: "What is the Ship-To GSTIN requirement in 2026?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Starting August 1, 2026, all Bill-To / Ship-To e-Way Bill transactions must capture the exact Ship-To GSTIN. If the recipient is unregistered, mark the field as URP (Unregistered Person).",
+  const faqSchemas: Record<string, object> = {
+    "indian-logistics-eway-bill-gst-2026": {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "What is the Ship-To GSTIN requirement in 2026?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Starting August 1, 2026, all Bill-To / Ship-To e-Way Bill transactions must capture the exact Ship-To GSTIN. If the recipient is unregistered, mark the field as URP (Unregistered Person).",
+          },
         },
-      },
-      {
-        "@type": "Question",
-        name: "Can I still use a single GSTIN for multi-location shipments?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "No. The new rules require the actual destination entity's GSTIN. Using your headquarters GSTIN for goods shipped to a branch will trigger a mismatch flag in the GST analytics engine.",
+        {
+          "@type": "Question",
+          name: "Can I still use a single GSTIN for multi-location shipments?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "No. The new rules require the actual destination entity's GSTIN. Using your headquarters GSTIN for goods shipped to a branch will trigger a mismatch flag in the GST analytics engine.",
+          },
         },
-      },
-      {
-        "@type": "Question",
-        name: "What happens if my e-Way Bill data doesn't match my GSTR-3B filing?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "The GST department's tri-party cross-matching system will flag the discrepancy automatically. This can result in ITC blockage, detention notices, and penalties of up to 200% of the tax amount.",
+        {
+          "@type": "Question",
+          name: "What happens if my e-Way Bill data doesn't match my GSTR-3B filing?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "The GST department's tri-party cross-matching system will flag the discrepancy automatically. This can result in ITC blockage, detention notices, and penalties of up to 200% of the tax amount.",
+          },
         },
-      },
-      {
-        "@type": "Question",
-        name: "How does voluntary e-Way Bill closure work?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "After physical delivery is confirmed, any authorized party can close the e-Way Bill on the portal. A closed e-Way Bill prevents unauthorized reuse and eliminates transit audit discrepancies.",
+        {
+          "@type": "Question",
+          name: "How does voluntary e-Way Bill closure work?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "After physical delivery is confirmed, any authorized party can close the e-Way Bill on the portal. A closed e-Way Bill prevents unauthorized reuse and eliminates transit audit discrepancies.",
+          },
         },
-      },
-      {
-        "@type": "Question",
-        name: "What is the penalty for non-compliance with 2026 e-Way Bill rules?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Penalties can reach up to 200% of the tax amount for invoice-to-cargo mismatches. Detention notices are issued in real-time when the analytics engine detects discrepancies.",
+        {
+          "@type": "Question",
+          name: "What is the penalty for non-compliance with 2026 e-Way Bill rules?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Penalties can reach up to 200% of the tax amount for invoice-to-cargo mismatches. Detention notices are issued in real-time when the analytics engine detects discrepancies.",
+          },
         },
-      },
-    ],
-  } : null;
+      ],
+    },
+    "gst-advisory-668-eway-bill-ship-to-gstin-hold-msme-logistics-2026": {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "Does GST Advisory 668 mean e-Way Bills are no longer required for goods transport?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "No! E-Way Bills remain strictly mandatory for all movement of goods exceeding ₹50,000 in consignment value. Advisory 668 only puts on hold the new proposed enhancements (mandatory 'Ship-To' GSTIN field and voluntary online closure). Standard e-Way Bill rules continue as before.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Should our business update its ERP software for 'Ship-To' GSTIN fields now?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "No. GSTN explicitly advises that taxpayers and ERP vendors do not need to make changes to their production environments at this time. All previous advisories regarding mandatory 'Ship-To' fields have been withdrawn.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How does LoadSaathi protect MSMEs from transport compliance penalties?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "LoadSaathi works with verified carriers and automatically links your e-Way Bill Part-A with the carrier's valid Transporter ID (TRANS ID) for Part-B compliance. Combined with real-time FASTag tracking, your cargo moves seamlessly without check-post delays.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Can an MSME save money on freight during regulatory changes?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes! By booking Part Truckload (PTL) shared freight on LoadSaathi, MSMEs pay only for the exact volume or weight they use. This eliminates the financial waste of booking full truckloads (FTL) for small shipments.",
+          },
+        },
+      ],
+    },
+  };
+  const faqSchema = faqSchemas[slug] ?? null;
 
   const relatedRoutes = article.relatedRoutes
     ? routes.filter((r) => article.relatedRoutes?.includes(r.slug))

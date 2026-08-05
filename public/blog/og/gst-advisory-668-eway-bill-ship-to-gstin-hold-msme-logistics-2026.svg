@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#047857;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#065f46;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect x="0" y="0" width="1200" height="630" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="2" rx="0" />
+  <circle cx="1100" cy="80" r="200" fill="white" fill-opacity="0.05" />
+  <circle cx="100" cy="550" r="150" fill="white" fill-opacity="0.05" />
+  <rect x="60" y="60" width="8" height="60" rx="4" fill="white" fill-opacity="0.6" />
+  <text x="84" y="98" fill="white" font-size="28" font-weight="600" font-family="system-ui, -apple-system, sans-serif" fill-opacity="0.9">Industry Insights</text>
+  <text x="50%" y="170" text-anchor="middle" fill="white" font-size="40" font-weight="700" font-family="system-ui, -apple-system, sans-serif">GST Advisory 668: E-Way Bill</text>
+  <text x="50%" y="218" text-anchor="middle" fill="white" font-size="40" font-weight="700" font-family="system-ui, -apple-system, sans-serif">Rule Enhancements Put On Hold</text>
+  <rect x="430" y="250" width="340" height="64" rx="32" fill="white" fill-opacity="0.12" />
+  <text x="600" y="292" text-anchor="middle" fill="#a7f3d0" font-size="26" font-weight="600" font-family="system-ui, -apple-system, sans-serif">Ship-To GSTIN &amp; Closure: ON HOLD</text>
+  <text x="50%" y="380" text-anchor="middle" fill="white" font-size="24" font-weight="500" font-family="system-ui, -apple-system, sans-serif">What Indian MSMEs &amp; Transporters</text>
+  <text x="50%" y="414" text-anchor="middle" fill="white" font-size="24" font-weight="500" font-family="system-ui, -apple-system, sans-serif">Must Do Now — A 2026 MSME Logistics Guide</text>
+  <text x="60" y="540" fill="white" font-size="22" font-weight="500" font-family="system-ui, -apple-system, sans-serif" fill-opacity="0.7">loadsaathi.in</text>
+  <text x="1140" y="540" text-anchor="end" fill="white" font-size="22" font-weight="500" font-family="system-ui, -apple-system, sans-serif" fill-opacity="0.7">AI Shared Freight Marketplace</text>
+</svg>
