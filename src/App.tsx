@@ -304,10 +304,10 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/favorites" element={<Favorites />} />
                     <Route path="/credit-score" element={<CreditScore />} />
-
-                    {/* Catch-all */}
-                    <Route path="*" element={<NotFound />} />
                   </Route>
+
+                  {/* Catch-all (top-level: public unknown URLs must show 404, not redirect to /) */}
+                  <Route path="*" element={<ErrorBoundary><NotFound /></ErrorBoundary>} />
                 </Routes>
               </Suspense>
               </HelmetProvider>
