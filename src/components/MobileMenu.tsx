@@ -47,7 +47,7 @@ const MobileMenu = React.memo(({ open, onClose }: MobileMenuProps) => {
           </Button>
         </Link>
         <Link to="/register" onClick={onClose}>
-          <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-3 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.3)]">
+          <Button className="bg-orange-700 hover:bg-orange-800 text-white text-sm font-bold tracking-wider uppercase px-8 py-3 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.3)]">
             Get Started
           </Button>
         </Link>

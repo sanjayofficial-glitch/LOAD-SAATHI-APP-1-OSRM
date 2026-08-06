@@ -50,7 +50,7 @@ const DockNav = React.memo(({ items, visible, extra, className }: DockNavProps) 
             ? React.cloneElement(item.icon, { className: "h-6 w-6" })
             : item.icon;
           return (
-            <Link key={item.path} to={item.path} aria-label={item.label} className="outline-none">
+            <Link key={item.path} to={item.path} aria-label={item.label} className="outline-none min-w-11 min-h-11 flex items-center justify-center rounded-2xl focus-visible:outline-2 focus-visible:outline-orange-500 focus-visible:outline-offset-1">
               <DockItem className={cn(active && "text-orange-600 dark:text-orange-400")}>
                 <DockIcon>
                   <span

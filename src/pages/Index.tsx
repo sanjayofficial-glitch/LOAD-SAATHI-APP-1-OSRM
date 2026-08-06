@@ -371,17 +371,17 @@ const Index = () => {
           </Link>
           <div className="flex items-center gap-3 sm:gap-4">
             <ThemeToggle />
-            <Link to="/login" className="hidden sm:inline-block text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
+            <Link to="/login" className="hidden sm:inline-flex items-center min-h-11 px-3 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
               Sign In
             </Link>
             <Link to="/register" className="hidden sm:inline-block">
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold tracking-wider uppercase px-5 py-2 h-auto shadow-lg">
+              <Button className="bg-orange-700 hover:bg-orange-800 text-white text-xs font-semibold tracking-wider uppercase px-6 py-2 h-auto min-h-11 shadow-lg">
                 Get Started
               </Button>
             </Link>
             <button
               type="button"
-              className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+              className="md:hidden p-2.5 text-muted-foreground hover:text-foreground"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
             >
@@ -419,7 +419,7 @@ const Index = () => {
             </div>
             <p className="text-sm text-muted-foreground mb-4">Precision Freight Intelligence — matching every load to its perfect space using AI.</p>
             <Link to="/register">
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold tracking-wider uppercase px-4 py-2 h-auto rounded-lg">
+              <Button className="bg-orange-700 hover:bg-orange-800 text-white text-xs font-bold tracking-wider uppercase px-4 py-2 h-auto rounded-lg">
                 Join Now <ArrowRight className="ml-1 h-3 w-3" />
               </Button>
             </Link>

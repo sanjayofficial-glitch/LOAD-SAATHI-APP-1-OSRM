@@ -269,7 +269,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         items={navItems.filter((item) => item.path !== "/messages")}
         visible={mobileNavOpen}
         extra={
-          <Link to="/messages" aria-label="Chat" className="outline-none">
+          <Link to="/messages" aria-label="Chat" className="outline-none min-w-11 min-h-11 flex items-center justify-center rounded-2xl focus-visible:outline-2 focus-visible:outline-orange-500 focus-visible:outline-offset-1">
             <DockItem
               className={cn(
                 currentPath === "/messages" && "text-orange-600 dark:text-orange-400"

@@ -15,7 +15,7 @@ const CtaSection = React.memo(() => (
         <p className="text-sm sm:text-base text-muted-foreground mb-8">Join India&apos;s intelligent freight network. Sign up as a shipper or trucker and start optimizing today.</p>
         <div className="space-y-4">
           <Link to="/register?type=shipper" className="block">
-            <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-6 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.3)]">
+            <Button className="w-full bg-orange-700 hover:bg-orange-800 text-white text-sm font-bold tracking-wider uppercase px-6 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.3)]">
               <Package className="mr-2 h-5 w-5" /> I Want to Ship Goods
             </Button>
           </Link>

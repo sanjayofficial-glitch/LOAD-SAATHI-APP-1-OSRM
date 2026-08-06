@@ -153,9 +153,6 @@ function DockItem({ children, className }: DockItemProps) {
         'relative inline-flex items-center justify-center',
         className
       )}
-      tabIndex={0}
-      role='button'
-      aria-haspopup='true'
     >
       {Children.map(children, (child) =>
         cloneElement(

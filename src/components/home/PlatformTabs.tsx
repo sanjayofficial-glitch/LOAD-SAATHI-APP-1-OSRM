@@ -50,7 +50,7 @@ const FeatureCard = React.memo(({ feat }: { feat: Feature }) => {
       <div className="bg-orange-900/10 dark:bg-orange-900/10 w-9 h-9 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shrink-0">
         <Icon className="h-4 w-4 text-orange-400" />
       </div>
-      <h4 className="text-sm font-bold text-foreground mb-1.5">{feat.title}</h4>
+      <h3 className="text-sm font-bold text-foreground mb-1.5">{feat.title}</h3>
       <p className="text-xs text-muted-foreground leading-relaxed flex-grow">{feat.desc}</p>
       <span className={`mt-auto inline-block text-[10px] font-semibold ${feat.accentClass} px-2 py-0.5 rounded border w-fit`}>{feat.accent}</span>
     </div>

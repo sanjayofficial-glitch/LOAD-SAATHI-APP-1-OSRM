@@ -23,7 +23,7 @@ const VisionSection = React.memo(({ globeRef }: VisionSectionProps) => (
       </p>
       <div className="mt-12 pointer-events-auto">
         <Link to="/register">
-          <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+          <Button className="bg-orange-700 hover:bg-orange-800 text-white text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)]">
             Join the Network <ChevronRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
