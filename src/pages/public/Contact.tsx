@@ -245,9 +245,9 @@ const Contact = () => {
               {/* CEO */}
               <div className="glass-card p-8 rounded-xl border border-orange-500/10 hover:border-orange-500/30 transition-all duration-300 group">
                 <div className="flex items-center gap-4 mb-6">
-                  <Avatar className="w-16 h-16">
-                    <AvatarImage className="object-cover object-top" src="/team/sanjaya-sahu.webp" alt="Sanjaya Sahu" />
-                    <AvatarFallback className="bg-orange-100 dark:bg-orange-900/30 text-2xl font-black text-orange-600 dark:text-orange-400">SS</AvatarFallback>
+                  <Avatar className="w-28 h-28 ring-2 ring-orange-500/25 ring-offset-2 ring-offset-background transition-all duration-500 group-hover:ring-orange-500/60 group-hover:shadow-lg group-hover:shadow-orange-500/10">
+                    <AvatarImage className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.08]" src="/team/sanjaya-sahu.webp" alt="Sanjaya Sahu" />
+                    <AvatarFallback className="bg-orange-100 dark:bg-orange-900/30 text-4xl font-black text-orange-600 dark:text-orange-400">SS</AvatarFallback>
                   </Avatar>
                   <div>
                     <h3 className="text-xl font-bold text-foreground">Sanjaya Sahu</h3>
@@ -272,9 +272,9 @@ const Contact = () => {
               {/* COO */}
               <div className="glass-card p-8 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all duration-300 group">
                 <div className="flex items-center gap-4 mb-6">
-                  <Avatar className="w-16 h-16">
-                    <AvatarImage className="object-cover object-top" src="/team/prince-mallik.webp" alt="Prince Mallik" />
-                    <AvatarFallback className="bg-blue-100 dark:bg-blue-900/30 text-2xl font-black text-blue-600 dark:text-blue-400">PM</AvatarFallback>
+                  <Avatar className="w-28 h-28 ring-2 ring-blue-500/25 ring-offset-2 ring-offset-background transition-all duration-500 group-hover:ring-blue-500/60 group-hover:shadow-lg group-hover:shadow-blue-500/10">
+                    <AvatarImage className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.08]" src="/team/prince-mallik.webp" alt="Prince Mallik" />
+                    <AvatarFallback className="bg-blue-100 dark:bg-blue-900/30 text-4xl font-black text-blue-600 dark:text-blue-400">PM</AvatarFallback>
                   </Avatar>
                   <div>
                     <h3 className="text-xl font-bold text-foreground">Prince Mallik</h3>

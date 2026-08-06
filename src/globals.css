@@ -92,6 +92,13 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
+    /* The consent manager (CookieHub) sets body{overflow:hidden} while its dialog is open
+       and can leave it stuck when the dialog is dismissed, which propagates to the viewport
+       and makes the whole app unscrollable (with a phantom second scrollbar). An explicit
+       non-visible overflow on <html> keeps the document scrollable (overflow-y: auto) and
+       horizontally clipped (overflow-x: hidden) regardless of body's inline lock. */
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -330,6 +337,14 @@
 }
 .cl-internal-1dauvpw {
   display: none !important;
+}
+
+/* Page wrappers use overflow-x-hidden only to clip decorative overflow, but that
+   creates a scroll container (overflow-y computes to auto) and can show a stray
+   inner scrollbar. overflow-x: clip clips without becoming a scroll container.
+   Placed after @tailwind utilities so it wins at equal specificity. */
+.overflow-x-hidden {
+  overflow-x: clip;
 }
 
 /* Leaflet CSS fixes for Tailwind preflight */

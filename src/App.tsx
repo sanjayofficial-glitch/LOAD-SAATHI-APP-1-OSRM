@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Skeleton } from "./components/ui/skeleton";
 import Layout from "./components/Layout";
+import ScrollToTop from "./components/ScrollToTop";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { ThemeProvider, useTheme } from "@/theme/theme";
 import { PostHogProvider } from "./components/PostHogProvider";
@@ -123,6 +124,7 @@ function App() {
           <ThemeProvider>
           <AuthProvider>
             <BrowserRouter>
+              <ScrollToTop />
               <GoogleAnalyticsTracker />
               <HelmetProvider>
               <Suspense fallback={<Skeleton className="h-screen w-full" />}>
