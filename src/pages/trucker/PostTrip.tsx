@@ -27,6 +27,7 @@ const PostTrip = () => {
   const { isOnline } = useNetworkStatus();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<'quick' | 'full'>('quick');
   const [locationData, setLocationData] = useState<LocationData | null>(null);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ const PostTrip = () => {
         trucker_id: userProfile.id,
         available_capacity_tonnes: capacity,
         price_per_tonne: price,
+        vehicle_number: formData.vehicle_number.trim() || 'TBA',
         status: 'active'
       };
 
@@ -162,6 +164,36 @@ const PostTrip = () => {
           <WifiOff className="h-4 w-4 shrink-0" />
           <span>You are offline. You cannot post trips until reconnected.</span>
         </div>
+      )}
+
+      <div className="mb-5 inline-flex rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-1">
+        <button
+          type="button"
+          onClick={() => setMode('quick')}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            mode === 'quick'
+              ? 'bg-white dark:bg-gray-800 shadow-sm text-orange-700 dark:text-orange-300'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+          }`}
+        >
+          Quick Post
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('full')}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            mode === 'full'
+              ? 'bg-white dark:bg-gray-800 shadow-sm text-orange-700 dark:text-orange-300'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+          }`}
+        >
+          Full Details
+        </button>
+      </div>
+      {mode === 'quick' && (
+        <p className="-mt-3 mb-4 text-sm text-gray-500 dark:text-gray-400">
+          Only the essentials needed — you can add vehicle number and more later.
+        </p>
       )}
 
       <Card className="border-orange-100 dark:border-orange-800 shadow-lg">
@@ -273,16 +305,18 @@ const PostTrip = () => {
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="vehicleNumber">Vehicle Number</Label>
-                <Input
-                  id="vehicleNumber"
-                  placeholder="e.g. RJ 14 GB 1234"
-                  value={formData.vehicle_number}
-                  onChange={(e) => setFormData({...formData, vehicle_number: e.target.value})}
-                  required
-                />
-              </div>
+              {mode === 'full' && (
+                <div className="space-y-2">
+                  <Label htmlFor="vehicleNumber">Vehicle Number</Label>
+                  <Input
+                    id="vehicleNumber"
+                    placeholder="e.g. RJ 14 GB 1234"
+                    value={formData.vehicle_number}
+                    onChange={(e) => setFormData({...formData, vehicle_number: e.target.value})}
+                    required
+                  />
+                </div>
+              )}
             </div>
 
             {!isOnline && (

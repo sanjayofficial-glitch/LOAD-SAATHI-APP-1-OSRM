@@ -37,12 +37,12 @@ const HeroSection = React.memo(() => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/register?type=shipper">
-                <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg w-full sm:w-auto shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+                <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg w-full sm:w-auto shadow-[0_0_20px_rgba(249,115,22,0.4)] transition-transform duration-150 active:scale-[0.97]">
                   I Want to Ship Goods <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/register?type=trucker">
-                <Button variant="outline" className="text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg border-white/20 text-white hover:bg-white/5 w-full sm:w-auto">
+                <Button variant="outline" className="text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg border-white/20 text-white hover:bg-white/5 w-full sm:w-auto transition-transform duration-150 active:scale-[0.97]">
                   I Have Truck Space <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -52,7 +52,7 @@ const HeroSection = React.memo(() => {
           <div className="bg-[#0d2035]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 hidden lg:block shadow-[0_0_50px_rgba(0,0,0,0.5)]">
              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
                 {stats.map((stat, i) => (
-                  <div key={i} className="p-4 bg-black/40 border border-white/5 rounded-xl">
+                  <div key={i} className="p-4 bg-black/40 border border-white/5 rounded-xl animate-fade-in-up" style={{ animationDelay: `${i * 120}ms` }}>
                      <h3 className="text-3xl font-black text-orange-500 mb-1">{stat.value}</h3>
                      <p className="text-sm font-medium text-white">{stat.label}</p>
                   </div>

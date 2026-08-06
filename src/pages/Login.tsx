@@ -109,7 +109,7 @@ const Login = () => {
               <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-transparent text-gray-400">or sign in with email</span>
+              <span className="px-2 bg-transparent text-gray-400 dark:text-gray-500">or sign in with email</span>
             </div>
           </div>
 
@@ -136,7 +136,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
@@ -150,20 +150,36 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="mt-4 text-center space-y-2">
+          <div className="mt-4 text-center">
             <Link
               to="/forgot-password"
               className="text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-semibold hover:underline"
             >
               Forgot password?
             </Link>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Don't have an account?{" "}
-              <Link to="/register" className="text-orange-600 dark:text-orange-400 font-semibold hover:underline">
-                Sign up
-              </Link>
-            </p>
           </div>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-transparent text-gray-400 dark:text-gray-500">New to LoadSaathi?</span>
+            </div>
+          </div>
+
+          <Link to="/register" className="block">
+            <button
+              type="button"
+              className="w-full flex items-center justify-center gap-3 border-2 border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400 font-bold py-3 px-4 rounded-xl hover:bg-orange-100 dark:hover:bg-orange-950/40 transition-all"
+            >
+              Create a free account
+            </button>
+          </Link>
+
+          <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            Join thousands of truckers &amp; shippers moving India's freight smarter.
+          </p>
         </div>
       </div>
     </div>

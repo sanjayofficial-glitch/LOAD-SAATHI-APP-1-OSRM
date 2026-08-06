@@ -27,6 +27,7 @@ const PostShipments = () => {
   const { isOnline } = useNetworkStatus();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<'quick' | 'full'>('quick');
   const [locationData, setLocationData] = useState<LocationData | null>(null);
 
   useEffect(() => {
@@ -89,10 +90,10 @@ const PostShipments = () => {
         destination_city: formData.destination_city.trim(),
         destination_state: formData.destination_state,
         departure_date: formData.departure_date,
-        goods_description: formData.goods_description.trim(),
+        goods_description: formData.goods_description.trim() || 'Freight goods',
         weight_tonnes: weight,
-        pickup_address: formData.pickup_address.trim(),
-        delivery_address: formData.delivery_address.trim(),
+        pickup_address: formData.pickup_address.trim() || `${formData.origin_city.trim()}, ${formData.origin_state || 'India'}`,
+        delivery_address: formData.delivery_address.trim() || `${formData.destination_city.trim()}, ${formData.destination_state || 'India'}`,
         budget_per_tonne: budget,
         status: 'pending'
       }).select('id').single();
@@ -167,6 +168,36 @@ const PostShipments = () => {
           <WifiOff className="h-4 w-4 shrink-0" />
           <span>You are offline. You cannot post shipments until reconnected.</span>
         </div>
+      )}
+
+      <div className="mb-5 inline-flex rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-1">
+        <button
+          type="button"
+          onClick={() => setMode('quick')}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            mode === 'quick'
+              ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-700 dark:text-blue-300'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+          }`}
+        >
+          Quick Post
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('full')}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            mode === 'full'
+              ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-700 dark:text-blue-300'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+          }`}
+        >
+          Full Details
+        </button>
+      </div>
+      {mode === 'quick' && (
+        <p className="-mt-3 mb-4 text-sm text-gray-500 dark:text-gray-400">
+          Only the essentials needed — pickup & delivery addresses will default to your cities and can be edited later.
+        </p>
       )}
 
       <Card className="border-blue-100 dark:border-blue-800 shadow-lg">
@@ -279,28 +310,30 @@ const PostShipments = () => {
                 />
               </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="pickup">Pickup Address</Label>
-                <Input 
-                  id="pickup"
-                  placeholder="Full pickup address"
-                  value={formData.pickup_address} 
-                  onChange={(e) => setFormData({...formData, pickup_address: e.target.value})} 
-                  required 
-                />
+            {mode === 'full' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="pickup">Pickup Address</Label>
+                  <Input 
+                    id="pickup"
+                    placeholder="Full pickup address"
+                    value={formData.pickup_address} 
+                    onChange={(e) => setFormData({...formData, pickup_address: e.target.value})} 
+                    required 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="delivery">Delivery Address</Label>
+                  <Input 
+                    id="delivery"
+                    placeholder="Full delivery address"
+                    value={formData.delivery_address} 
+                    onChange={(e) => setFormData({...formData, delivery_address: e.target.value})} 
+                    required 
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="delivery">Delivery Address</Label>
-                <Input 
-                  id="delivery"
-                  placeholder="Full delivery address"
-                  value={formData.delivery_address} 
-                  onChange={(e) => setFormData({...formData, delivery_address: e.target.value})} 
-                  required 
-                />
-              </div>
-            </div>
+            )}
 
             {!isOnline && (
               <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">

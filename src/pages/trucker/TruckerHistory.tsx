@@ -18,12 +18,14 @@ import {
   Eye,
   Package,
   CheckCircle,
-  Loader2,
   IndianRupee,
-  AlertCircle,
   Inbox,
+  Search,
   LucideIcon
 } from 'lucide-react';
+import EmptyState from '@/components/EmptyState';
+import ErrorState from '@/components/ErrorState';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ActivityItem {
   id: string;
@@ -188,22 +190,30 @@ const TruckerHistory = () => {
   };
 
   if (isLoading) return (
-    <div className="container mx-auto px-4 py-12 flex flex-col items-center justify-center">
-      <Loader2 className="h-10 w-10 text-orange-600 dark:text-orange-400 animate-spin mb-4" />
-      <p className="text-gray-500 dark:text-gray-400 font-medium">Loading your activity history...</p>
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="mb-8 space-y-2">
+        <Skeleton className="h-9 w-64" />
+        <Skeleton className="h-4 w-80 max-w-full" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+      </div>
+      <Skeleton className="h-12 w-full rounded-xl mb-6" />
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+        ))}
+      </div>
     </div>
   );
 
   if (error) return (
-    <div className="container mx-auto px-4 py-12">
-      <Card className="border-red-100 bg-red-50/30">
-        <CardContent className="pt-6 text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Failed to load history</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">We encountered an error while fetching your activities.</p>
-          <Button onClick={() => refetch()} className="bg-orange-600 hover:bg-orange-700">Try Again</Button>
-        </CardContent>
-      </Card>
+    <div className="container mx-auto px-4 py-12 max-w-3xl">
+      <ErrorState
+        title="Failed to load history"
+        description="We encountered an error while fetching your activities. Please try again."
+        retry={() => refetch()}
+      />
     </div>
   );
 
@@ -269,23 +279,24 @@ const TruckerHistory = () => {
 
       <div className="space-y-4">
         {filteredActivities.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-700">
-            <div className="bg-gray-50 dark:bg-gray-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Inbox className="h-10 w-10 text-gray-300 dark:text-gray-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">No activities found</h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mt-2">
-              {activities.length === 0 
-                ? "You haven't posted any trips or sent any offers yet." 
-                : "No activities match your selected filters."}
-            </p>
-            {activities.length === 0 && (
-              <div className="mt-8 flex justify-center gap-4">
-                <Button onClick={() => navigate('/trucker/post-trip')} className="bg-orange-600 hover:bg-orange-700">Post a Trip</Button>
-                <Button onClick={() => navigate('/trucker/browse-shipments')} variant="outline">Find Shipments</Button>
-              </div>
-            )}
-          </div>
+          activities.length === 0 ? (
+            <EmptyState
+              accent="orange"
+              icon={<Inbox className="h-8 w-8 sm:h-10 sm:w-10" />}
+              title="No activities yet"
+              description="You haven't posted any trips or sent any offers yet. Get started to see your activity here."
+              primaryAction={{ label: 'Post a Trip', to: '/trucker/post-trip' }}
+              secondaryAction={{ label: 'Find Shipments', to: '/trucker/browse-shipments' }}
+            />
+          ) : (
+            <EmptyState
+              accent="orange"
+              icon={<Search className="h-8 w-8 sm:h-10 sm:w-10" />}
+              title="No activities found"
+              description="No activities match your selected filters."
+              primaryAction={{ label: 'Clear Filters', onClick: () => setFilters({ type: 'all', status: 'all' }) }}
+            />
+          )
         ) : (
           filteredActivities.map((activity) => (
             <Card key={activity.id} className="hover:shadow-xl transition-all duration-300 border-gray-100 dark:border-gray-800 overflow-hidden group">

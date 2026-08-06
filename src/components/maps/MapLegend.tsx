@@ -15,7 +15,7 @@ export default React.memo(function MapLegend({
 }: MapLegendProps) {
   return (
     <div
-      className={`absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border px-3 py-2 text-xs ${className}`}
+      className={`absolute bottom-4 left-4 z-[1000] bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg shadow-lg border px-3 py-2 text-xs ${className}`}
     >
       <p className="font-semibold text-foreground mb-1.5">Legend</p>
       <div className="flex flex-col gap-1">

@@ -22,7 +22,7 @@ import SafetyTrust from '@/components/home/SafetyTrust';
 import FaqSection from '@/components/home/FaqSection';
 import CtaSection from '@/components/home/CtaSection';
 import MobileMenu from '@/components/MobileMenu';
-import MobileBottomNav, { publicBottomNavItems } from '@/components/MobileBottomNav';
+import DockNav, { publicBottomNavItems } from '@/components/DockNav';
 
 const Index = () => {
   const [ready, setReady] = useState(false);
@@ -369,15 +369,6 @@ const Index = () => {
             <LogoMark size="h-11 w-11" />
             <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
           </Link>
-          <div className="hidden md:flex items-center gap-5">
-            <Link to="/features" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Features</Link>
-            <Link to="/fare-calculator" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Fare Calculator</Link>
-            <Link to="/how-it-works" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">How It Works</Link>
-            <Link to="/pricing" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Pricing</Link>
-            <Link to="/about" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">About</Link>
-            <Link to="/faq" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">FAQ</Link>
-            <Link to="/contact" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Contact</Link>
-          </div>
           <div className="flex items-center gap-3 sm:gap-4">
             <ThemeToggle />
             <Link to="/login" className="hidden sm:inline-block text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
@@ -402,7 +393,7 @@ const Index = () => {
 
       <MobileMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
-      <main className="pb-16 lg:pb-0">
+      <main className="pb-24">
         <HeroSection />
         <ProofBar />
         <BentoGrid />
@@ -419,7 +410,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full py-16">
+      <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full pt-16 pb-24">
         <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-5 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
           <div className="sm:col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
@@ -465,7 +456,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
-      <MobileBottomNav items={publicBottomNavItems} />
+      <DockNav items={publicBottomNavItems} />
     </div>
     </>
   );

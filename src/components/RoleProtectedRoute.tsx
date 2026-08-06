@@ -17,8 +17,8 @@ const RoleProtectedRoute = ({ children, allowedRole }: RoleProtectedRouteProps) 
   // Loading state – show a spinner while checking auth status
   if (!isLoaded || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="h-8 w-8 animate-spin text-orange-600 dark:text-orange-400" />
       </div>
     );
   }

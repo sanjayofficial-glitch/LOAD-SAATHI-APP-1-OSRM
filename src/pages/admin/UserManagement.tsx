@@ -152,7 +152,7 @@ const UserManagement = () => {
         </Select>
       </div>
 
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>

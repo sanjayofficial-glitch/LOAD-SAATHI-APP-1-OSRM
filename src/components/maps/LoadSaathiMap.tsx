@@ -8,6 +8,7 @@ import LoadMarker, { type LoadLocation } from './LoadMarker';
 import RoutePolyline from './RoutePolyline';
 import MapLegend from './MapLegend';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/theme/theme';
 
 // ── Map click events (react-leaflet has no eventHandlers on MapContainer) ────
 function MapClickHandler({ onClick }: { onClick?: (e: L.LeafletMouseEvent) => void }) {
@@ -83,6 +84,12 @@ export default React.memo(function LoadSaathiMap({
   zoom = DEFAULT_ZOOM,
   onMapClick,
 }: LoadSaathiMapProps) {
+  const { isDark } = useTheme();
+
+  const tileUrl = isDark
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
   // Compute all positions for bounds fitting
   const allPositions = useMemo(() => {
     const positions: [number, number][] = [];
@@ -141,8 +148,10 @@ export default React.memo(function LoadSaathiMap({
         <MapSizeHandler />
         <MapClickHandler onClick={onMapClick} />
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={isDark
+            ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
+          url={tileUrl}
         />
         {allPositions.length > 0 && <FitBounds positions={allPositions} />}
         {showClusters ? (

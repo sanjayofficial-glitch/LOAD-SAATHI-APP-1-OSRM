@@ -5,7 +5,7 @@ import LogoMark from "@/components/LogoMark";
 const IndexSkeleton = () => {
   return (
     <div className="min-h-screen bg-background">
-      <header className="fixed top-0 w-full z-50 h-20 border-b border-white/10" style={{ background: 'rgba(5, 8, 22, 0.7)' }}>
+      <header className="fixed top-0 w-full z-50 h-20 border-b border-border bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl">
         <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
           <div className="flex items-center gap-2">
             <LogoMark size="h-9 w-9 opacity-70" />
@@ -34,7 +34,7 @@ const IndexSkeleton = () => {
             <Skeleton className="h-[600px] w-full rounded-xl" />
           </div>
         </section>
-        <section className="py-8 border-y border-white/5">
+        <section className="py-8 border-y border-border">
           <div className="max-w-[1440px] mx-auto px-6 flex justify-around">
             {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-32 rounded" />)}
           </div>
@@ -51,7 +51,7 @@ const IndexSkeleton = () => {
           </div>
         </section>
       </main>
-      <footer className="border-t border-white/5 py-12">
+      <footer className="border-t border-border py-12">
         <div className="max-w-[1440px] mx-auto px-6 flex justify-between">
           <Skeleton className="h-6 w-36 rounded" />
           <Skeleton className="h-6 w-48 rounded" />

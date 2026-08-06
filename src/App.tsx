@@ -20,6 +20,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const AuthSync = lazy(() => import("./components/AuthSync"));
 const ChooseRole = lazy(() => import("./pages/ChooseRole"));
+const OnboardingFlow = lazy(() => import("./pages/OnboardingFlow"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const PublicLayout = lazy(() => import("./components/PublicLayout"));
 const Features = lazy(() => import("./pages/public/Features"));
@@ -132,6 +133,7 @@ function App() {
                   <Route path="/register" element={<ErrorBoundary><Register /></ErrorBoundary>} />
                   <Route path="/auth-sync" element={<ErrorBoundary><AuthSync /></ErrorBoundary>} />
                   <Route path="/choose-role" element={<ErrorBoundary><ChooseRole /></ErrorBoundary>} />
+                  <Route path="/onboarding" element={<ErrorBoundary><OnboardingFlow /></ErrorBoundary>} />
                   <Route path="/forgot-password" element={<ErrorBoundary><ForgotPassword /></ErrorBoundary>} />
 
                   {/* Public info pages wrapped in PublicLayout */}

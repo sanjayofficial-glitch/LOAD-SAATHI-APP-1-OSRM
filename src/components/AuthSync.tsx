@@ -4,6 +4,7 @@ import { useUser, useSession } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
 import { Loader2 } from "lucide-react";
+import LogoMark from "@/components/LogoMark";
 
 const AuthSync = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -13,7 +14,14 @@ const AuthSync = () => {
   const syncedRef = useRef(false);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user || syncedRef.current) return;
+    if (!isLoaded) return;
+
+    if (!isSignedIn || !user) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (syncedRef.current) return;
     syncedRef.current = true;
 
     const timeout = setTimeout(() => {
@@ -73,10 +81,12 @@ const AuthSync = () => {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-orange-600 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Loading your dashboard...</p>
+      <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 items-center justify-center px-4">
+        <div className="text-center animate-scale-in">
+          <LogoMark size="h-16 w-16" className="mx-auto mb-6" />
+          <Loader2 className="h-8 w-8 animate-spin text-orange-600 dark:text-orange-400 mx-auto mb-4" />
+          <p className="text-gray-700 dark:text-gray-200 font-bold">Setting up your account...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Loading your dashboard</p>
         </div>
       </div>
     );

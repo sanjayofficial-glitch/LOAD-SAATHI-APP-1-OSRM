@@ -7,7 +7,7 @@ import OfflineBanner from "./OfflineBanner";
 import { Button } from "./ui/button";
 import LogoMark from "./LogoMark";
 import MobileMenu from "./MobileMenu";
-import MobileBottomNav, { publicBottomNavItems } from "./MobileBottomNav";
+import DockNav, { publicBottomNavItems } from "./DockNav";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./ui/tooltip";
 import { socialLinks } from "@/data/socialLinks";
 
@@ -54,15 +54,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <LogoMark size="h-11 w-11" />
             <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
           </Link>
-          <div className="hidden md:flex items-center gap-5">
-            <Link to="/features" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Features</Link>
-            <Link to="/fare-calculator" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Fare Calculator</Link>
-            <Link to="/how-it-works" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">How It Works</Link>
-            <Link to="/pricing" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Pricing</Link>
-            <Link to="/about" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">About</Link>
-            <Link to="/faq" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">FAQ</Link>
-            <Link to="/contact" className="nav-link text-muted-foreground hover:text-foreground dark:hover:text-orange-400">Contact</Link>
-          </div>
           <div className="flex items-center gap-3 sm:gap-4">
             <ThemeToggle />
             <Link to="/login" className="hidden sm:inline-block text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
@@ -84,10 +75,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
       </nav>
-      <main className="pt-16 min-h-screen pb-16 lg:pb-0">
+      <main className="pt-16 min-h-screen pb-24">
         {children}
       </main>
-      <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full py-16">
+      <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full pt-16 pb-24">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
           <div className="col-span-2 md:col-span-1 mb-4 md:mb-0">
             <div className="flex items-center gap-2 mb-4">
@@ -143,7 +134,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         </div>
       </footer>
       <MobileMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
-      <MobileBottomNav items={publicBottomNavItems} />
+      <DockNav items={publicBottomNavItems} />
     </div>
   );
 }

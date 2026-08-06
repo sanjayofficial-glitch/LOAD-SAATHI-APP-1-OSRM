@@ -87,8 +87,8 @@ export default function TeamShowcase() {
             <PhotoCard
               key={member.id}
               member={member}
-              defaultClass="w-[120px] h-[160px]"
-              expandedClass="w-[180px] h-[240px]"
+              defaultClass="w-[140px] h-[190px]"
+              expandedClass="w-[200px] h-[270px]"
               hoveredId={hoveredId}
               expandedId={expandedId}
               onHover={setHoveredId}
@@ -104,8 +104,8 @@ export default function TeamShowcase() {
               <PhotoCard
                 key={member.id}
                 member={member}
-                defaultClass="w-[190px] h-[260px]"
-                expandedClass="w-[260px] h-[360px]"
+                defaultClass="w-[220px] h-[300px]"
+                expandedClass="w-[290px] h-[400px]"
                 hoveredId={hoveredId}
                 expandedId={expandedId}
                 onHover={setHoveredId}
@@ -118,8 +118,8 @@ export default function TeamShowcase() {
               <PhotoCard
                 key={member.id}
                 member={member}
-                defaultClass="w-[200px] h-[275px]"
-                expandedClass="w-[270px] h-[375px]"
+                defaultClass="w-[230px] h-[315px]"
+                expandedClass="w-[300px] h-[415px]"
                 hoveredId={hoveredId}
                 expandedId={expandedId}
                 onHover={setHoveredId}
@@ -132,8 +132,8 @@ export default function TeamShowcase() {
               <PhotoCard
                 key={member.id}
                 member={member}
-                defaultClass="w-[185px] h-[255px]"
-                expandedClass="w-[255px] h-[350px]"
+                defaultClass="w-[215px] h-[290px]"
+                expandedClass="w-[285px] h-[385px]"
                 hoveredId={hoveredId}
                 expandedId={expandedId}
                 onHover={setHoveredId}
@@ -188,9 +188,9 @@ function PhotoCard({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-xl cursor-pointer flex-shrink-0 transition-all duration-500 ease-smooth relative',
+        'overflow-hidden rounded-2xl cursor-pointer flex-shrink-0 transition-all duration-300 ease-smooth relative',
         isExpanded ? expandedClass : defaultClass,
-        isDimmed && !isExpanded && 'opacity-50 scale-[0.88]',
+        isDimmed && !isExpanded && 'opacity-70 scale-[0.95]',
         !isDimmed && !isExpanded && 'opacity-100 scale-100',
         isExpanded && 'z-10 shadow-2xl',
       )}
@@ -203,7 +203,7 @@ function PhotoCard({
         alt={member.name}
         className="w-full h-full object-cover object-top transition-[filter] duration-500"
         style={{
-          filter: isActive ? 'grayscale(0) brightness(1)' : 'grayscale(1) brightness(0.77)',
+          filter: isActive ? 'grayscale(0) brightness(1) saturate(1.1)' : 'grayscale(0.5) brightness(0.85)',
         }}
       />
 

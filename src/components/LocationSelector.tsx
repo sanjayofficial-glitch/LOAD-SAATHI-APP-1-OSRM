@@ -47,7 +47,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = memo(({ label, value, 
   return (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{label}</label>
         <Select value={selectedState} onValueChange={handleStateChange}>
           <SelectTrigger>
             <SelectValue placeholder="Select State" />
@@ -64,7 +64,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = memo(({ label, value, 
 
       {selectedState && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">District</label>
           <Select value={selectedDistrict} onValueChange={handleDistrictChange}>
             <SelectTrigger>
               <SelectValue placeholder="Select District" />
@@ -82,7 +82,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = memo(({ label, value, 
 
       {selectedDistrict && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">City/Town</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City/Town</label>
           <Select value={selectedCity} onValueChange={handleCityChange}>
             <SelectTrigger>
               <SelectValue placeholder="Select City" />

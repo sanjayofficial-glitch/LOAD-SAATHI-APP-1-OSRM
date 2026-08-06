@@ -36,7 +36,8 @@ import OfflineBanner from "./OfflineBanner";
 import ThemeToggle from "./ThemeToggle";
 import VerificationBadge from "./VerificationBadge";
 import AutoGpsTracker from "./AutoGpsTracker";
-import MobileBottomNav from "./MobileBottomNav";
+import DockNav from "./DockNav";
+import { DockItem, DockIcon, DockLabel } from "@/components/ui/dock";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
@@ -167,7 +168,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       
       {userProfile?.user_type !== 'admin' && <AutoGpsTracker />}
       
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 shadow-sm backdrop-blur-xl">
         <div className="container mx-auto px-4">
           <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center gap-4 sm:gap-8">
@@ -178,10 +179,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <span className="hidden sm:inline">LoadSaathi</span>
                 </span>
               </Link>
-              
-              <div className="hidden lg:flex items-center gap-1">
-                <NavLinks navItems={navItems} currentPath={currentPath} />
-              </div>
             </div>
 
             <div className="flex items-center gap-1 sm:gap-3">
@@ -258,34 +255,45 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {mobileNavOpen && (
-          <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 space-y-1 animate-fade-in shadow-lg">
+          <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 px-4 py-3 space-y-1 animate-fade-in-up shadow-lg backdrop-blur-xl">
             <NavLinks navItems={navItems} currentPath={currentPath} onClick={() => setMobileNavOpen(false)} mobile />
           </div>
         )}
       </nav>
 
-      <main className="flex-grow pb-16 lg:pb-0">
+      <main className="flex-grow pb-24">
         {children}
       </main>
 
-      <MobileBottomNav
-        items={navItems.slice(0, 4)}
+      <DockNav
+        items={navItems.filter((item) => item.path !== "/messages")}
         visible={mobileNavOpen}
         extra={
-          <Link
-            to="/messages"
-            className={cn(
-              "flex flex-col items-center py-2 px-3 rounded-lg transition-all min-w-0 flex-1",
-              currentPath === '/messages' ? "text-orange-600 dark:text-orange-400" : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-            )}
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span className="text-[10px] font-medium mt-0.5">Chat</span>
+          <Link to="/messages" aria-label="Chat" className="outline-none">
+            <DockItem
+              className={cn(
+                currentPath === "/messages" && "text-orange-600 dark:text-orange-400"
+              )}
+            >
+              <DockIcon>
+                <span
+                  className={cn(
+                    "flex h-full w-full items-center justify-center rounded-2xl transition-colors",
+                    currentPath === "/messages"
+                      ? "bg-orange-500/15 text-orange-600 dark:bg-orange-400/15 dark:text-orange-400"
+                      : "bg-transparent text-gray-500 hover:bg-black/5 dark:text-gray-400 dark:hover:bg-white/10"
+                  )}
+                >
+                  <MessageSquare className="h-6 w-6" />
+                </span>
+              </DockIcon>
+              <DockLabel>Chat</DockLabel>
+            </DockItem>
           </Link>
         }
       />
 
-      <footer className="hidden lg:block bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 sm:py-8 mt-auto">
+      <footer className="hidden lg:block bg-white/80 dark:bg-gray-900/80 border-t border-gray-200 dark:border-gray-800 pt-6 sm:pt-8 pb-24 mt-auto backdrop-blur-xl">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <LogoMark size="h-8 w-8" />

@@ -3,6 +3,7 @@ export interface User {
   user_type: 'trucker' | 'shipper' | 'admin';
   full_name: string;
   phone?: string;
+  company_name?: string;
   rating: number;
   total_trips: number;
   is_verified?: boolean;

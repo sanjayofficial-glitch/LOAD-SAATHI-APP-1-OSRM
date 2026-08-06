@@ -1,7 +1,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAuth as useClerkAuth } from '@clerk/clerk-react'; // Clerk's useAuth for getToken
+import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react'; // Clerk's useAuth for getToken
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from '@/components/ui/skeleton';
 import { showSuccess, showError } from '@/utils/toast';
+import { cn } from '@/lib/utils';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCreditScore } from '@/hooks/useCreditScore';
 import CreditScoreBadge from '@/components/CreditScoreBadge';
@@ -22,6 +24,7 @@ import {
   Truck, 
   Package, 
   Calendar,
+  Mail,
   Lock,
   Loader2,
   CheckCircle2,
@@ -35,11 +38,13 @@ import type { Review } from '@/types';
 const ALLOWED_ADMIN_ID = import.meta.env.VITE_ADMIN_USER_ID || '';
 
 const Profile = () => {
-  const { userProfile, refreshProfile } = useAuth();
+  const { userProfile, loading: authLoading, refreshProfile } = useAuth();
   const { getToken } = useClerkAuth();
+  const { user: clerkUser } = useUser();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState(userProfile?.full_name || '');
   const [phone, setPhone] = useState(userProfile?.phone || '');
+  const [companyName, setCompanyName] = useState(userProfile?.company_name || '');
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [switching, setSwitching] = useState(false);
@@ -118,12 +123,17 @@ const Profile = () => {
     if (userProfile) {
       setFullName(userProfile.full_name || '');
       setPhone(userProfile.phone || '');
+      setCompanyName(userProfile.company_name || '');
       fetchStats();
       fetchReviews();
     }
   }, [userProfile, fetchStats, fetchReviews]);
 
   const handleUpdate = async () => {
+    if (!fullName.trim()) {
+      showError('Please enter your full name');
+      return;
+    }
     setLoading(true);
     try {
       const supabaseToken = await getToken({ template: 'supabase' });
@@ -137,8 +147,9 @@ const Profile = () => {
       const { error } = await supabase
         .from('users')
         .update({ 
-          full_name: fullName, 
-          phone
+          full_name: fullName.trim(), 
+          phone,
+          company_name: companyName.trim() || null
         })
         .eq('id', userProfile?.id);
 
@@ -209,26 +220,65 @@ const Profile = () => {
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-16 w-16 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-40" />
+              <Skeleton className="h-5 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-10 w-36" />
+        </div>
+        <Skeleton className="h-10 w-full lg:w-[500px] mb-6" />
+        <div className="grid gap-6 md:grid-cols-2">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-36 w-full rounded-2xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl animate-fade-in">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg shadow-orange-200/50 dark:shadow-orange-900/30">
+          <div className={cn(
+            'w-16 h-16 rounded-full flex items-center justify-center shadow-lg shrink-0',
+            userProfile?.user_type === 'shipper'
+              ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-200/50 dark:shadow-blue-900/30'
+              : userProfile?.user_type === 'admin'
+                ? 'bg-gradient-to-br from-purple-400 to-purple-600 shadow-purple-200/50 dark:shadow-purple-900/30'
+                : 'bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-200/50 dark:shadow-orange-900/30'
+          )}>
             <span className="text-2xl font-bold text-white">
               {(userProfile?.full_name || 'U').charAt(0).toUpperCase()}
             </span>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{userProfile?.full_name || 'User'}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant="secondary" className="bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-100 dark:border-orange-800 capitalize">
-                {userProfile?.user_type}
-              </Badge>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{userProfile?.full_name || 'User'}</h1>
               {userProfile?.is_verified && (
                 <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800">
                   <CheckCircle2 className="h-3 w-3 mr-1" /> Verified
                 </Badge>
               )}
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge variant="secondary" className={cn(
+                'capitalize',
+                userProfile?.user_type === 'shipper'
+                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-800'
+                  : userProfile?.user_type === 'admin'
+                    ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-800'
+                    : 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-100 dark:border-orange-800'
+              )}>
+                {userProfile?.user_type}
+              </Badge>
             </div>
           </div>
         </div>
@@ -248,7 +298,7 @@ const Profile = () => {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-[500px] lg:grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
           <TabsTrigger value="personal">Personal Info</TabsTrigger>
@@ -335,10 +385,17 @@ const Profile = () => {
                     </div>
                   </div>
                   <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-3 shrink-0" />
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{clerkUser?.primaryEmailAddress?.emailAddress || 'Not provided'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                     <Building className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-3 shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">City</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Not provided</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Company</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{userProfile?.company_name || 'Not provided'}</p>
                     </div>
                   </div>
                   <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
@@ -346,7 +403,7 @@ const Profile = () => {
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Member Since</p>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {userProfile?.created_at ? new Date(userProfile.created_at).toLocaleDateString() : 'N/A'}
+                        {userProfile?.created_at ? new Date(userProfile.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
                       </p>
                     </div>
                   </div>
@@ -368,8 +425,20 @@ const Profile = () => {
             </CardHeader>
             <CardContent>
               {reviewsLoading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="p-4 border border-gray-100 dark:border-gray-800 rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-5 w-24" />
+                          <Skeleton className="h-4 w-16" />
+                        </div>
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4 mt-2" />
+                    </div>
+                  ))}
                 </div>
               ) : reviews.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl border border-dashed dark:border-gray-700">
@@ -454,11 +523,24 @@ const Profile = () => {
                     />
                   </div>
                 </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="companyName" className="dark:text-gray-300">Company Name <span className="text-xs text-gray-400 font-normal">(optional)</span></Label>
+                  <div className="relative">
+                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                    <Input 
+                      id="companyName"
+                      className="pl-10 border-orange-100 dark:border-orange-800"
+                      value={companyName} 
+                      onChange={(e) => setCompanyName(e.target.value)} 
+                      placeholder="Your transport company (optional)"
+                    />
+                  </div>
+                </div>
               </div>
               <Button 
                 onClick={handleUpdate} 
                 className="w-full md:w-auto bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-md"
-                disabled={loading}
+                disabled={loading || !fullName.trim()}
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Save Changes

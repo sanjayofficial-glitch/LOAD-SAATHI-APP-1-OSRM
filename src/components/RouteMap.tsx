@@ -17,6 +17,7 @@ import 'leaflet/dist/leaflet.css';
 import { Skeleton } from '@/components/ui/skeleton';
 import { geocodeCity } from '@/utils/geocode';
 import { getRoute, RouteResult } from '@/utils/osrm';
+import { useTheme } from '@/theme/theme';
 
 // Fix Leaflet's default marker icon (broken in Vite builds)
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -78,6 +79,11 @@ const RouteMap = React.memo(({
   const [route, setRoute] = useState<RouteResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const { isDark } = useTheme();
+
+  const tileUrl = isDark
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   const hasPreStoredCoords = propOriginLat !== undefined && propOriginLng !== undefined &&
                              propDestLat !== undefined && propDestLng !== undefined;
@@ -152,8 +158,10 @@ const RouteMap = React.memo(({
         <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
           <MapSizeHandler />
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution={isDark
+              ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}
+            url={tileUrl}
           />
           <Marker position={[origin.lat, origin.lon]} icon={originIcon}>
             <Popup>🟢 From: {originCity}</Popup>

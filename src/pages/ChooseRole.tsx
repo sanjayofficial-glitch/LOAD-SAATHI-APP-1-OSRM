@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUser, useSession } from '@clerk/clerk-react';
 import { Loader2, User, Truck, CheckCircle2 } from 'lucide-react';
@@ -16,11 +16,21 @@ const ChooseRole = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const justSelectedRef = useRef(false);
 
   const suggestedRole = searchParams.get('type');
 
-  // Redirect if user already has a role
+  // Redirect unauthenticated users to login once Clerk has loaded
   useEffect(() => {
+    if (isLoaded && !user) {
+      navigate('/login', { replace: true });
+    }
+  }, [isLoaded, user, navigate]);
+
+  // Redirect if user already has a role (skip when a fresh selection was just saved)
+  useEffect(() => {
+    if (justSelectedRef.current) return;
+
     if (userProfile?.user_type) {
       let targetPath = '/';
       if (userProfile.user_type === 'shipper') targetPath = '/shipper/dashboard';
@@ -89,8 +99,9 @@ const ChooseRole = () => {
 
       showSuccess(`Welcome ${role === 'shipper' ? 'Shipper' : 'Trucker'}!`);
 
-      const targetPath = role === 'shipper' ? '/shipper/dashboard' : '/trucker/dashboard';
-      navigate(targetPath, { replace: true });
+      // First-time users go through onboarding before reaching their dashboard
+      justSelectedRef.current = true;
+      navigate('/onboarding', { replace: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to set role';
       console.error('[ChooseRole] Error:', err);
@@ -104,10 +115,10 @@ const ChooseRole = () => {
   // Wait for Clerk to load
   if (!isLoaded || !user) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 px-4">
+      <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-orange-600 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Loading...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-orange-600 dark:text-orange-400 mx-auto mb-2" />
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );
@@ -168,8 +179,12 @@ const ChooseRole = () => {
           </button>
         </div>
 
+        <p className="mt-8 text-center text-sm text-gray-400 dark:text-gray-500">
+          Don't worry — you can switch your role anytime from your profile settings.
+        </p>
+
         {loading && (
-          <div className="mt-12 text-center animate-fade-in">
+          <div className="mt-8 text-center animate-fade-in">
             <div className="bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Loader2 className="h-8 w-8 animate-spin text-orange-600 dark:text-orange-400" />
             </div>

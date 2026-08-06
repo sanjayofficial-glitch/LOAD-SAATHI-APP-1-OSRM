@@ -1,14 +1,15 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { MessageSquare, ArrowRight, Mail } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/components/EmptyState';
+import ErrorState from '@/components/ErrorState';
 import { showError } from '@/utils/toast';
 
 interface ChatConversation {
@@ -30,94 +31,96 @@ const ChatList = () => {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+
+  const fetchConversations = useCallback(async () => {
+    if (!userProfile) return;
+    try {
+      const supabaseToken = await getToken({ template: 'supabase' });
+      if (!supabaseToken) throw new Error('No Supabase token');
+
+      const supabase = createClerkSupabaseClient(supabaseToken);
+
+      const { data: messages, error } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          request:requests(
+            id,
+            shipper:users!requests_shipper_id_fkey(id, full_name, user_type),
+            receiver:users!requests_receiver_id_fkey(id, full_name, user_type)
+          ),
+          shipment_request:shipment_requests(
+            id,
+            shipper:users!shipment_requests_shipper_id_fkey(id, full_name, user_type),
+            trucker:users!shipment_requests_trucker_id_fkey(id, full_name, user_type)
+          )
+        `)
+        .or(`sender_id.eq.${userProfile.id},recipient_id.eq.${userProfile.id}`)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const conversationMap = new Map<string, ChatConversation>();
+
+      messages?.forEach(msg => {
+        const conversationId = msg.request_id ?? msg.shipment_request_id;
+        if (!conversationId) return;
+
+        const existing = conversationMap.get(conversationId);
+        const isFromMe = msg.sender_id === userProfile.id;
+        const otherUserId = isFromMe ? msg.recipient_id : msg.sender_id;
+
+        const request = msg.request as { shipper?: { id: string; full_name: string; user_type: string }; receiver?: { id: string; full_name: string; user_type: string } } | null;
+        const shipmentRequest = msg.shipment_request as { shipper?: { id: string; full_name: string; user_type: string }; trucker?: { id: string; full_name: string; user_type: string } } | null;
+
+        let otherUser: { id: string; full_name: string; user_type: string } | undefined;
+        if (request?.shipper) {
+          otherUser = userProfile.id === request.shipper.id ? request.receiver : request.shipper;
+        } else if (shipmentRequest) {
+          otherUser = userProfile.id === shipmentRequest.trucker?.id ? shipmentRequest.shipper : shipmentRequest.trucker;
+        }
+        if (!otherUser) {
+          otherUser = { id: otherUserId, full_name: 'Unknown', user_type: '' };
+        }
+
+        if (!existing) {
+          conversationMap.set(conversationId, {
+            id: conversationId,
+            request_id: conversationId,
+            other_user: otherUser,
+            last_message: msg.content,
+            last_message_time: msg.created_at,
+            unread_count: !isFromMe && !msg.is_read ? 1 : 0
+          });
+        } else {
+          if (new Date(msg.created_at) > new Date(existing.last_message_time)) {
+            existing.last_message = msg.content;
+            existing.last_message_time = msg.created_at;
+          }
+          if (!isFromMe && !msg.is_read) {
+            existing.unread_count += 1;
+          }
+        }
+      });
+
+      const conversationsList = Array.from(conversationMap.values())
+        .sort((a, b) => new Date(b.last_message_time).getTime() - new Date(a.last_message_time).getTime());
+
+      setConversations(conversationsList);
+      setFetchError(false);
+    } catch (error: unknown) {
+      console.error('[ChatList] Error:', error);
+      setFetchError(true);
+      showError('Failed to load conversations');
+    } finally {
+      setLoading(false);
+    }
+  }, [getToken, userProfile]);
 
   useEffect(() => {
-    if (!userProfile) return;
-
-    const fetchConversations = async () => {
-      try {
-        const supabaseToken = await getToken({ template: 'supabase' });
-        if (!supabaseToken) throw new Error('No Supabase token');
-        
-        const supabase = createClerkSupabaseClient(supabaseToken);
-
-        const { data: messages, error } = await supabase
-          .from('messages')
-          .select(`
-            *,
-            request:requests(
-              id,
-              shipper:users!requests_shipper_id_fkey(id, full_name, user_type),
-              receiver:users!requests_receiver_id_fkey(id, full_name, user_type)
-            ),
-            shipment_request:shipment_requests(
-              id,
-              shipper:users!shipment_requests_shipper_id_fkey(id, full_name, user_type),
-              trucker:users!shipment_requests_trucker_id_fkey(id, full_name, user_type)
-            )
-          `)
-          .or(`sender_id.eq.${userProfile.id},recipient_id.eq.${userProfile.id}`)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        const conversationMap = new Map<string, ChatConversation>();
-        
-        messages?.forEach(msg => {
-          const conversationId = msg.request_id ?? msg.shipment_request_id;
-          if (!conversationId) return;
-
-          const existing = conversationMap.get(conversationId);
-          const isFromMe = msg.sender_id === userProfile.id;
-          const otherUserId = isFromMe ? msg.recipient_id : msg.sender_id;
-
-          const request = msg.request as { shipper?: { id: string; full_name: string; user_type: string }; receiver?: { id: string; full_name: string; user_type: string } } | null;
-          const shipmentRequest = msg.shipment_request as { shipper?: { id: string; full_name: string; user_type: string }; trucker?: { id: string; full_name: string; user_type: string } } | null;
-
-          let otherUser: { id: string; full_name: string; user_type: string } | undefined;
-          if (request?.shipper) {
-            otherUser = userProfile.id === request.shipper.id ? request.receiver : request.shipper;
-          } else if (shipmentRequest) {
-            otherUser = userProfile.id === shipmentRequest.trucker?.id ? shipmentRequest.shipper : shipmentRequest.trucker;
-          }
-          if (!otherUser) {
-            otherUser = { id: otherUserId, full_name: 'Unknown', user_type: '' };
-          }
-
-          if (!existing) {
-            conversationMap.set(conversationId, {
-              id: conversationId,
-              request_id: conversationId,
-              other_user: otherUser,
-              last_message: msg.content,
-              last_message_time: msg.created_at,
-              unread_count: !isFromMe && !msg.is_read ? 1 : 0
-            });
-          } else {
-            if (new Date(msg.created_at) > new Date(existing.last_message_time)) {
-              existing.last_message = msg.content;
-              existing.last_message_time = msg.created_at;
-            }
-            if (!isFromMe && !msg.is_read) {
-              existing.unread_count += 1;
-            }
-          }
-        });
-
-        const conversationsList = Array.from(conversationMap.values())
-          .sort((a, b) => new Date(b.last_message_time).getTime() - new Date(a.last_message_time).getTime());
-
-        setConversations(conversationsList);
-      } catch (error: unknown) {
-        console.error('[ChatList] Error:', error);
-        showError('Failed to load conversations');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchConversations();
-  }, [userProfile, getToken]);
+  }, [fetchConversations]);
 
   const getRequestTitle = (conv: ChatConversation) => {
     return `${conv.other_user.full_name}`;
@@ -150,6 +153,18 @@ const ChatList = () => {
     );
   }
 
+  if (fetchError) {
+    return (
+      <div className="container mx-auto px-4 py-12 max-w-3xl">
+        <ErrorState
+          title="Failed to load messages"
+          description="We couldn't fetch your conversations right now. Check your connection and try again."
+          retry={fetchConversations}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 animate-fade-in">
       <div className="mb-8">
@@ -163,23 +178,16 @@ const ChatList = () => {
       </div>
 
       {conversations.length === 0 ? (
-        <Card className="border-orange-100 dark:border-orange-800 shadow-sm">
-          <CardContent className="pt-6">
-            <div className="text-center py-12">
-              <div className="bg-orange-50 dark:bg-orange-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageSquare className="h-8 w-8 text-orange-300 dark:text-orange-600" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">No conversations yet</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto">Start a conversation by booking a trip or accepting a request.</p>
-              <Button 
-                onClick={() => navigate(userProfile?.user_type === 'trucker' ? '/trucker/dashboard' : '/browse-trucks')}
-                className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-md"
-              >
-                Go to Dashboard
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          accent="orange"
+          icon={<MessageSquare className="h-8 w-8 sm:h-10 sm:w-10" />}
+          title="No conversations yet"
+          description="Start a conversation by booking a trip or accepting a request."
+          primaryAction={{
+            label: 'Go to Dashboard',
+            onClick: () => navigate(userProfile?.user_type === 'trucker' ? '/trucker/dashboard' : '/browse-trucks'),
+          }}
+        />
       ) : (
         <div className="grid gap-3">
           {conversations.map((conv, i) => (

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/components/EmptyState';
+import ErrorState from '@/components/ErrorState';
 import {
   Select,
   SelectContent,
@@ -27,7 +29,6 @@ import {
   MapPin,
   Package as PackageIcon,
   AlertCircle,
-  Plus,
   Clock,
   Sparkles,
   Loader2,
@@ -91,7 +92,7 @@ const TripList = () => {
   });
 
   // Fetch active trips with React Query caching
-  const { data: trips = [], isLoading } = useQuery({
+  const { data: trips = [], isLoading, error, refetch } = useQuery({
     queryKey: ['activeTrips', filters.origin, filters.destination, filters.minCapacity, filters.maxPrice, filters.vehicle_type],
     queryFn: async () => {
       const token = await getToken({ template: 'supabase' });
@@ -248,6 +249,18 @@ const TripList = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="py-8">
+        <ErrorState
+          title="Failed to load trucks"
+          description="We couldn't fetch available trucks right now. Check your connection and try again."
+          retry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
   const hasActiveFilters = filters.origin || filters.destination || filters.minCapacity || filters.maxPrice || filters.vehicle_type;
 
   return (
@@ -371,33 +384,20 @@ const TripList = () => {
       {/* Results */}
       <div className="grid gap-4">
         {filteredTrips.length === 0 ? (
-          <Card className="border-dashed border-2 border-gray-200 dark:border-gray-700">
-            <CardContent className="py-20 text-center">
-              <div className="bg-gray-50 dark:bg-gray-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Truck className="h-8 w-8 text-gray-300 dark:text-gray-600" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">No trucks found</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6">Try adjusting your search or filters</p>
-              <div className="flex gap-4 justify-center">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setFilters({ origin: '', destination: '', minCapacity: '', maxPrice: '', vehicle_type: '' })}
-                  className="border-gray-200 dark:border-gray-700"
-                >
-                  Clear All Filters
-                </Button>
-                <Link to="/trucker/post-trip">
-                  <Button className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-md">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Post Your Own Trip
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+          <EmptyState
+            accent="blue"
+            icon={<Search className="h-8 w-8 sm:h-10 sm:w-10" />}
+            title="No trucks found"
+            description="Try adjusting your search or filters, or post your load and let truckers come to you."
+            primaryAction={{
+              label: 'Clear All Filters',
+              onClick: () => setFilters({ origin: '', destination: '', minCapacity: '', maxPrice: '', vehicle_type: '' }),
+            }}
+            secondaryAction={{ label: 'Post Your Load', to: '/shipper/post-shipment' }}
+          />
         ) : viewMode === 'map' ? (
           /* Map View — side-by-side on desktop, stacked on mobile */
-          <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-280px)] min-h-[400px]">
+          <div className="flex flex-col lg:flex-row gap-4 h-[calc(100dvh-280px)] min-h-[400px]">
             {/* Map */}
             <div className="flex-1 min-h-[300px] lg:min-h-0">
               <LoadSaathiMap

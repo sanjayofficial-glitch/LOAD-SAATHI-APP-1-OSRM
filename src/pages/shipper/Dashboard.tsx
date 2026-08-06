@@ -22,6 +22,8 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
+import EmptyState from '@/components/EmptyState';
+import OnboardingChecklist from '@/components/OnboardingChecklist';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const StatCardSkeleton = () => (
@@ -228,6 +230,35 @@ const ShipperDashboard = () => {
         <div className="mb-4 sm:mb-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-300 animate-fade-in">
           <WifiOff className="h-4 w-4 shrink-0" />
           <span>You are offline. Data shown may be out of date.</span>
+        </div>
+      )}
+
+      {/* First-Time Welcome */}
+      {!loading && stats.activeShipments === 0 && stats.completedShipments === 0 && stats.pendingRequests === 0 && (
+        <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <EmptyState
+            accent="blue"
+            icon={<Truck />}
+            title="Welcome aboard! Let's get your first shipment moving"
+            description="Post your goods and get instant quotes from verified truckers on your route. LoadSaathi matches you with reliable transport at the best price."
+            primaryAction={{ label: 'Post Your First Load', to: '/shipper/post-shipment' }}
+            secondaryAction={{ label: 'Browse Available Trucks', to: '/browse-trucks' }}
+          />
+        </div>
+      )}
+
+      {/* Onboarding Checklist */}
+      {!loading && !(stats.activeShipments === 0 && stats.completedShipments === 0 && stats.pendingRequests === 0) && userProfile?.id && (
+        <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+          <OnboardingChecklist
+            accent="blue"
+            userId={userProfile.id}
+            items={[
+              { label: 'Post your first load', done: stats.activeShipments > 0, to: '/shipper/post-shipment' },
+              { label: 'Complete your profile', done: Boolean(userProfile.full_name?.trim() && userProfile.phone?.trim()), to: '/profile' },
+              { label: 'Get a trucker offer', done: stats.pendingRequests > 0, to: '/shipper/my-shipments?tab=incoming' },
+            ]}
+          />
         </div>
       )}
 

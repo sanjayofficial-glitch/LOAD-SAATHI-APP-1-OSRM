@@ -28,6 +28,8 @@ import CreditScoreBadge from '@/components/CreditScoreBadge';
 import CreditScoreGauge from '@/components/CreditScoreGauge';
 import LiveMap from '@/components/LiveMap';
 import LogoMark from '@/components/LogoMark';
+import EmptyState from '@/components/EmptyState';
+import OnboardingChecklist from '@/components/OnboardingChecklist';
 import type { TruckLocation } from '@/components/LiveMap';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -229,6 +231,35 @@ const TruckerDashboard = () => {
         <div className="mb-4 sm:mb-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-300 animate-fade-in">
           <WifiOff className="h-4 w-4 shrink-0" />
           <span>You are offline. Data shown may be out of date.</span>
+        </div>
+      )}
+
+      {/* First-Time Welcome */}
+      {!loading && stats.activeTrips === 0 && stats.completedTrips === 0 && stats.pendingRequests === 0 && (
+        <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <EmptyState
+            accent="orange"
+            icon={<Truck />}
+            title="Welcome aboard! Let's get your first trip rolling"
+            description="Post your available truck capacity and start earning. LoadSaathi matches you with shippers moving freight on your route."
+            primaryAction={{ label: 'Post Your First Trip', to: '/trucker/post-trip' }}
+            secondaryAction={{ label: 'Browse Available Loads', to: '/trucker/browse-shipments' }}
+          />
+        </div>
+      )}
+
+      {/* Onboarding Checklist */}
+      {!loading && !(stats.activeTrips === 0 && stats.completedTrips === 0 && stats.pendingRequests === 0) && userProfile?.id && (
+        <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+          <OnboardingChecklist
+            accent="orange"
+            userId={userProfile.id}
+            items={[
+              { label: 'Post your first trip', done: stats.activeTrips > 0, to: '/trucker/post-trip' },
+              { label: 'Complete your profile', done: Boolean(userProfile.full_name?.trim() && userProfile.phone?.trim()), to: '/profile' },
+              { label: 'Get a booking request', done: stats.pendingRequests > 0, to: '/trucker/my-trips?tab=incoming' },
+            ]}
+          />
         </div>
       )}
 

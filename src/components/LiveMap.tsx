@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useTheme } from "@/theme/theme";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -67,6 +68,11 @@ function formatTime(iso: string): string {
 }
 
 export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapProps) {
+  const { isDark } = useTheme();
+  const tileUrl = isDark
+    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
   return (
     <div
       className={`relative w-full rounded-lg overflow-hidden border ${className}`}
@@ -80,8 +86,10 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
       >
         <MapSizeHandler />
         <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={isDark
+            ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            : "&copy; OpenStreetMap contributors"}
+          url={tileUrl}
         />
         <FitBounds trucks={trucks} />
         {trucks.map((truck) => (
@@ -90,11 +98,11 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
               <div>
                 <p className="font-semibold">{truck.driverName}</p>
                 {truck.originCity && truck.destinationCity && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     {truck.originCity} to {truck.destinationCity}
                   </p>
                 )}
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Updated: {formatTime(truck.lastUpdated)}
                 </p>
               </div>

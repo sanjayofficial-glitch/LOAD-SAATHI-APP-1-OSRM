@@ -42,6 +42,8 @@ import {
   notifyTruckerOfOfferDeclined,
 } from '@/utils/notifications';
 import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/components/EmptyState';
+import ErrorState from '@/components/ErrorState';
 import type { Shipment, Request, ShipmentRequest } from '@/types';
 
 
@@ -73,6 +75,7 @@ const MyShipments = () => {
   const [sentRequests, setSentRequests] = useState<Request[]>([]);
   const [incomingOffers, setIncomingOffers] = useState<ShipmentRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -121,7 +124,9 @@ const MyShipments = () => {
       setShipments(mappedShipments);
       setSentRequests(mappedSent);
       setIncomingOffers(mappedIncoming);
+      setFetchError(false);
     } catch {
+      setFetchError(true);
       showError('Failed to fetch data');
     } finally {
       setLoading(false);
@@ -216,6 +221,16 @@ const MyShipments = () => {
     </div>
   );
 
+  if (fetchError) return (
+    <div className="container mx-auto px-4 py-12 max-w-3xl">
+      <ErrorState
+        title="Failed to load your loads"
+        description="We couldn't fetch your shipments right now. Check your connection and try again."
+        retry={fetchData}
+      />
+    </div>
+  );
+
   const pendingOffers = incomingOffers.filter(o => o.status === 'pending');
 
   return (
@@ -255,16 +270,14 @@ const MyShipments = () => {
 
         <TabsContent value="loads">
           {shipments.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No loads posted yet</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6">Post a shipment to start receiving offers from truckers</p>
-              <Link to="/shipper/post-shipment">
-                <Button variant="outline" className="border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950">
-                  Post Your First Load
-                </Button>
-              </Link>
-            </div>
+            <EmptyState
+              accent="blue"
+              icon={<Package className="h-8 w-8 sm:h-10 sm:w-10" />}
+              title="No loads posted yet"
+              description="Post a shipment to start receiving offers from truckers."
+              primaryAction={{ label: 'Post Your First Load', to: '/shipper/post-shipment' }}
+              secondaryAction={{ label: 'Find Trucks', to: '/browse-trucks' }}
+            />
           ) : (
             <div className="grid gap-6">
               {shipments.map(shipment => (
@@ -324,14 +337,13 @@ const MyShipments = () => {
 
         <TabsContent value="sent">
           {sentRequests.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <Send className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No requests sent yet</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6">Browse available trucks to book space for your goods</p>
-              <Link to="/browse-trucks">
-                <Button className="bg-blue-600 hover:bg-blue-700">Find Trucks</Button>
-              </Link>
-            </div>
+            <EmptyState
+              accent="blue"
+              icon={<Send className="h-8 w-8 sm:h-10 sm:w-10" />}
+              title="No requests sent yet"
+              description="Browse available trucks to book space for your goods."
+              primaryAction={{ label: 'Find Trucks', to: '/browse-trucks' }}
+            />
           ) : (
             <div className="grid gap-6">
               {sentRequests.map((request) => (
@@ -371,11 +383,13 @@ const MyShipments = () => {
 
         <TabsContent value="incoming">
           {incomingOffers.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <Inbox className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No offers received</h3>
-              <p className="text-gray-500 dark:text-gray-400">When truckers send offers for your loads, they'll appear here</p>
-            </div>
+            <EmptyState
+              accent="blue"
+              icon={<Inbox className="h-8 w-8 sm:h-10 sm:w-10" />}
+              title="No offers received"
+              description="When truckers send offers for your loads, they'll appear here. Post a load to start receiving offers."
+              primaryAction={{ label: 'Post a Load', to: '/shipper/post-shipment' }}
+            />
           ) : (
             <div className="grid gap-6">
               {incomingOffers.map((offer) => (

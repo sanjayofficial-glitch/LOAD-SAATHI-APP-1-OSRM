@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const supabaseClient = createClerkSupabaseClient(supabaseToken);
       const { data, error } = await supabaseClient
         .from('users')
-        .select('id, user_type, full_name, phone, rating, total_trips, is_verified, created_at')
+        .select('id, user_type, full_name, phone, company_name, rating, total_trips, is_verified, created_at')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -78,6 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           user_type: data.user_type || null,
           full_name: data.full_name || '',
           phone: data.phone || '',
+          company_name: data.company_name || undefined,
           rating: data.rating || 0,
           total_trips: data.total_trips || 0,
           is_verified: data.is_verified || false,

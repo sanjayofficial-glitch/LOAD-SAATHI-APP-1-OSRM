@@ -4,7 +4,7 @@ import { useSignUp, useUser } from "@clerk/clerk-react";
 import { Capacitor } from "@capacitor/core";
 import ThemeToggle from "@/components/ThemeToggle";
 import LogoMark from "@/components/LogoMark";
-import { Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Loader2, Eye, EyeOff, ArrowLeft, Package, Truck, CheckCircle2 } from "lucide-react";
 
 const Register = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -131,26 +131,71 @@ const Register = () => {
                 onClick={() => handleRoleSelect("shipper")}
                 className="w-full text-left bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-6 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg group"
               >
-                <div className="text-3xl mb-3">📦</div>
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-                  Shipper
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Post loads and find trucks for your goods
-                </p>
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                    <Package className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                      Shipper
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">I need to move goods</p>
+                  </div>
+                </div>
+                <ul className="space-y-1.5 text-sm text-gray-600 dark:text-gray-300">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                    Post loads and find trucks instantly
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                    Compare verified transporters
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                    Track shipments in real time
+                  </li>
+                </ul>
               </button>
               <button
                 onClick={() => handleRoleSelect("trucker")}
                 className="w-full text-left bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-6 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg group"
               >
-                <div className="text-3xl mb-3">🚛</div>
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-                  Trucker
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Find loads and grow your transport business
-                </p>
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="bg-orange-50 dark:bg-orange-900/30 p-3 rounded-xl group-hover:bg-orange-100 dark:group-hover:bg-orange-900/50 transition-colors">
+                    <Truck className="h-7 w-7 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                      Trucker
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">I have trucks to offer</p>
+                  </div>
+                </div>
+                <ul className="space-y-1.5 text-sm text-gray-600 dark:text-gray-300">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                    Find loads on your route
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                    Get paid for every trip
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                    Grow with a verified rating
+                  </li>
+                </ul>
               </button>
+
+              <div className="text-center pt-2">
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-orange-600 dark:text-orange-400 font-semibold hover:underline">
+                    Sign in
+                  </Link>
+                </p>
+              </div>
             </div>
           ) : verifying ? (
             <div className="space-y-4">
@@ -279,7 +324,7 @@ const Register = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>

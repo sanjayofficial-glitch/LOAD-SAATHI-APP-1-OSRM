@@ -28,6 +28,8 @@ import {
   X
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/components/EmptyState';
+import ErrorState from '@/components/ErrorState';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -74,6 +76,7 @@ const TruckerHub = () => {
   const [sentOffers, setSentOffers] = useState<ShipmentRequest[]>([]);
   const [incomingRequests, setIncomingRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -126,7 +129,9 @@ const TruckerHub = () => {
       setTrips(tripsData || []);
       setSentOffers(mappedSent);
       setIncomingRequests(mappedIncoming);
+      setFetchError(false);
     } catch (_err) {
+      setFetchError(true);
       showError('Failed to fetch data');
     } finally {
       setLoading(false);
@@ -242,6 +247,16 @@ const TruckerHub = () => {
     </div>
   );
 
+  if (fetchError) return (
+    <div className="container mx-auto px-4 py-12 max-w-3xl">
+      <ErrorState
+        title="Failed to load your hub"
+        description="We couldn't fetch your trips and requests right now. Check your connection and try again."
+        retry={fetchData}
+      />
+    </div>
+  );
+
   const pendingIncoming = incomingRequests.filter(r => r.status === 'pending');
 
   return (
@@ -281,16 +296,14 @@ const TruckerHub = () => {
 
         <TabsContent value="trips">
           {trips.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <Truck className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">No trips posted yet</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6">Post a trip to start finding loads</p>
-              <Link to="/trucker/post-trip">
-                <Button variant="outline" className="border-orange-600 text-orange-600 dark:text-orange-400 dark:border-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950">
-                  Post Your First Trip
-                </Button>
-              </Link>
-            </div>
+            <EmptyState
+              accent="orange"
+              icon={<Truck className="h-8 w-8 sm:h-10 sm:w-10" />}
+              title="No trips posted yet"
+              description="Post a trip to start finding loads to carry and earn more."
+              primaryAction={{ label: 'Post Your First Trip', to: '/trucker/post-trip' }}
+              secondaryAction={{ label: 'Find Shipments', to: '/trucker/browse-shipments' }}
+            />
           ) : (
             <div className="grid gap-6">
               {trips.map(trip => (
@@ -377,14 +390,13 @@ const TruckerHub = () => {
 
         <TabsContent value="sent">
           {sentOffers.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <Send className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">No offers sent yet</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6">Browse shipments to find loads for your truck</p>
-              <Link to="/trucker/browse-shipments">
-                <Button className="bg-orange-600 hover:bg-orange-700">Find Shipments</Button>
-              </Link>
-            </div>
+            <EmptyState
+              accent="orange"
+              icon={<Send className="h-8 w-8 sm:h-10 sm:w-10" />}
+              title="No offers sent yet"
+              description="Browse shipments to find loads for your truck and send an offer."
+              primaryAction={{ label: 'Find Shipments', to: '/trucker/browse-shipments' }}
+            />
           ) : (
             <div className="grid gap-6">
               {sentOffers.map((offer) => (
@@ -431,11 +443,13 @@ const TruckerHub = () => {
 
         <TabsContent value="incoming">
           {incomingRequests.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <Inbox className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">No booking requests</h3>
-              <p className="text-gray-500 dark:text-gray-400">When shippers book space on your trips, they'll appear here</p>
-            </div>
+            <EmptyState
+              accent="orange"
+              icon={<Inbox className="h-8 w-8 sm:h-10 sm:w-10" />}
+              title="No booking requests"
+              description="When shippers book space on your trips, they'll appear here. Post a trip to start receiving requests."
+              primaryAction={{ label: 'Post a Trip', to: '/trucker/post-trip' }}
+            />
           ) : (
             <div className="grid gap-6">
               {incomingRequests.map((request) => (

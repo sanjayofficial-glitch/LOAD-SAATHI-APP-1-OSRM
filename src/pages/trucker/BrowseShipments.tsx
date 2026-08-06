@@ -11,6 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/components/EmptyState';
+import ErrorState from '@/components/ErrorState';
 import { 
    Search, 
    Calendar, 
@@ -130,7 +132,7 @@ const BrowseShipments = () => {
   });
 
   // Fetch pending shipments with React Query caching
-  const { data: shipments = [], isLoading } = useQuery({
+  const { data: shipments = [], isLoading, error, refetch } = useQuery({
     queryKey: ['pendingShipments'],
     queryFn: async () => {
       const token = await getToken({ template: 'supabase' });
@@ -205,6 +207,18 @@ const BrowseShipments = () => {
         }
       });
   }, [shipments, searchTerm, filters, sortBy, myActiveTrip]);
+
+  const hasActiveFilters = searchTerm.trim() !== '' ||
+    filters.originState !== 'Any' ||
+    filters.destinationState !== 'Any' ||
+    filters.minWeight !== '' ||
+    filters.maxPrice !== '' ||
+    filters.departureDate !== '';
+
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setFilters({ originState: 'Any', destinationState: 'Any', minWeight: '', maxPrice: '', departureDate: '' });
+  };
 
   const { scores: aiScores, loadingId: aiLoadingId } = useSmartMatch(
     filteredShipments,
@@ -374,10 +388,7 @@ const BrowseShipments = () => {
                   <Label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Min Weight (t)</Label>
                   <Input type="number" value={filters.minWeight} onChange={(e) => setFilters({...filters, minWeight: e.target.value})} />
                 </div>
-                <Button variant="outline" className="w-full" onClick={() => {
-                  setFilters({ originState: 'Any', destinationState: 'Any', minWeight: '', maxPrice: '', departureDate: '' });
-                  setSearchTerm('');
-                }}>Clear All</Button>
+                <Button variant="outline" className="w-full" onClick={clearAllFilters}>Clear All</Button>
               </CardContent>
             )}
           </Card>
@@ -389,7 +400,7 @@ const BrowseShipments = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input 
                 placeholder="Search by city or goods type..." 
-                className="pl-10 py-6 rounded-xl border-gray-200"
+                className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -410,7 +421,7 @@ const BrowseShipments = () => {
             </div>
             <div className="w-48">
               <Select value={sortBy} onValueChange={(val) => setSortBy(val as 'match' | 'budget_asc' | 'budget_desc' | 'date' | 'weight')}>
-                <SelectTrigger className="py-6 rounded-xl border-gray-200">
+                <SelectTrigger className="py-6 rounded-xl border-gray-200 dark:border-gray-700">
                   <ArrowUpDown className="h-4 w-4 mr-2 text-gray-400" />
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
@@ -429,15 +440,33 @@ const BrowseShipments = () => {
             <div className="grid gap-6">
               {[1, 2, 3].map((i) => <Skeleton key={i} className="h-48 w-full rounded-xl" />)}
             </div>
+          ) : error ? (
+            <ErrorState
+              title="Failed to load shipments"
+              description="We couldn't fetch the available loads right now. Check your connection and try again."
+              retry={() => refetch()}
+            />
           ) : filteredShipments.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-white dark:bg-gray-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <Package className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">No shipments found</h3>
-              <p className="text-gray-500 dark:text-gray-400">Try adjusting your filters or check back later.</p>
-            </div>
+            hasActiveFilters ? (
+              <EmptyState
+                accent="orange"
+                icon={<Search className="h-8 w-8 sm:h-10 sm:w-10" />}
+                title="No shipments match your filters"
+                description="Try clearing your filters or adjusting your search to see more available loads."
+                primaryAction={{ label: 'Clear All Filters', onClick: clearAllFilters }}
+              />
+            ) : (
+              <EmptyState
+                accent="orange"
+                icon={<Package className="h-8 w-8 sm:h-10 sm:w-10" />}
+                title="No shipments available right now"
+                description="Shippers haven't posted loads on this route yet. Post your trip to attract shippers directly."
+                primaryAction={{ label: 'Post a Trip', to: '/trucker/post-trip' }}
+              />
+            )
           ) : viewMode === 'map' ? (
             /* Map View — side-by-side on desktop, stacked on mobile */
-            <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-280px)] min-h-[400px]">
+            <div className="flex flex-col lg:flex-row gap-4 h-[calc(100dvh-280px)] min-h-[400px]">
               {/* Map */}
               <div className="flex-1 min-h-[300px] lg:min-h-0">
                 <LoadSaathiMap
