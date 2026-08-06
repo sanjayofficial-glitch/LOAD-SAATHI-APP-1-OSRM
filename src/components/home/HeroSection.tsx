@@ -14,10 +14,12 @@ const HeroSection = React.memo(() => {
     <section className="min-h-[95vh] flex items-center relative overflow-hidden pt-16 sm:pt-0">
       <div className="absolute inset-0 z-0">
         <img
-          src="/hero-bg.jpg"
-          alt="LoadSaathi Hero Background"
+          src="/hero-bg.webp"
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover opacity-20"
           loading="eager"
+          fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a1a2e]/90 via-[#0a1a2e]/80 to-[#0a1a2e]/95" />
       </div>

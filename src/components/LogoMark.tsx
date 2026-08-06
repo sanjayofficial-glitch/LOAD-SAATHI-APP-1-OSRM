@@ -16,10 +16,14 @@ interface LogoMarkProps {
 export default React.memo(function LogoMark({ size = "h-8 w-8", className = "" }: LogoMarkProps) {
   return (
     <img
-      src="/logo.webp"
+      src="/logo-64.webp"
+      srcSet="/logo-32.webp 32w, /logo-64.webp 64w, /logo-128.webp 128w"
+      sizes="(min-width: 768px) 44px, 32px"
       alt="LoadSaathi logo"
       className={`${size} object-contain select-none ${className}`}
       draggable={false}
+      width={128}
+      height={128}
     />
   );
 });

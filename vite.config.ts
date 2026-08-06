@@ -16,7 +16,7 @@ export default defineConfig(() => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    deduplicate: ["react", "react-dom"],
+    dedupe: ["react", "react-dom"],
   },
   build: {
     // Increase warning threshold (our chunks are intentionally split)
@@ -41,7 +41,7 @@ export default defineConfig(() => ({
           "vendor-supabase": ["@supabase/supabase-js"],
 
           // Leaflet maps — only loads on map-heavy pages (trip/shipment detail)
-          "vendor-leaflet": ["leaflet", "react-leaflet"],
+          "vendor-leaflet": ["leaflet", "react-leaflet", "react-leaflet-cluster", "leaflet.heat", "leaflet.markercluster"],
 
           // Recharts — only loads on dashboard / chart pages
           "vendor-recharts": ["recharts"],
@@ -49,23 +49,43 @@ export default defineConfig(() => ({
           // TanStack Query (data fetching)
           "vendor-query": ["@tanstack/react-query"],
 
+          // Framer Motion — animation library (kept out of the app shell)
+          "vendor-motion": ["framer-motion"],
+
+          // Forms + validation
+          "vendor-forms": ["react-hook-form", "@hookform/resolvers", "zod", "class-variance-authority"],
+
+          // Toast notifications
+          "vendor-sonner": ["sonner"],
+
           // Radix UI + shadcn components (all grouped — large but stable)
           "vendor-ui": [
             "@radix-ui/react-accordion",
             "@radix-ui/react-alert-dialog",
+            "@radix-ui/react-aspect-ratio",
             "@radix-ui/react-avatar",
             "@radix-ui/react-checkbox",
+            "@radix-ui/react-collapsible",
+            "@radix-ui/react-context-menu",
             "@radix-ui/react-dialog",
             "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-hover-card",
             "@radix-ui/react-label",
+            "@radix-ui/react-menubar",
+            "@radix-ui/react-navigation-menu",
             "@radix-ui/react-popover",
+            "@radix-ui/react-progress",
+            "@radix-ui/react-radio-group",
             "@radix-ui/react-scroll-area",
             "@radix-ui/react-select",
             "@radix-ui/react-separator",
+            "@radix-ui/react-slider",
             "@radix-ui/react-slot",
             "@radix-ui/react-switch",
             "@radix-ui/react-tabs",
             "@radix-ui/react-toast",
+            "@radix-ui/react-toggle",
+            "@radix-ui/react-toggle-group",
             "@radix-ui/react-tooltip",
           ],
 
