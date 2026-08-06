@@ -103,7 +103,7 @@ export default function GuidePage() {
       "@type": "Organization",
       name: "LoadSaathi",
       url: "https://loadsaathi.in",
-      logo: { "@type": "ImageObject", url: "https://loadsaathi.in/logo.png" },
+      logo: { "@type": "ImageObject", url: "https://loadsaathi.in/logo-512.png" },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": `https://loadsaathi.in/guide/${slug}` },
     wordCount: guide.content.join(" ").split(/\s+/).length,

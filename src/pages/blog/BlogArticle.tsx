@@ -84,7 +84,7 @@ export default function BlogArticle() {
           url: "https://loadsaathi.in",
           logo: {
             "@type": "ImageObject",
-            url: "https://loadsaathi.in/logo.png",
+            url: "https://loadsaathi.in/logo-512.png",
           },
         },
         mainEntityOfPage: {
