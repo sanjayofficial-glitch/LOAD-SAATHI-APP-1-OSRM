@@ -4,6 +4,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Loader2, Navigation } from 'lucide-react';
 import MapControls, { type MapFilters } from '@/components/MapControls';
+import ZoomControls, { fitPositionsToBounds } from '@/components/maps/ZoomControls';
+import { useMapUserInteraction } from '@/components/maps/useMapUserInteraction';
 import { cn } from '@/lib/utils';
 
 // ── Leaflet icon fix for Vite ────────────────────────────────────────────────
@@ -218,19 +220,15 @@ function InvalidateSize() {
   }, [map]);
   return null;
 }
-function FitBounds({ locations }: { locations: UserLocation[] }) {
+function FitBounds({ locations, boundsKey }: { locations: UserLocation[]; boundsKey: string }) {
   const map = useMap();
+  const userInteracted = useMapUserInteraction(map);
   useEffect(() => {
-    if (locations.length === 0) return;
-    const first = locations[0];
-    if (!first) return;
-    if (locations.length === 1) {
-      map.setView([first.lat, first.lng], 12);
-      return;
-    }
+    if (locations.length === 0 || userInteracted.current) return;
     const coords: [number, number][] = locations.map((l) => [l.lat, l.lng]);
-    map.fitBounds(L.latLngBounds(coords), { padding: [50, 50] });
-  }, [locations, map]);
+    fitPositionsToBounds(map, coords);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boundsKey, map]);
   return null;
 }
 
@@ -311,6 +309,27 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
     return filteredLocations.map((loc) => [loc.lat, loc.lng, 1] as [number, number, number]);
   }, [filteredLocations]);
 
+  // All visible points (for the "fit all" zoom button)
+  const allPositions = useMemo<[number, number][]>(() => {
+    const pts: [number, number][] = filteredLocations.map((loc) => [loc.lat, loc.lng]);
+    if (filters.showRoutes) {
+      resolvedTrips.forEach((t) => {
+        pts.push(t.origin);
+        pts.push(t.destination);
+      });
+      resolvedShipments.forEach((s) => {
+        pts.push(s.origin);
+        pts.push(s.destination);
+      });
+    }
+    return pts;
+  }, [filteredLocations, resolvedTrips, resolvedShipments, filters.showRoutes]);
+
+  const fitBoundsKey = useMemo(
+    () => filteredLocations.map((l) => l.driver_id).sort().join(','),
+    [filteredLocations]
+  );
+
   // Stats
   const onlineCount = locations.length;
   const onTripCount = locations.filter(l => l.trip_id).length;
@@ -332,10 +351,13 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
         center={[22.5, 84.0]}
         zoom={7}
         className="absolute inset-0"
-        style={{ background: '#020617' }}
-        scrollWheelZoom={true}
+        style={{ background: '#020617', position: 'relative' }}
+        scrollWheelZoom
+        touchZoom
+        zoomControl={false}
       >
         <InvalidateSize />
+        <ZoomControls positions={allPositions} />
         <TileLayer
           attribution='&copy; OSM'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -345,7 +367,7 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
         {filters.showHeatmap && <HeatmapLayer points={heatPoints} />}
 
         {/* Fit bounds to filtered locations */}
-        {filteredLocations.length > 0 && <FitBounds locations={filteredLocations} />}
+        {filteredLocations.length > 0 && <FitBounds locations={filteredLocations} boundsKey={fitBoundsKey} />}
 
         {/* User location markers */}
         {filteredLocations.map((loc) => {

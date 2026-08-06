@@ -22,8 +22,8 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
-import EmptyState from '@/components/EmptyState';
 import OnboardingChecklist from '@/components/OnboardingChecklist';
+import LiveTruckMap from '@/components/shipper/LiveTruckMap';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const StatCardSkeleton = () => (
@@ -233,19 +233,10 @@ const ShipperDashboard = () => {
         </div>
       )}
 
-      {/* First-Time Welcome */}
-      {!loading && stats.activeShipments === 0 && stats.completedShipments === 0 && stats.pendingRequests === 0 && (
-        <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          <EmptyState
-            accent="blue"
-            icon={<Truck />}
-            title="Welcome aboard! Let's get your first shipment moving"
-            description="Post your goods and get instant quotes from verified truckers on your route. LoadSaathi matches you with reliable transport at the best price."
-            primaryAction={{ label: 'Post Your First Load', to: '/shipper/post-shipment' }}
-            secondaryAction={{ label: 'Browse Available Trucks', to: '/browse-trucks' }}
-          />
-        </div>
-      )}
+      {/* Live Truck Map — hero for first-time & returning shippers */}
+      <div className="mb-8 sm:mb-10 animate-fade-in">
+        <LiveTruckMap getToken={getToken} />
+      </div>
 
       {/* Onboarding Checklist */}
       {!loading && !(stats.activeShipments === 0 && stats.completedShipments === 0 && stats.pendingRequests === 0) && userProfile?.id && (

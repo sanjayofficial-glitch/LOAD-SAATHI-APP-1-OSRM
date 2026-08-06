@@ -17,6 +17,7 @@ import 'leaflet/dist/leaflet.css';
 import { Skeleton } from '@/components/ui/skeleton';
 import { geocodeCity } from '@/utils/geocode';
 import { getRoute, RouteResult } from '@/utils/osrm';
+import ZoomControls from '@/components/maps/ZoomControls';
 import { useTheme } from '@/theme/theme';
 
 // Fix Leaflet's default marker icon (broken in Vite builds)
@@ -152,11 +153,19 @@ const RouteMap = React.memo(({
   const displayDistanceKm = propDistanceKm || route?.distance_km;
   const displayDurationMin = propDurationMin || route?.duration_min;
 
+  const positions: [number, number][] = [
+    [origin.lat, origin.lon],
+    [destination.lat, destination.lon],
+  ];
+
+  // Note: computed after the loading/error early-returns, so no hooks here.
+
   return (
     <div>
-      <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style={{ height }}>
-        <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
+      <div className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style={{ height }}>
+        <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%', position: 'relative' }} scrollWheelZoom touchZoom zoomControl={false}>
           <MapSizeHandler />
+          <ZoomControls positions={positions} />
           <TileLayer
             attribution={isDark
               ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'

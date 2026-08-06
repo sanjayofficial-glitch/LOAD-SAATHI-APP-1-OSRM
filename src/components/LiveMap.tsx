@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import ZoomControls, { fitPositionsToBounds } from "@/components/maps/ZoomControls";
+import { useMapUserInteraction } from "@/components/maps/useMapUserInteraction";
 import { useTheme } from "@/theme/theme";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -40,18 +42,22 @@ interface LiveMapProps {
   className?: string;
 }
 
-function FitBounds({ trucks }: { trucks: TruckLocation[] }) {
+function FitBounds({ trucks, boundsKey }: { trucks: TruckLocation[]; boundsKey: string }) {
   const map = useMap();
+  const userInteracted = useMapUserInteraction(map);
+  const lastFitKey = useRef("");
+
   useEffect(() => {
-    if (trucks.length === 0) return;
-    if (trucks.length === 1) {
-      const truck = trucks[0];
-      if (!truck) return;
-      map.setView([truck.lat, truck.lng], 12);
-      return;
-    }
+    if (trucks.length === 0 || userInteracted.current) return;
+    // Multi-truck maps only re-fit when the *set* of trucks changes so live
+    // position pings don't yank the view. A single truck (trip/shipment
+    // detail) keeps re-centering so the map follows it — until the user
+    // zooms or pans manually.
+    if (trucks.length > 1 && lastFitKey.current === boundsKey) return;
+    lastFitKey.current = boundsKey;
     const coords: [number, number][] = trucks.map((t) => [t.lat, t.lng]);
-    map.fitBounds(L.latLngBounds(coords), { padding: [40, 40] });
+    fitPositionsToBounds(map, coords);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trucks, map]);
   return null;
 }
@@ -73,6 +79,12 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
     ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
+  const positions = useMemo<[number, number][]>(
+    () => trucks.map((t) => [t.lat, t.lng] as [number, number]),
+    [trucks]
+  );
+  const boundsKey = useMemo(() => trucks.map((t) => t.id).sort().join(","), [trucks]);
+
   return (
     <div
       className={`relative w-full rounded-lg overflow-hidden border ${className}`}
@@ -81,17 +93,20 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
       <MapContainer
         center={[20.5937, 78.9629]}
         zoom={5}
-        style={{ height: "100%", width: "100%" }}
-        scrollWheelZoom={false}
+        style={{ height: "100%", width: "100%", position: "relative" }}
+        scrollWheelZoom
+        touchZoom
+        zoomControl={false}
       >
         <MapSizeHandler />
+        <ZoomControls positions={positions} />
         <TileLayer
           attribution={isDark
             ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             : "&copy; OpenStreetMap contributors"}
           url={tileUrl}
         />
-        <FitBounds trucks={trucks} />
+        <FitBounds trucks={trucks} boundsKey={boundsKey} />
         {trucks.map((truck) => (
           <Marker key={truck.id} position={[truck.lat, truck.lng]}>
             <Popup>

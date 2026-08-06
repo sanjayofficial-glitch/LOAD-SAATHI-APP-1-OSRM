@@ -42,7 +42,8 @@ import FavoriteButton from '@/components/FavoriteButton';
 import { calculateMatchScore, getMatchLabel, getAIMatchBadge } from '@/utils/matching';
 import { useSmartMatch } from '@/hooks/useSmartMatch';
 import { useLiveDriverLocations } from '@/hooks/useLiveDriverLocations';
-import { LoadSaathiMap } from '@/components/maps';
+import { useTripMapMarkers } from '@/hooks/useTripMapMarkers';
+import { LoadSaathiMap, type TruckLocation } from '@/components/maps';
 import { formatDuration } from '@/utils/format';
 import type { Trip } from '@/types';
 import {
@@ -224,6 +225,23 @@ const TripList = () => {
   // Live driver positions for map overlay
   const { driverLocations } = useLiveDriverLocations(getToken);
 
+  // Map markers: every listed trip's truck gets a marker — its live GPS position
+  // if the driver is sharing one, otherwise a pin at the trip's origin city
+  // (stored coords first, geocoded city name as fallback). This guarantees every
+  // truck in the list (e.g. a trucker who posted a trip but isn't broadcasting
+  // GPS) also shows up on the map.
+  const tripMarkers = useTripMapMarkers(filteredTrips, driverLocations, viewMode === 'map');
+
+  // Legacy behaviour: also surface live trucks sitting at a listed trip's
+  // origin city, so nearby trucks show up even without a posted trip match.
+  const mapTrucks = useMemo<TruckLocation[]>(() => {
+    const seen = new Set(tripMarkers.map((t) => t.driver_id));
+    const extra = driverLocations.filter(
+      (d) => !seen.has(d.driver_id) && filteredTrips.some((t) => t.origin_city === d.origin_city),
+    );
+    return [...tripMarkers, ...extra];
+  }, [tripMarkers, driverLocations, filteredTrips]);
+
   if (!userProfile) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -250,6 +268,12 @@ const TripList = () => {
   }
 
   if (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : error && typeof error === 'object' && 'message' in error
+          ? String((error as { message: unknown }).message)
+          : String(error);
     return (
       <div className="py-8">
         <ErrorState
@@ -257,6 +281,11 @@ const TripList = () => {
           description="We couldn't fetch available trucks right now. Check your connection and try again."
           retry={() => refetch()}
         />
+        {errorMessage && (
+          <p className="mt-4 text-center text-xs text-gray-400 dark:text-gray-500 break-words max-w-md mx-auto">
+            Details: {errorMessage}
+          </p>
+        )}
       </div>
     );
   }
@@ -401,9 +430,7 @@ const TripList = () => {
             {/* Map */}
             <div className="flex-1 min-h-[300px] lg:min-h-0">
               <LoadSaathiMap
-                trucks={driverLocations.filter((d) =>
-                  filteredTrips.some((t) => t.trucker_id === d.driver_id || t.origin_city === d.origin_city)
-                )}
+                trucks={mapTrucks}
                 height="100%"
                 showClusters
                 onTruckClick={(truck) => {

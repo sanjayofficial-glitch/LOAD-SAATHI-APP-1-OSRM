@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Loader2 } from 'lucide-react';
+import ZoomControls from '@/components/maps/ZoomControls';
 
 const coordCache: Record<string, [number, number]> = {
   'mumbai': [19.0760, 72.8777],
@@ -188,10 +189,24 @@ const TripMap: React.FC<TripMapProps> = ({ trips, shipments }) => {
     return () => { isMounted = false; };
   }, [trips, shipments]);
 
+  const allPositions = useMemo<[number, number][]>(() => {
+    const pts: [number, number][] = [];
+    resolvedTrips.forEach((t) => {
+      pts.push(t.origin);
+      pts.push(t.destination);
+    });
+    resolvedShipments.forEach((s) => {
+      pts.push(s.origin);
+      pts.push(s.destination);
+    });
+    return pts;
+  }, [resolvedTrips, resolvedShipments]);
+
   return (
     <div className="h-full w-full bg-slate-900 overflow-hidden relative">
-      <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: '100%', width: '100%', background: '#020617' }} scrollWheelZoom={false}>
+      <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: '100%', width: '100%', background: '#020617', position: 'relative' }} scrollWheelZoom touchZoom zoomControl={false}>
         <MapResizer />
+        <ZoomControls positions={allPositions} />
         <TileLayer attribution='&copy; OSM' url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
 
         {resolvedTrips.map(t => (

@@ -7,6 +7,8 @@ import TruckMarker, { type TruckLocation } from './TruckMarker';
 import LoadMarker, { type LoadLocation } from './LoadMarker';
 import RoutePolyline from './RoutePolyline';
 import MapLegend from './MapLegend';
+import ZoomControls, { fitPositionsToBounds } from './ZoomControls';
+import { useMapUserInteraction } from './useMapUserInteraction';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/theme/theme';
 
@@ -29,17 +31,25 @@ function MapSizeHandler() {
 }
 
 // ── Auto-fit bounds ──────────────────────────────────────────────────────────
-function FitBounds({ positions }: { positions: [number, number][] }) {
+// Only refits when the *set* of trucks/loads changes (boundsKey) so live GPS
+// pings that move existing trucks don't re-zoom the map on every update.
+// Once the user interacts with the map (drag, wheel, pinch, double-click or
+// the zoom buttons) auto-fit hands over control so manual zooming sticks.
+function FitBounds({
+  positions,
+  boundsKey,
+}: {
+  positions: [number, number][];
+  boundsKey: string;
+}) {
   const map = useMap();
+  const userInteracted = useMapUserInteraction(map);
+
   useEffect(() => {
-    if (positions.length === 0) return;
-    if (positions.length === 1) {
-      const only = positions[0];
-      if (only) map.setView(only, 12);
-      return;
-    }
-    map.fitBounds(L.latLngBounds(positions), { padding: [40, 40] });
-  }, [positions, map]);
+    if (positions.length === 0 || userInteracted.current) return;
+    fitPositionsToBounds(map, positions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boundsKey, map]);
   return null;
 }
 
@@ -73,6 +83,7 @@ export interface LoadSaathiMapProps {
 export default React.memo(function LoadSaathiMap({
   trucks = [],
   loads = [],
+  selectedTruckId,
   onTruckClick,
   onLoadClick,
   showRouteFor,
@@ -90,7 +101,8 @@ export default React.memo(function LoadSaathiMap({
     ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
     : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-  // Compute all positions for bounds fitting
+  // Compute all positions for bounds fitting (route endpoints are excluded so
+  // selecting a truck doesn't re-zoom the map to fit the whole route).
   const allPositions = useMemo(() => {
     const positions: [number, number][] = [];
     trucks.forEach((t) => {
@@ -99,12 +111,16 @@ export default React.memo(function LoadSaathiMap({
     loads.forEach((l) => {
       if (l.origin_lat && l.origin_lng) positions.push([l.origin_lat, l.origin_lng]);
     });
-    if (showRouteFor) {
-      positions.push([showRouteFor.originLat, showRouteFor.originLng]);
-      positions.push([showRouteFor.destLat, showRouteFor.destLng]);
-    }
     return positions;
-  }, [trucks, loads, showRouteFor]);
+  }, [trucks, loads]);
+
+  // Stable key for auto-fit: only the *set* of trucks/loads (ids), so moving
+  // markers don't trigger re-fits on every realtime update.
+  const boundsKey = useMemo(() => {
+    const truckIds = trucks.map((t) => t.driver_id).sort().join(',');
+    const loadIds = loads.map((l) => l.id).sort().join(',');
+    return `${truckIds}|${loadIds}`;
+  }, [trucks, loads]);
 
   const markers = (
     <>
@@ -112,6 +128,7 @@ export default React.memo(function LoadSaathiMap({
         <TruckMarker
           key={truck.driver_id}
           truck={truck}
+          selected={truck.driver_id === selectedTruckId}
           onClick={onTruckClick}
         />
       ))}
@@ -142,18 +159,21 @@ export default React.memo(function LoadSaathiMap({
       <MapContainer
         center={center}
         zoom={zoom}
-        style={{ height: '100%', width: '100%' }}
-        scrollWheelZoom={false}
+        style={{ height: '100%', width: '100%', position: 'relative' }}
+        scrollWheelZoom
+        touchZoom
+        zoomControl={false}
       >
         <MapSizeHandler />
         <MapClickHandler onClick={onMapClick} />
+        <ZoomControls positions={allPositions} />
         <TileLayer
           attribution={isDark
             ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
           url={tileUrl}
         />
-        {allPositions.length > 0 && <FitBounds positions={allPositions} />}
+        {allPositions.length > 0 && <FitBounds positions={allPositions} boundsKey={boundsKey} />}
         {showClusters ? (
           <MarkerClusterGroup
             chunkedLoading
