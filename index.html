@@ -325,7 +325,21 @@
         // CookieHub — loaded after first paint (was async in <head>)
         var ch = document.createElement('script'); ch.async = true;
         ch.src = 'https://cdn.cookiehub.eu/c2/ca96bc89.js';
-        ch.onload = function () { if (window.cookiehub) { window.cookiehub.load({}); } };
+        ch.onload = function () {
+          if (window.cookiehub) {
+            window.cookiehub.load({});
+            // Hide settings button after consent is given
+            window.addEventListener('cookiehub_onAllowAll', function() {
+              var icon = document.querySelector('.ch2-icon');
+              if (icon) icon.style.display = 'none';
+            });
+            // Also hide if consent was already given (returning visitor)
+            if (window.cookiehub.hasConsented && window.cookiehub.hasConsented()) {
+              var icon = document.querySelector('.ch2-icon');
+              if (icon) icon.style.display = 'none';
+            }
+          }
+        };
         document.getElementsByTagName('head')[0].appendChild(ch);
       });
     </script>

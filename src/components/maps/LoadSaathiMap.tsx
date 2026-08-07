@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, useMap, useMapEvents, Marker, Circle, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -8,6 +8,7 @@ import LoadMarker, { type LoadLocation } from './LoadMarker';
 import RoutePolyline from './RoutePolyline';
 import MapLegend from './MapLegend';
 import ZoomControls, { fitPositionsToBounds } from './ZoomControls';
+import TileLayerSwitcher, { type TileLayerId, getTileLayer } from './TileLayerSwitcher';
 import { useMapUserInteraction } from './useMapUserInteraction';
 import { myLocationIcon } from './icons';
 import { cn } from '@/lib/utils';
@@ -105,9 +106,15 @@ export default React.memo(function LoadSaathiMap({
 }: LoadSaathiMapProps) {
   const { isDark } = useTheme();
 
-  const tileUrl = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const defaultTileId: TileLayerId = isDark ? 'dark' : 'standard';
+  const [tileLayerId, setTileLayerId] = useState<TileLayerId>(defaultTileId);
+
+  // Sync tile layer with theme changes (only if user hasn't manually overridden)
+  useEffect(() => {
+    setTileLayerId(isDark ? 'dark' : 'standard');
+  }, [isDark]);
+
+  const tile = getTileLayer(tileLayerId);
 
   // Compute all positions for bounds fitting (route endpoints are excluded so
   // selecting a truck doesn't re-zoom the map to fit the whole route).
@@ -188,7 +195,7 @@ export default React.memo(function LoadSaathiMap({
 
   return (
     <div
-      className={cn('relative w-full rounded-lg overflow-hidden border', className)}
+      className={cn('relative w-full rounded-lg overflow-hidden border isolate', className)}
       style={{ height }}
     >
       <MapContainer
@@ -203,10 +210,8 @@ export default React.memo(function LoadSaathiMap({
         <MapClickHandler onClick={onMapClick} />
         <ZoomControls positions={allPositions} />
         <TileLayer
-          attribution={isDark
-            ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
-          url={tileUrl}
+          attribution={tile.attribution}
+          url={tile.url}
         />
         {allPositions.length > 0 && <FitBounds positions={allPositions} boundsKey={boundsKey} />}
         {showClusters ? (
@@ -228,6 +233,7 @@ export default React.memo(function LoadSaathiMap({
           showLoads={loads.length > 0}
         />
       )}
+      <TileLayerSwitcher currentLayer={tileLayerId} onLayerChange={setTileLayerId} />
     </div>
   );
 });

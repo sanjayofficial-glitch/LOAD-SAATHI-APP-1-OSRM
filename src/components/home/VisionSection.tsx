@@ -8,11 +8,8 @@ interface VisionSectionProps {
 }
 
 const VisionSection = React.memo(({ globeRef }: VisionSectionProps) => (
-  <section id="vision" className="fade-section min-h-[716px] flex items-center justify-center relative bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 py-24 overflow-hidden">
-    <div className="absolute inset-0 opacity-30"
-      style={{
-        backgroundImage: `url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDEwZjFmIiAvPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDUpIiAvPgo8L3N2Zz4=")`,
-      }} />
+  <section id="vision" className="fade-section min-h-[716px] flex items-center justify-center relative bg-muted/30 dark:bg-[#010f1f] border-y border-border dark:border-white/5 py-24 overflow-hidden isolate">
+    <div className="absolute inset-0 opacity-30 dark:opacity-30 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(circle,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:4px_4px]" />
     <div ref={globeRef} id="globe-container" className="absolute inset-0 z-0" />
     <div className="max-w-4xl mx-auto px-6 sm:px-12 text-center relative z-10 pointer-events-none">
       <h2 className="text-5xl sm:text-7xl lg:text-8xl font-black text-foreground dark:text-white tracking-tighter leading-none mb-6">
@@ -23,7 +20,7 @@ const VisionSection = React.memo(({ globeRef }: VisionSectionProps) => (
       </p>
       <div className="mt-12 pointer-events-auto">
         <Link to="/register">
-          <Button className="bg-orange-700 hover:bg-orange-800 text-white text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+          <Button className="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold tracking-wider uppercase px-8 py-4 h-auto rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)]">
             Join the Network <ChevronRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>

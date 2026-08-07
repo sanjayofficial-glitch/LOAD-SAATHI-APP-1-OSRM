@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('SupabaseClient');
@@ -11,6 +11,12 @@ const log = createLogger('SupabaseClient');
  *
  * For Realtime subscriptions (read-only), use the anonymous client
  * from @/integrations/supabase/client instead.
+ *
+ * IMPORTANT: Each call creates a fresh client with the provided token.
+ * Previously this cached clients by token prefix, but cached clients
+ * could retain stale/expired Authorization headers causing 401 errors
+ * when Clerk rotated tokens. Creating a new client is cheap (just
+ * config setup) so the cache is no longer needed.
  */
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
@@ -24,21 +30,12 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   );
 }
 
-/** Map of Clerk JWT token prefix → cached Supabase client instance */
-const clientCache = new Map<string, SupabaseClient>();
-const CACHE_MAX = 5;
-
 /**
- * Creates a Supabase client configured with a Clerk JWT for authorization.
- * Caches up to 5 clients keyed by token prefix to avoid recreating on every call.
+ * Creates a fresh Supabase client configured with a Clerk JWT for authorization.
+ * Always creates a new client to ensure the Authorization header has a valid token.
  */
 export const createClerkSupabaseClient = (clerkToken: string) => {
-  const cacheKey = clerkToken.slice(0, 16);
-  if (clientCache.has(cacheKey)) {
-    return clientCache.get(cacheKey)!;
-  }
-
-  const client = createClient(
+  return createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
     {
@@ -55,14 +52,4 @@ export const createClerkSupabaseClient = (clerkToken: string) => {
       },
     }
   );
-
-  // Evict oldest entry if over limit
-  if (clientCache.size >= CACHE_MAX) {
-    const oldest = clientCache.keys().next().value;
-    if (oldest !== undefined) {
-      clientCache.delete(oldest);
-    }
-  }
-  clientCache.set(cacheKey, client);
-  return client;
 };

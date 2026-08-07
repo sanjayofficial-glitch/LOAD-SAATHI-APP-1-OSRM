@@ -39,6 +39,9 @@ import ReviewDialog from '@/components/ReviewDialog';
 import type { Trip, Request } from '@/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { posthog } from '@/utils/posthog';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('TruckerTripDetail');
 
 const StatusBadge = ({ status }: { status: string }) => {
   const cfg: Record<string, string> = {
@@ -62,7 +65,7 @@ const TruckerTripDetail = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const { userProfile } = useAuth();
   const { getToken } = useClerkAuth();
-  const { getAuthenticatedClient } = useSupabase();
+  const { getAuthenticatedClient, withAuthRetry } = useSupabase();
   const navigate = useNavigate();
 
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -121,17 +124,23 @@ const TruckerTripDetail = () => {
     if (!tripId || !trip) return;
     setActionLoading('start');
     try {
-      const supabase = await getAuthenticatedClient();
-      const { error } = await supabase
-        .from('trips')
-        .update({ status: 'in_transit' })
-        .eq('id', tripId);
+      const { error } = await withAuthRetry(async (supabase) =>
+        supabase
+          .from('trips')
+          .update({ status: 'in_transit' })
+          .eq('id', tripId)
+      );
       if (error) throw error;
 
-      await updateLinkedShipmentStatuses(supabase, 'in_transit');
+      // Non-blocking: update linked shipments and send notifications
+      // These should not prevent the trip from starting
+      const supabase = await getAuthenticatedClient();
+      updateLinkedShipmentStatuses(supabase, 'in_transit').catch(() => 
+        console.warn('[handleStartTrip] Failed to update linked shipment statuses')
+      );
 
       const acceptedShippers = bookingRequests.filter(r => r.status === 'accepted');
-      await Promise.all(acceptedShippers.map(request =>
+      Promise.all(acceptedShippers.map(request =>
         notifyShipperOfTripStarted({
           shipperId: request.shipper_id,
           truckerName: userProfile?.full_name || 'The trucker',
@@ -140,7 +149,9 @@ const TruckerTripDetail = () => {
           tripId: trip.id,
           getToken: () => getToken({ template: 'supabase' }),
         })
-      ));
+      )).catch(() => 
+        console.warn('[handleStartTrip] Failed to notify some shippers')
+      );
 
       posthog.capture('trip_status_updated', {
         trip_id: trip.id,
@@ -150,8 +161,9 @@ const TruckerTripDetail = () => {
       });
       showSuccess('Trip started! Shippers have been notified.');
       fetchData();
-    } catch (_err) {
-      showError('Failed to start trip');
+    } catch (err) {
+      log.error('Failed to start trip', { tripId, error: err });
+      showError('Failed to start trip. Please try again.');
     } finally {
       setActionLoading(null);
     }
@@ -161,17 +173,22 @@ const TruckerTripDetail = () => {
     if (!tripId || !trip) return;
     setActionLoading('delivered');
     try {
-      const supabase = await getAuthenticatedClient();
-      const { error } = await supabase
-        .from('trips')
-        .update({ status: 'delivered' })
-        .eq('id', tripId);
+      const { error } = await withAuthRetry(async (supabase) =>
+        supabase
+          .from('trips')
+          .update({ status: 'delivered' })
+          .eq('id', tripId)
+      );
       if (error) throw error;
 
-      await updateLinkedShipmentStatuses(supabase, 'delivered');
+      // Non-blocking: update linked shipments and send notifications
+      const supabase = await getAuthenticatedClient();
+      updateLinkedShipmentStatuses(supabase, 'delivered').catch(() =>
+        console.warn('[handleMarkDelivered] Failed to update linked shipment statuses')
+      );
 
       const acceptedShippers = bookingRequests.filter(r => r.status === 'accepted');
-      await Promise.all(acceptedShippers.map(request =>
+      Promise.all(acceptedShippers.map(request =>
         notifyShipperOfTripDelivered({
           shipperId: request.shipper_id,
           truckerName: userProfile?.full_name || 'The trucker',
@@ -180,7 +197,9 @@ const TruckerTripDetail = () => {
           tripId: trip.id,
           getToken: () => getToken({ template: 'supabase' }),
         })
-      ));
+      )).catch(() =>
+        console.warn('[handleMarkDelivered] Failed to notify some shippers')
+      );
 
       posthog.capture('trip_status_updated', {
         trip_id: trip.id,
@@ -190,8 +209,9 @@ const TruckerTripDetail = () => {
       });
       showSuccess('Marked as delivered! Shippers have been notified.');
       fetchData();
-    } catch (_err) {
-      showError('Failed to mark delivered');
+    } catch (err) {
+      log.error('Failed to mark delivered', { tripId, error: err });
+      showError('Failed to mark delivered. Please try again.');
     } finally {
       setActionLoading(null);
     }
@@ -201,19 +221,23 @@ const TruckerTripDetail = () => {
     if (!tripId || !trip) return;
     setActionLoading('complete');
     try {
-      const supabase = await getAuthenticatedClient();
-      const { error } = await supabase
-        .from('trips')
-        .update({ status: 'completed' })
-        .eq('id', tripId);
+      const { error } = await withAuthRetry(async (supabase) =>
+        supabase
+          .from('trips')
+          .update({ status: 'completed' })
+          .eq('id', tripId)
+      );
 
       if (error) throw error;
 
-      await updateLinkedShipmentStatuses(supabase, 'completed');
+      // Non-blocking: update linked shipments and send notifications
+      const supabase = await getAuthenticatedClient();
+      updateLinkedShipmentStatuses(supabase, 'completed').catch(() =>
+        console.warn('[handleCompleteTrip] Failed to update linked shipment statuses')
+      );
 
-      // Notify all shippers with accepted requests
       const acceptedRequests = bookingRequests.filter(r => r.status === 'accepted');
-      const notificationPromises = acceptedRequests.map(request => 
+      Promise.all(acceptedRequests.map(request => 
         notifyShipperOfTripCompletion({
           shipperId: request.shipper_id,
           truckerName: userProfile?.full_name || 'The trucker',
@@ -222,9 +246,9 @@ const TruckerTripDetail = () => {
           tripId: trip.id,
           getToken: () => getToken({ template: 'supabase' }),
         })
+      )).catch(() =>
+        console.warn('[handleCompleteTrip] Failed to notify some shippers')
       );
-
-      await Promise.all(notificationPromises);
 
       posthog.capture('trip_status_updated', {
         trip_id: trip.id,
@@ -234,8 +258,9 @@ const TruckerTripDetail = () => {
       });
       showSuccess('Trip marked as completed! Shippers have been notified.');
       fetchData();
-    } catch (_err) {
-      showError('Failed to complete trip');
+    } catch (err) {
+      log.error('Failed to complete trip', { tripId, error: err });
+      showError('Failed to complete trip. Please try again.');
     } finally {
       setActionLoading(null);
     }
@@ -244,11 +269,12 @@ const TruckerTripDetail = () => {
   const handleBookingAction = async (request: Request, status: 'accepted' | 'declined') => {
     setActionLoading(request.id);
     try {
-      const supabase = await getAuthenticatedClient();
-      const { error } = await supabase
-        .from('requests')
-        .update({ status })
-        .eq('id', request.id);
+      const { error } = await withAuthRetry(async (supabase) =>
+        supabase
+          .from('requests')
+          .update({ status })
+          .eq('id', request.id)
+      );
 
       if (error) throw error;
 
@@ -282,8 +308,9 @@ const TruckerTripDetail = () => {
       }
       fetchData();
     } catch (err) {
+      log.error('Failed to update booking request', { requestId: request.id, status, error: err });
       posthog.captureException(err, { flow: 'update_booking_request', new_status: status });
-      showError(`Failed to ${status} request`);
+      showError(`Failed to ${status} request. Please try again.`);
     } finally {
       setActionLoading(null);
     }
@@ -402,6 +429,7 @@ const TruckerTripDetail = () => {
           distanceKm={trip.estimated_distance_km}
           durationMin={trip.estimated_duration_min}
           height="240px"
+          interactive={false}
         />
       </div>
 

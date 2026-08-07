@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { geocodeCity } from '@/utils/geocode';
 import { getRoute, RouteResult } from '@/utils/osrm';
 import ZoomControls from '@/components/maps/ZoomControls';
+import TileLayerSwitcher, { type TileLayerId, getTileLayer } from '@/components/maps/TileLayerSwitcher';
 import { useTheme } from '@/theme/theme';
 
 // Fix Leaflet's default marker icon (broken in Vite builds)
@@ -62,6 +63,7 @@ interface RouteMapProps {
   distanceKm?: number;
   durationMin?: number;
   height?: string;
+  interactive?: boolean;
 }
 
 const RouteMap = React.memo(({
@@ -73,7 +75,8 @@ const RouteMap = React.memo(({
   destLng: propDestLng,
   distanceKm: propDistanceKm,
   durationMin: propDurationMin,
-  height = '300px'
+  height = '300px',
+  interactive = true,
 }: RouteMapProps) => {
   const [origin, setOrigin] = useState<Coords | null>(null);
   const [destination, setDestination] = useState<Coords | null>(null);
@@ -82,9 +85,14 @@ const RouteMap = React.memo(({
   const [error, setError] = useState(false);
   const { isDark } = useTheme();
 
-  const tileUrl = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const defaultTileId: TileLayerId = isDark ? 'dark' : 'standard';
+  const [tileLayerId, setTileLayerId] = useState<TileLayerId>(defaultTileId);
+
+  useEffect(() => {
+    setTileLayerId(isDark ? 'dark' : 'standard');
+  }, [isDark]);
+
+  const tile = getTileLayer(tileLayerId);
 
   const hasPreStoredCoords = propOriginLat !== undefined && propOriginLng !== undefined &&
                              propDestLat !== undefined && propDestLng !== undefined;
@@ -162,15 +170,13 @@ const RouteMap = React.memo(({
 
   return (
     <div>
-      <div className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style={{ height }}>
-        <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%', position: 'relative' }} scrollWheelZoom touchZoom zoomControl={false}>
+      <div className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 isolate" style={{ height }}>
+        <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%', position: 'relative' }} scrollWheelZoom={interactive} touchZoom={interactive} dragging={interactive} zoomControl={false}>
           <MapSizeHandler />
           <ZoomControls positions={positions} />
           <TileLayer
-            attribution={isDark
-              ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}
-            url={tileUrl}
+            attribution={tile.attribution}
+            url={tile.url}
           />
           <Marker position={[origin.lat, origin.lon]} icon={originIcon}>
             <Popup>🟢 From: {originCity}</Popup>
@@ -198,6 +204,7 @@ const RouteMap = React.memo(({
             />
           )}
         </MapContainer>
+        <TileLayerSwitcher currentLayer={tileLayerId} onLayerChange={setTileLayerId} />
       </div>
       {displayDistanceKm && displayDurationMin && (
         <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">

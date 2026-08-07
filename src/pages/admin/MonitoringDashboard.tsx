@@ -210,11 +210,21 @@ const MonitoringDashboard = () => {
     fetchData().then(() => {
       const client = supabaseRef.current;
       if (!client || channelRef.current) return;
+
+      // Debounce: skip realtime refetches if last fetch was <2s ago
+      const lastFetchRef = { current: Date.now() };
+      const debouncedFetch = () => {
+        const now = Date.now();
+        if (now - lastFetchRef.current < 2000) return;
+        lastFetchRef.current = now;
+        fetchData();
+      };
+
       channelRef.current = client.channel('admin-monitoring')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'trips' }, () => fetchData())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => fetchData())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => fetchData())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'driver_locations' }, () => fetchData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'trips' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'driver_locations' }, debouncedFetch)
         .subscribe();
     });
 

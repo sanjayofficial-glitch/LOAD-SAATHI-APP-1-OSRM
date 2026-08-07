@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import ZoomControls, { fitPositionsToBounds } from "@/components/maps/ZoomControls";
+import TileLayerSwitcher, { type TileLayerId, getTileLayer } from "@/components/maps/TileLayerSwitcher";
 import { useMapUserInteraction } from "@/components/maps/useMapUserInteraction";
 import { useTheme } from "@/theme/theme";
 
@@ -75,9 +76,15 @@ function formatTime(iso: string): string {
 
 export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapProps) {
   const { isDark } = useTheme();
-  const tileUrl = isDark
-    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+  const defaultTileId: TileLayerId = isDark ? 'dark' : 'standard';
+  const [tileLayerId, setTileLayerId] = useState<TileLayerId>(defaultTileId);
+
+  useEffect(() => {
+    setTileLayerId(isDark ? 'dark' : 'standard');
+  }, [isDark]);
+
+  const tile = getTileLayer(tileLayerId);
 
   const positions = useMemo<[number, number][]>(
     () => trucks.map((t) => [t.lat, t.lng] as [number, number]),
@@ -87,7 +94,7 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
 
   return (
     <div
-      className={`relative w-full rounded-lg overflow-hidden border ${className}`}
+      className={`relative w-full rounded-lg overflow-hidden border isolate ${className}`}
       style={{ height: "500px" }}
     >
       <MapContainer
@@ -101,10 +108,8 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
         <MapSizeHandler />
         <ZoomControls positions={positions} />
         <TileLayer
-          attribution={isDark
-            ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            : "&copy; OpenStreetMap contributors"}
-          url={tileUrl}
+          attribution={tile.attribution}
+          url={tile.url}
         />
         <FitBounds trucks={trucks} boundsKey={boundsKey} />
         {trucks.map((truck) => (
@@ -125,6 +130,7 @@ export default React.memo(function LiveMap({ trucks, className = "" }: LiveMapPr
           </Marker>
         ))}
       </MapContainer>
+      <TileLayerSwitcher currentLayer={tileLayerId} onLayerChange={setTileLayerId} />
     </div>
   );
 });

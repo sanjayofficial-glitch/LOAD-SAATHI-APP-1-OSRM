@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { Suspense, useEffect, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
@@ -32,7 +32,8 @@ import LogoMark from '@/components/LogoMark';
 import EmptyState from '@/components/EmptyState';
 import OnboardingChecklist from '@/components/OnboardingChecklist';
 import type { TruckLocation } from '@/components/LiveMap';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+const LazyBarChart = React.lazy(() => import('./TruckerEarningsChart'));
 
 interface DriverLocationRow {
   driver_id: string;
@@ -435,21 +436,9 @@ const TruckerDashboard = () => {
                 <p className="text-sm">Complete trips to see earnings trends</p>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={monthlyData} margin={{ top: 12, right: 8, left: -8, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
-                  <Tooltip formatter={(value) => `₹${Number(value).toLocaleString('en-IN')}`} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 12 }} />
-                  <Bar dataKey="earnings" fill="url(#orangeGradient)" radius={[6, 6, 0, 0]} maxBarSize={48} />
-                  <defs>
-                    <linearGradient id="orangeGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f97316" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="#fb923c" stopOpacity={0.4} />
-                    </linearGradient>
-                  </defs>
-                </BarChart>
-              </ResponsiveContainer>
+              <Suspense fallback={<Skeleton className="h-64 w-full rounded-xl" />}>
+                <LazyBarChart data={monthlyData} />
+              </Suspense>
             )}
           </CardContent>
         </Card>

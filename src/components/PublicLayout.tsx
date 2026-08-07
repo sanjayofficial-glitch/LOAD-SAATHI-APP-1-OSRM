@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Menu } from "lucide-react";
+import { ArrowRight, Menu, LayoutDashboard } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import OfflineBanner from "./OfflineBanner";
 import { Button } from "./ui/button";
@@ -10,6 +9,7 @@ import MobileMenu from "./MobileMenu";
 import DockNav, { publicBottomNavItems } from "./DockNav";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./ui/tooltip";
 import { socialLinks } from "@/data/socialLinks";
+import { useAuth } from "@/contexts/AuthContext";
 
 const footerLinks = {
   Platform: [
@@ -45,10 +45,19 @@ const footerLinks = {
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { userProfile } = useAuth();
+
+  const dashboardPath = userProfile?.user_type === 'admin'
+    ? '/admin/dashboard'
+    : userProfile?.user_type === 'trucker'
+      ? '/trucker/dashboard'
+      : userProfile?.user_type === 'shipper'
+        ? '/shipper/dashboard'
+        : null;
   return (
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       <OfflineBanner />
-      <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-16">
+      <nav className="fixed top-0 w-full z-[100] bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-16">
         <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-full">
           <Link to="/" className="flex items-center gap-2">
             <LogoMark size="h-11 w-11" />
@@ -56,14 +65,23 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </Link>
           <div className="flex items-center gap-3 sm:gap-4">
             <ThemeToggle />
-            <Link to="/login" className="hidden sm:inline-block text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
-              Sign In
-            </Link>
-            <Link to="/register" className="hidden sm:inline-block">
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold tracking-wider uppercase px-5 py-2 h-auto shadow-lg">
-                Get Started
-              </Button>
-            </Link>
+            {dashboardPath ? (
+              <Link to={dashboardPath} className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="hidden sm:inline-block text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
+                  Sign In
+                </Link>
+                <Link to="/register" className="hidden sm:inline-block">
+                  <Button className="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold tracking-wider uppercase px-5 py-2 h-auto shadow-lg">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}

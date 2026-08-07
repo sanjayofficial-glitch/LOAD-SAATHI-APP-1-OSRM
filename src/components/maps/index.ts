@@ -3,6 +3,8 @@ export { default as TruckMarker } from './TruckMarker';
 export { default as LoadMarker } from './LoadMarker';
 export { default as RoutePolyline } from './RoutePolyline';
 export { default as MapLegend } from './MapLegend';
+export { default as TileLayerSwitcher, TILE_LAYERS, getTileLayer } from './TileLayerSwitcher';
+export type { TileLayerId, TileLayerOption } from './TileLayerSwitcher';
 export * from './icons';
 export type { TruckLocation } from './TruckMarker';
 export type { LoadLocation } from './LoadMarker';

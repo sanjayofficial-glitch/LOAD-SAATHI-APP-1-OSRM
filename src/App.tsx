@@ -95,7 +95,7 @@ const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 function ThemedToaster() {
   const { isDark } = useTheme();
-  return <Toaster position="top-center" richColors theme={isDark ? 'dark' : 'light'} key={String(isDark)} />;
+  return <Toaster position="bottom-center" richColors theme={isDark ? 'dark' : 'light'} key={String(isDark)} />;
 }
 
 function App() {
@@ -130,7 +130,6 @@ function App() {
               <Suspense fallback={<Skeleton className="h-screen w-full" />}>
                 <Routes>
                   {/* Public routes with individual error boundaries */}
-                  <Route path="/" element={<ErrorBoundary><Index /></ErrorBoundary>} />
                   <Route path="/login" element={<ErrorBoundary><Login /></ErrorBoundary>} />
                   <Route path="/register" element={<ErrorBoundary><Register /></ErrorBoundary>} />
                   <Route path="/auth-sync" element={<ErrorBoundary><AuthSync /></ErrorBoundary>} />
@@ -140,6 +139,7 @@ function App() {
 
                   {/* Public info pages wrapped in PublicLayout */}
                   <Route element={<PublicLayout><Outlet /></PublicLayout>}>
+                    <Route index element={<Index />} />
                     <Route path="/features" element={<Features />} />
                     <Route path="/how-it-works" element={<HowItWorks />} />
                     <Route path="/about" element={<About />} />

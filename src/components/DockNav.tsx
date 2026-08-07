@@ -39,7 +39,7 @@ const DockNav = React.memo(({ items, visible, extra, className }: DockNavProps) 
   return (
     <div
       className={cn(
-        "fixed bottom-3 left-0 right-0 z-50 flex justify-center px-2 pointer-events-none safe-area-bottom",
+        "fixed bottom-3 left-0 right-0 z-[100] flex justify-center px-2 pointer-events-none safe-area-bottom",
         className
       )}
     >

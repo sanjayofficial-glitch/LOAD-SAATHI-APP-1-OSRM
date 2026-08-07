@@ -327,6 +327,7 @@ const ShipmentDetail = () => {
           distanceKm={shipment.estimated_distance_km}
           durationMin={shipment.estimated_duration_min}
           height="260px"
+          interactive={false}
         />
       </div>
 

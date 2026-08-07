@@ -237,6 +237,7 @@ const TripDetail = () => {
           distanceKm={trip.estimated_distance_km}
           durationMin={trip.estimated_duration_min}
           height="280px"
+          interactive={false}
         />
       </div>
 

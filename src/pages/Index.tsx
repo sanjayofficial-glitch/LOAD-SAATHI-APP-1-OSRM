@@ -1,12 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import OfflineBanner from '@/components/OfflineBanner';
-import ThemeToggle from '@/components/ThemeToggle';
-import IndexSkeleton from '@/components/IndexSkeleton';
-import { useTheme } from '@/theme/theme';
-import LogoMark from '@/components/LogoMark';
 import SeoMeta from '@/components/SeoMeta';
 import HeroSection from '@/components/home/HeroSection';
 import ProofBar from '@/components/home/ProofBar';
@@ -21,12 +13,11 @@ import AppPreview from '@/components/home/AppPreview';
 import SafetyTrust from '@/components/home/SafetyTrust';
 import FaqSection from '@/components/home/FaqSection';
 import CtaSection from '@/components/home/CtaSection';
-import MobileMenu from '@/components/MobileMenu';
-import DockNav, { publicBottomNavItems } from '@/components/DockNav';
+import IndexSkeleton from '@/components/IndexSkeleton';
+import { useTheme } from '@/theme/theme';
 
 const Index = () => {
   const [ready, setReady] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const globeRef = useRef<HTMLDivElement>(null);
   const globeInited = useRef(false);
@@ -46,7 +37,6 @@ const Index = () => {
     setReady(true);
   }, []);
 
-  // Fade-in sections on scroll
   useEffect(() => {
     if (!ready) return;
     const observer = new IntersectionObserver(
@@ -300,164 +290,79 @@ const Index = () => {
 
   return (
     <>
-    <SeoMeta
-      title="Shared Freight Marketplace | PTL/LTL East India"
-      description="LoadSaathi connects shippers and truckers for PTL and LTL shared freight across East India. Save up to 40% on freight costs on the Rourkela–Ranchi–Burdwan corridor. Book part loads online."
-      canonical="/"
-      keywords="PTL freight Rourkela, LTL transport East India, shared truck Ranchi Burdwan, part load Jharkhand Odisha, freight marketplace India, truck booking Rourkela"
-      jsonLd={{
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What is LoadSaathi and how does it work?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "LoadSaathi is an AI-powered shared freight marketplace connecting shippers and truckers for PTL and LTL loads across East India. Shippers post their loads, AI matches them with the best available trucks based on route, capacity, price, and reliability — and both sides track the shipment in real time with GPS."
+      <SeoMeta
+        title="Shared Freight Marketplace | PTL/LTL East India"
+        description="LoadSaathi connects shippers and truckers for PTL and LTL shared freight across East India. Save up to 40% on freight costs on the Rourkela–Ranchi–Burdwan corridor. Book part loads online."
+        canonical="/"
+        keywords="PTL freight Rourkela, LTL transport East India, shared truck Ranchi Burdwan, part load Jharkhand Odisha, freight marketplace India, truck booking Rourkela"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is LoadSaathi and how does it work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "LoadSaathi is an AI-powered shared freight marketplace connecting shippers and truckers for PTL and LTL loads across East India. Shippers post their loads, AI matches them with the best available trucks based on route, capacity, price, and reliability — and both sides track the shipment in real time with GPS."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How much does it cost to use LoadSaathi?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "LoadSaathi is free to join for both shippers and truckers. We charge a small transaction fee of 2–5% per completed shipment, which varies by role, volume, and credit score. There are no subscriptions, no hidden fees, and no minimum commitments."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which cities and routes does LoadSaathi cover?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "LoadSaathi currently operates across East India with the Rourkela–Ranchi–Burdwan corridor as our primary route. We also cover Bhubaneswar, Kolkata, Jamshedpur, and 50+ cities across Odisha, Jharkhand, and West Bengal with 25+ active freight corridors."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does the credit score system work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Every user on LoadSaathi has a digital freight credit score ranging from 300 to 900. The score is based on completion rate, on-time performance, bidirectional reviews, and tenure on the platform. Higher scores unlock better loads and preferential matching."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is my payment secure on LoadSaathi?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. LoadSaathi uses an escrow-backed payment system. Funds are held securely and released in milestones as delivery progresses. Digital settlements mean faster, transparent payouts compared to traditional 30–60 day credit cycles."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Who can use LoadSaathi — shippers or truckers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Both. Shippers (MSMEs, manufacturers, traders) can post loads and find truck space. Truckers (independent operators, fleet owners) can browse available loads, fill empty capacity, and earn on return trips."
+              }
             }
-          },
-          {
-            "@type": "Question",
-            "name": "How much does it cost to use LoadSaathi?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "LoadSaathi is free to join for both shippers and truckers. We charge a small transaction fee of 2–5% per completed shipment, which varies by role, volume, and credit score. There are no subscriptions, no hidden fees, and no minimum commitments."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Which cities and routes does LoadSaathi cover?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "LoadSaathi currently operates across East India with the Rourkela–Ranchi–Burdwan corridor as our primary route. We also cover Bhubaneswar, Kolkata, Jamshedpur, and 50+ cities across Odisha, Jharkhand, and West Bengal with 25+ active freight corridors."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How does the credit score system work?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Every user on LoadSaathi has a digital freight credit score ranging from 300 to 900. The score is based on completion rate, on-time performance, bidirectional reviews, and tenure on the platform. Higher scores unlock better loads and preferential matching."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Is my payment secure on LoadSaathi?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. LoadSaathi uses an escrow-backed payment system. Funds are held securely and released in milestones as delivery progresses. Digital settlements mean faster, transparent payouts compared to traditional 30–60 day credit cycles."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Who can use LoadSaathi — shippers or truckers?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Both. Shippers (MSMEs, manufacturers, traders) can post loads and find truck space. Truckers (independent operators, fleet owners) can browse available loads, fill empty capacity, and earn on return trips."
-            }
-          }
-        ]
-      }}
-    />
-    <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
-      <OfflineBanner />
-
-      <nav className="fixed top-0 w-full z-50 bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-16">
-        <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-full">
-          <Link to="/" className="flex items-center gap-2">
-            <LogoMark size="h-11 w-11" />
-            <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
-          </Link>
-          <div className="flex items-center gap-3 sm:gap-4">
-            <ThemeToggle />
-            <Link to="/login" className="hidden sm:inline-flex items-center min-h-11 px-3 text-sm font-semibold text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-colors">
-              Sign In
-            </Link>
-            <Link to="/register" className="hidden sm:inline-block">
-              <Button className="bg-orange-700 hover:bg-orange-800 text-white text-xs font-semibold tracking-wider uppercase px-6 py-2 h-auto min-h-11 shadow-lg">
-                Get Started
-              </Button>
-            </Link>
-            <button
-              type="button"
-              className="md:hidden p-2.5 text-muted-foreground hover:text-foreground"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-menu h-6 w-6"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <MobileMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
-
-      <main className="pb-24">
-        <HeroSection />
-        <ProofBar />
-        <BentoGrid />
-        <WhatIsLoadSaathi />
-        <HowItWorksSection />
-        <WhyLoadSaathi />
-        <PlatformTabs />
-        <TrustedAcrossEastIndia />
-        <VisionSection globeRef={globeRef} />
-        <AppPreview />
-        <SafetyTrust />
-        <FaqSection />
-        <CtaSection />
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full pt-16 pb-24">
-        <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-5 gap-8 px-6 sm:px-12 max-w-[1440px] mx-auto">
-          <div className="sm:col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <LogoMark size="h-10 w-10" />
-              <span className="text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">Precision Freight Intelligence — matching every load to its perfect space using AI.</p>
-            <Link to="/register">
-              <Button className="bg-orange-700 hover:bg-orange-800 text-white text-xs font-bold tracking-wider uppercase px-4 py-2 h-auto rounded-lg">
-                Join Now <ArrowRight className="ml-1 h-3 w-3" />
-              </Button>
-            </Link>
-          </div>
-          <div className="flex flex-col gap-3">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Platform</span>
-            <Link to="/features" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Features</Link>
-            <Link to="/how-it-works" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">How It Works</Link>
-            <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Pricing</Link>
-            <Link to="/safety-trust" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Safety & Trust</Link>
-          </div>
-          <div className="flex flex-col gap-3">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Solutions</span>
-            <Link to="/solutions/shippers" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">For Shippers</Link>
-            <Link to="/solutions/truckers" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">For Truckers</Link>
-            <Link to="/fare-calculator" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Fare Calculator</Link>
-          </div>
-          <div className="flex flex-col gap-3">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Company</span>
-            <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">About</Link>
-            <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Blog</Link>
-            <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Contact</Link>
-            <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">FAQ</Link>
-          </div>
-          <div className="flex flex-col gap-3">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Legal</span>
-            <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Privacy</Link>
-            <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground dark:hover:text-orange-400 transition-all">Terms</Link>
-          </div>
-        </div>
-        <div className="border-t border-border dark:border-white/5 mt-12 pt-8">
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} LoadSaathi. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-      <DockNav items={publicBottomNavItems} />
-    </div>
+          ]
+        }}
+      />
+      <HeroSection />
+      <ProofBar />
+      <BentoGrid />
+      <WhatIsLoadSaathi />
+      <HowItWorksSection />
+      <WhyLoadSaathi />
+      <PlatformTabs />
+      <TrustedAcrossEastIndia />
+      <VisionSection globeRef={globeRef} />
+      <AppPreview />
+      <SafetyTrust />
+      <FaqSection />
+      <CtaSection />
     </>
   );
 };

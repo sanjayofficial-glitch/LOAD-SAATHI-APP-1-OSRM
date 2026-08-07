@@ -76,6 +76,31 @@ const NavLinks = React.memo(({ navItems, currentPath, onClick, mobile }: { navIt
 ));
 NavLinks.displayName = "NavLinks";
 
+const DockNavExtra = React.memo(({ currentPath }: { currentPath: string }) => (
+  <Link to="/messages" aria-label="Chat" className="outline-none min-w-11 min-h-11 flex items-center justify-center rounded-2xl focus-visible:outline-2 focus-visible:outline-orange-500 focus-visible:outline-offset-1">
+    <DockItem
+      className={cn(
+        currentPath === "/messages" && "text-orange-600 dark:text-orange-400"
+      )}
+    >
+      <DockIcon>
+        <span
+          className={cn(
+            "flex h-full w-full items-center justify-center rounded-2xl transition-colors",
+            currentPath === "/messages"
+              ? "bg-orange-500/15 text-orange-600 dark:bg-orange-400/15 dark:text-orange-400"
+              : "bg-transparent text-gray-500 hover:bg-black/5 dark:text-gray-400 dark:hover:bg-white/10"
+          )}
+        >
+          <MessageSquare className="h-6 w-6" />
+        </span>
+      </DockIcon>
+      <DockLabel>Chat</DockLabel>
+    </DockItem>
+  </Link>
+));
+DockNavExtra.displayName = "DockNavExtra";
+
 const FooterSocialLinks = React.memo(() => (
   <TooltipProvider>
     <div className="flex items-center justify-center gap-3">
@@ -157,6 +182,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const currentPath = location.pathname;
 
+  const dockNavItems = useMemo(
+    () => navItems.filter((item) => item.path !== "/messages"),
+    [navItems]
+  );
+
   const handleSignOut = useCallback(async () => {
     await signOut();
     navigate("/");
@@ -168,7 +198,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       
       {userProfile?.user_type !== 'admin' && <AutoGpsTracker />}
       
-      <nav className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 shadow-sm backdrop-blur-xl">
+      <nav className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-[100] shadow-sm backdrop-blur-xl">
         <div className="container mx-auto px-4">
           <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center gap-4 sm:gap-8">
@@ -266,31 +296,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </main>
 
       <DockNav
-        items={navItems.filter((item) => item.path !== "/messages")}
+        items={dockNavItems}
         visible={mobileNavOpen}
-        extra={
-          <Link to="/messages" aria-label="Chat" className="outline-none min-w-11 min-h-11 flex items-center justify-center rounded-2xl focus-visible:outline-2 focus-visible:outline-orange-500 focus-visible:outline-offset-1">
-            <DockItem
-              className={cn(
-                currentPath === "/messages" && "text-orange-600 dark:text-orange-400"
-              )}
-            >
-              <DockIcon>
-                <span
-                  className={cn(
-                    "flex h-full w-full items-center justify-center rounded-2xl transition-colors",
-                    currentPath === "/messages"
-                      ? "bg-orange-500/15 text-orange-600 dark:bg-orange-400/15 dark:text-orange-400"
-                      : "bg-transparent text-gray-500 hover:bg-black/5 dark:text-gray-400 dark:hover:bg-white/10"
-                  )}
-                >
-                  <MessageSquare className="h-6 w-6" />
-                </span>
-              </DockIcon>
-              <DockLabel>Chat</DockLabel>
-            </DockItem>
-          </Link>
-        }
+        extra={<DockNavExtra currentPath={currentPath} />}
       />
 
       <footer className="hidden lg:block bg-white/80 dark:bg-gray-900/80 border-t border-gray-200 dark:border-gray-800 pt-6 sm:pt-8 pb-24 mt-auto backdrop-blur-xl">

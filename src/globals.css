@@ -355,9 +355,13 @@
 }
 
 /* Leaflet CSS fixes for Tailwind preflight */
+/* Contain Leaflet's internal z-index so maps never escape their container
+   and cover the nav bar, dock, or other page-level elements on scroll. */
 .leaflet-container {
   width: 100%;
   height: 100%;
+  isolation: isolate;
+  z-index: 0;
 }
 .leaflet-container img {
   max-width: none !important;
@@ -392,4 +396,9 @@
 }
 .leaflet-container .leaflet-control-zoom a:hover {
   background: hsl(var(--muted)) !important;
+}
+
+/* Hide the persistent CookieHub floating settings button */
+.ch2-icon.ch2-visible {
+  display: none !important;
 }

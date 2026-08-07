@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 interface ThemeContextType {
   isDark: boolean;
@@ -58,11 +58,13 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
-  const toggle = () => setIsDark(prev => !prev);
-  const setDark = (v: boolean) => setIsDark(v);
+  const toggle = useCallback(() => setIsDark(prev => !prev), []);
+  const setDark = useCallback((v: boolean) => setIsDark(v), []);
+
+  const value = useMemo(() => ({ isDark, toggle, setDark }), [isDark, toggle, setDark]);
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggle, setDark }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
