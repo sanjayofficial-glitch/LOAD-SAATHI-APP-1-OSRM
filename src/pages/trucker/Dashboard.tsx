@@ -27,6 +27,7 @@ import { useCreditScore, useCreditInsights } from '@/hooks/useCreditScore';
 import CreditScoreBadge from '@/components/CreditScoreBadge';
 import CreditScoreGauge from '@/components/CreditScoreGauge';
 import LiveMap from '@/components/LiveMap';
+import NearbyLoadsMap from '@/components/NearbyLoadsMap';
 import LogoMark from '@/components/LogoMark';
 import EmptyState from '@/components/EmptyState';
 import OnboardingChecklist from '@/components/OnboardingChecklist';
@@ -293,6 +294,11 @@ const TruckerDashboard = () => {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Nearby Loads Map */}
+      <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: '180ms' }}>
+        <NearbyLoadsMap />
       </div>
 
       {/* Action Cards */}

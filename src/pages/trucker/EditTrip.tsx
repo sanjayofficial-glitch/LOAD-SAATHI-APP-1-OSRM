@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { showSuccess, showError } from '@/utils/toast';  
 import { Truck, Calendar, IndianRupee, Loader2, ArrowLeft } from 'lucide-react';  
 import LocationSelector from '@/components/LocationSelector';  
+import VehicleSelect from '@/components/VehicleSelect';  
 import { geocodeCity } from '@/utils/geocode';  
 import { getRoute } from '@/utils/osrm';
 
@@ -93,6 +94,11 @@ const EditTrip = () => {
 
     if (isNaN(price) || price <= 0) {  
       showError('Please enter a valid price.');  
+      return;  
+    }  
+
+    if (!formData.vehicle_type.trim()) {  
+      showError('Please select a vehicle.');  
       return;  
     }  
 
@@ -225,11 +231,10 @@ const EditTrip = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">  
               <div className="space-y-2">  
                 <Label htmlFor="vehicleType" className="text-gray-700 dark:text-gray-200">Vehicle Type</Label>  
-                <Input  
+                <VehicleSelect  
                   id="vehicleType"  
                   value={formData.vehicle_type}  
-                  onChange={(e) => setFormData({...formData, vehicle_type: e.target.value})}  
-                  required  
+                  onChange={(vehicle_type) => setFormData({...formData, vehicle_type})}  
                 />  
               </div>  
 

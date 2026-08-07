@@ -22,9 +22,15 @@ const EMISSION_FACTORS: Record<VehicleEmissionClass, number> = {
 };
 
 export function getVehicleEmissionClass(vehicleType?: string | null): VehicleEmissionClass {
-  const normalized = vehicleType?.toLowerCase() ?? '';
-  if (/mini|pickup|tata ace|tempo|light/.test(normalized)) return 'light';
-  if (/14|16|17|medium|eicher/.test(normalized)) return 'medium';
+  const n = vehicleType?.toLowerCase() ?? '';
+  // Heavy: MHCVs, tippers, tractors, trailers and special-purpose trucks
+  if (/signa|prima|ultra|lpt|tipper|tractor|avtr|blazo|container|reefer|tanker|trailer|car carrier/.test(n)) return 'heavy';
+  // BharatBenz: small 10-16 tonne models are medium, everything else is heavy
+  if (/bharatbenz/.test(n)) return /1015|1215|1217|1415|1617/.test(n) ? 'medium' : 'heavy';
+  // Medium: 407s, Eichers, and other ILCV/MCV workhorses
+  if (/eicher|407|furio|loadking|ecomet|boss|partner|sartaj|samrat|shaktiman|trump|supreme|14|16|17/.test(n)) return 'medium';
+  // Light: LCVs, pickups and light vans
+  if (/mini|pick|ace|intra|jeeto|supro|veero|bolero|dost|saathi|jayo|kargo|minidor|d-max|hilux|v-cross|hi-lander|traveller|urbania|tempo|light/.test(n)) return 'light';
   return 'heavy';
 }
 

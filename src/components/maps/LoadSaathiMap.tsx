@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, useMapEvents, Marker, Circle, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -9,6 +9,7 @@ import RoutePolyline from './RoutePolyline';
 import MapLegend from './MapLegend';
 import ZoomControls, { fitPositionsToBounds } from './ZoomControls';
 import { useMapUserInteraction } from './useMapUserInteraction';
+import { myLocationIcon } from './icons';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/theme/theme';
 
@@ -64,6 +65,12 @@ export interface LoadSaathiMapProps {
   selectedLoadId?: string;
   onTruckClick?: (truck: TruckLocation) => void;
   onLoadClick?: (load: LoadLocation) => void;
+  /** Viewer's own position — renders a "you are here" marker and radius circle. */
+  userLocation?: {
+    lat: number;
+    lng: number;
+    radiusKm?: number;
+  };
   showRouteFor?: {
     originLat: number;
     originLng: number;
@@ -86,6 +93,7 @@ export default React.memo(function LoadSaathiMap({
   selectedTruckId,
   onTruckClick,
   onLoadClick,
+  userLocation,
   showRouteFor,
   className = '',
   height = '500px',
@@ -105,6 +113,9 @@ export default React.memo(function LoadSaathiMap({
   // selecting a truck doesn't re-zoom the map to fit the whole route).
   const allPositions = useMemo(() => {
     const positions: [number, number][] = [];
+    if (userLocation?.lat && userLocation?.lng) {
+      positions.push([userLocation.lat, userLocation.lng]);
+    }
     trucks.forEach((t) => {
       if (t.lat && t.lng) positions.push([t.lat, t.lng]);
     });
@@ -112,18 +123,42 @@ export default React.memo(function LoadSaathiMap({
       if (l.origin_lat && l.origin_lng) positions.push([l.origin_lat, l.origin_lng]);
     });
     return positions;
-  }, [trucks, loads]);
+  }, [trucks, loads, userLocation]);
 
   // Stable key for auto-fit: only the *set* of trucks/loads (ids), so moving
-  // markers don't trigger re-fits on every realtime update.
+  // markers don't trigger re-fits on every realtime update. The viewer's own
+  // position is included so the map centers on them once GPS resolves.
   const boundsKey = useMemo(() => {
     const truckIds = trucks.map((t) => t.driver_id).sort().join(',');
     const loadIds = loads.map((l) => l.id).sort().join(',');
-    return `${truckIds}|${loadIds}`;
-  }, [trucks, loads]);
+    const userPos = userLocation ? `${userLocation.lat},${userLocation.lng}` : '';
+    return `${truckIds}|${loadIds}|${userPos}`;
+  }, [trucks, loads, userLocation]);
 
   const markers = (
     <>
+      {userLocation && (
+        <>
+          {userLocation.radiusKm != null && userLocation.radiusKm > 0 && (
+            <Circle
+              center={[userLocation.lat, userLocation.lng]}
+              radius={userLocation.radiusKm * 1000}
+              pathOptions={{
+                color: '#2563eb',
+                weight: 1.5,
+                dashArray: '6 6',
+                fillColor: '#2563eb',
+                fillOpacity: 0.06,
+              }}
+            />
+          )}
+          <Marker position={[userLocation.lat, userLocation.lng]} icon={myLocationIcon}>
+            <Popup>
+              <p className="text-sm font-semibold">You are here</p>
+            </Popup>
+          </Marker>
+        </>
+      )}
       {trucks.map((truck) => (
         <TruckMarker
           key={truck.driver_id}

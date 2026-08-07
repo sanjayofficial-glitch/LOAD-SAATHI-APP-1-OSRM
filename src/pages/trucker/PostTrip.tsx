@@ -17,6 +17,7 @@ import { showSuccess, showError } from "@/utils/toast";
 import { PricePredictor } from "@/components/PricePredictor";
 import TemplateSelector from "@/components/TemplateSelector";
 import SaveAsTemplate from "@/components/SaveAsTemplate";
+import VehicleSelect from "@/components/VehicleSelect";
 import { posthog } from "@/utils/posthog";
 
 type LocationData = Record<string, Record<string, string[]>>;
@@ -71,6 +72,11 @@ const PostTrip = () => {
 
     if (isNaN(capacity) || capacity <= 0 || isNaN(price) || price <= 0) {
       showError('Please enter valid numeric values.');
+      return;
+    }
+
+    if (!formData.vehicle_type.trim()) {
+      showError('Please select a vehicle.');
       return;
     }
 
@@ -296,13 +302,14 @@ const PostTrip = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="vehicleType">Vehicle Type</Label>
-                <Input
+                <Label htmlFor="vehicleType">
+                  Vehicle Type <span className="text-red-500">*</span>
+                </Label>
+                <VehicleSelect
                   id="vehicleType"
-                  placeholder="e.g. 12 Wheeler"
                   value={formData.vehicle_type}
-                  onChange={(e) => setFormData({...formData, vehicle_type: e.target.value})}
-                  required
+                  onChange={(vehicle_type) => setFormData({ ...formData, vehicle_type })}
+                  placeholder="Select Vehicle"
                 />
               </div>
               {mode === 'full' && (

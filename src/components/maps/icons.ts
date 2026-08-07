@@ -47,6 +47,17 @@ export const selectedOnTripIcon = new L.DivIcon({
   iconAnchor: [22, 22],
 });
 
+// ── My location marker (blue dot, white ring) ────────────────────────────────
+export const myLocationIcon = new L.DivIcon({
+  className: 'my-location-marker',
+  html: `<div style="position:relative;width:22px;height:22px;">
+    <div style="position:absolute;inset:0;border-radius:50%;background:rgba(37,99,235,0.3);animation:pulse-ring 1.8s ease-out infinite;"></div>
+    <div style="position:absolute;inset:5px;border-radius:50%;background:#2563eb;border:2.5px solid #fff;box-shadow:0 0 10px rgba(37,99,235,0.8);"></div>
+  </div>`,
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
+});
+
 // ── Shipper/load marker (blue pulse) ─────────────────────────────────────────
 export const shipperIcon = new L.DivIcon({
   className: 'shipper-marker',
