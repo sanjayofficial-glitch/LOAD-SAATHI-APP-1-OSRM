@@ -212,6 +212,13 @@ const ShipperDashboard = () => {
     },
   ], [stats]);
 
+  const statCardLinks = useMemo(() => [
+    '/shipper/my-shipments?tab=active',
+    '/shipper/my-shipments?tab=incoming',
+    '/shipper/history',
+    '/shipper/history',
+  ], []);
+
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8 animate-fade-in">
       {/* Header */}
@@ -265,27 +272,29 @@ const ShipperDashboard = () => {
           </>
         ) : (
           statCards.map((card, i) => (
-            <Card key={card.title} className={`${card.border} shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up`} style={{ animationDelay: `${i * 80}ms` }}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{card.title}</CardTitle>
-                <div className={`${card.iconBg} p-2 rounded-lg`}>
-                  <card.icon className={`h-4 w-4 ${card.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <div className={`text-2xl sm:text-3xl font-black ${card.isCurrency ? card.color : 'text-gray-900 dark:text-white'}`}>
-                  {card.value}
-                </div>
-                {card.title !== 'Total Spent' && (
-                  <div className="mt-2 h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full rounded-full transition-all duration-700 ${card.title === 'Active Loads' ? 'bg-blue-500' : card.title === 'New Offers' ? 'bg-yellow-500' : 'bg-green-500'}`}
-                      style={{ width: `${Math.min(100, (card.title === 'Active Loads' ? stats.activeShipments : card.title === 'New Offers' ? stats.pendingRequests : stats.completedShipments) * 20)}%` }}
-                    />
+            <Link key={card.title} to={statCardLinks[i]} className="block group">
+              <Card className={`${card.border} shadow-sm group-hover:shadow-md group-hover:scale-[1.02] transition-all duration-200 animate-fade-in-up`} style={{ animationDelay: `${i * 80}ms` }}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+                  <CardTitle className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{card.title}</CardTitle>
+                  <div className={`${card.iconBg} p-2 rounded-lg`}>
+                    <card.icon className={`h-4 w-4 ${card.color}`} />
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                  <div className={`text-2xl sm:text-3xl font-black ${card.isCurrency ? card.color : 'text-gray-900 dark:text-white'}`}>
+                    {card.value}
+                  </div>
+                  {card.title !== 'Total Spent' && (
+                    <div className="mt-2 h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-700 ${card.title === 'Active Loads' ? 'bg-blue-500' : card.title === 'New Offers' ? 'bg-yellow-500' : 'bg-green-500'}`}
+                        style={{ width: `${Math.min(100, (card.title === 'Active Loads' ? stats.activeShipments : card.title === 'New Offers' ? stats.pendingRequests : stats.completedShipments) * 20)}%` }}
+                      />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </Link>
           ))
         )}
       </div>

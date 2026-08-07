@@ -255,6 +255,7 @@ const PostShipments = () => {
                     id="date"
                     type="date" 
                     className="pl-10"
+                    min={new Date().toISOString().split('T')[0]}
                     value={formData.departure_date} 
                     onChange={(e) => setFormData({...formData, departure_date: e.target.value})} 
                     required 
@@ -308,6 +309,13 @@ const PostShipments = () => {
                   weightTonnes={parseFloat(formData.weight_tonnes) || 0}
                   onApplyPrice={(price) => setFormData(prev => ({ ...prev, budget_per_tonne: String(price) }))}
                 />
+                {formData.weight_tonnes && formData.budget_per_tonne && (
+                  <div className="mt-2 p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800">
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      Estimated total: <span className="font-bold">₹{((parseFloat(formData.weight_tonnes) || 0) * (parseFloat(formData.budget_per_tonne) || 0)).toLocaleString('en-IN')}</span>
+                    </p>
+                  </div>
+                )}
               </div>
 
             {mode === 'full' && (

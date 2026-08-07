@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import { showError } from '@/utils/toast';
+import { supabase as supabaseAnon } from '@/integrations/supabase/client';
 
 interface ChatConversation {
   id: string;
@@ -121,6 +122,23 @@ const ChatList = () => {
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
+
+  useEffect(() => {
+    if (!userProfile?.id) return;
+
+    const channel = supabaseAnon
+      .channel('chatlist-updates')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'messages',
+      }, () => {
+        fetchConversations();
+      })
+      .subscribe();
+
+    return () => { supabaseAnon.removeChannel(channel); };
+  }, [userProfile?.id, fetchConversations]);
 
   const getRequestTitle = (conv: ChatConversation) => {
     return `${conv.other_user.full_name}`;

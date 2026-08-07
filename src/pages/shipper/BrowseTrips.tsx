@@ -69,6 +69,7 @@ const TripList = () => {
   });
 
   const [sortBy, setSortBy] = useState<'match' | 'price_asc' | 'price_desc' | 'date' | 'distance'>('match');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Fetch current shipper's pending shipment for match scoring
   const { data: myShipment } = useQuery({
@@ -349,6 +350,7 @@ const TripList = () => {
               </Button>
               <Button 
                 variant="outline" 
+                onClick={() => setShowFilters(!showFilters)}
                 className={`${hasActiveFilters ? 'border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950' : 'border-gray-200 dark:border-gray-700'}`}
               >
                 <Filter className="h-4 w-4 mr-2" />
@@ -358,55 +360,57 @@ const TripList = () => {
           </div>
 
           {/* Filter inputs collapsible */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Origin</Label>
-              <Input
-                placeholder="e.g. Mumbai"
-                value={filters.origin}
-                onChange={(e) => setFilters({ ...filters, origin: e.target.value })}
-                className="border-orange-100 dark:border-orange-800"
-              />
+          {showFilters && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mt-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Origin</Label>
+                <Input
+                  placeholder="e.g. Mumbai"
+                  value={filters.origin}
+                  onChange={(e) => setFilters({ ...filters, origin: e.target.value })}
+                  className="border-orange-100 dark:border-orange-800"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Destination</Label>
+                <Input
+                  placeholder="e.g. Delhi"
+                  value={filters.destination}
+                  onChange={(e) => setFilters({ ...filters, destination: e.target.value })}
+                  className="border-orange-100 dark:border-orange-800"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Min Capacity</Label>
+                <Input
+                  type="number"
+                  placeholder="e.g. 5"
+                  value={filters.minCapacity}
+                  onChange={(e) => setFilters({ ...filters, minCapacity: e.target.value })}
+                  className="border-orange-100 dark:border-orange-800"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Max Price</Label>
+                <Input
+                  type="number"
+                  placeholder="e.g. 2000"
+                  value={filters.maxPrice}
+                  onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+                  className="border-orange-100 dark:border-orange-800"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Vehicle Type</Label>
+                <Input
+                  placeholder="e.g. Open Truck, Container"
+                  value={filters.vehicle_type}
+                  onChange={(e) => setFilters({ ...filters, vehicle_type: e.target.value })}
+                  className="border-orange-100 dark:border-orange-800"
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Destination</Label>
-              <Input
-                placeholder="e.g. Delhi"
-                value={filters.destination}
-                onChange={(e) => setFilters({ ...filters, destination: e.target.value })}
-                className="border-orange-100 dark:border-orange-800"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Min Capacity</Label>
-              <Input
-                type="number"
-                placeholder="e.g. 5"
-                value={filters.minCapacity}
-                onChange={(e) => setFilters({ ...filters, minCapacity: e.target.value })}
-                className="border-orange-100 dark:border-orange-800"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Max Price</Label>
-              <Input
-                type="number"
-                placeholder="e.g. 2000"
-                value={filters.maxPrice}
-                onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                className="border-orange-100 dark:border-orange-800"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Vehicle Type</Label>
-              <Input
-                placeholder="e.g. Open Truck, Container"
-                value={filters.vehicle_type}
-                onChange={(e) => setFilters({ ...filters, vehicle_type: e.target.value })}
-                className="border-orange-100 dark:border-orange-800"
-              />
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 

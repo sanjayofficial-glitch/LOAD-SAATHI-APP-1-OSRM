@@ -1,7 +1,10 @@
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useAuth as useClerkAuth } from "@clerk/clerk-react";
+import { createClerkSupabaseClient } from "@/utils/supabaseClient";
+import { supabase as supabaseAnon } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -147,9 +150,53 @@ FooterSocialLinks.displayName = "FooterSocialLinks";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { userProfile, signOut } = useAuth();
+  const { getToken } = useClerkAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!userProfile?.id) return;
+
+    const fetchUnread = async () => {
+      const token = await getToken({ template: 'supabase' });
+      if (!token) return;
+      const supabase = createClerkSupabaseClient(token);
+      const { count } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('recipient_id', userProfile.id)
+        .eq('is_read', false);
+      setUnreadCount(count || 0);
+    };
+
+    fetchUnread();
+
+    const channel = supabaseAnon
+      .channel('layout-unread')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `recipient_id=eq.${userProfile.id}`,
+      }, () => {
+        setUnreadCount(prev => prev + 1);
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `recipient_id=eq.${userProfile.id}`,
+      }, (payload) => {
+        if (payload.new?.is_read) {
+          setUnreadCount(prev => Math.max(0, prev - 1));
+        }
+      })
+      .subscribe();
+
+    return () => { supabaseAnon.removeChannel(channel); };
+  }, [userProfile?.id]);
 
   const navItems = useMemo(() => {
     if (userProfile?.user_type === 'admin') {
@@ -216,8 +263,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <NotificationBell />
 
               <Link to="/messages">
-                <Button variant="ghost" size="icon" className="text-gray-600 dark:text-gray-400 h-9 w-9 sm:h-10 sm:w-10">
+                <Button variant="ghost" size="icon" className="relative text-gray-600 dark:text-gray-400 h-9 w-9 sm:h-10 sm:w-10">
                   <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-orange-600 text-[10px] font-bold text-white flex items-center justify-center shadow-sm">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
 

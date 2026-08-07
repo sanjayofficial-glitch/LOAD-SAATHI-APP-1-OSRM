@@ -255,6 +255,7 @@ const PostTrip = () => {
                     id="date"
                     type="date"
                     className="pl-10"
+                    min={new Date().toISOString().split('T')[0]}
                     value={formData.departure_date}
                     onChange={(e) => setFormData({...formData, departure_date: e.target.value})}
                     required
@@ -298,6 +299,13 @@ const PostTrip = () => {
                   vehicleType={formData.vehicle_type}
                   onApplyPrice={(price) => setFormData(prev => ({ ...prev, price_per_tonne: String(price) }))}
                 />
+                {formData.available_capacity_tonnes && formData.price_per_tonne && (
+                  <div className="mt-2 p-2.5 rounded-lg bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800">
+                    <p className="text-sm text-orange-700 dark:text-orange-300">
+                      Estimated total: <span className="font-bold">₹{((parseFloat(formData.available_capacity_tonnes) || 0) * (parseFloat(formData.price_per_tonne) || 0)).toLocaleString('en-IN')}</span>
+                    </p>
+                  </div>
+                )}
               </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">

@@ -206,6 +206,13 @@ const TruckerDashboard = () => {
     },
   ], [stats]);
 
+  const statCardLinks = useMemo(() => [
+    '/trucker/my-trips',
+    '/trucker/my-trips?tab=incoming',
+    '/trucker/history',
+    '/trucker/history',
+  ], []);
+
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8 animate-fade-in">
       {/* Header */}
@@ -268,32 +275,34 @@ const TruckerDashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {statCards.map((card, i) => (
-          <Card key={card.title} className={`${card.border} shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up`} style={{ animationDelay: `${i * 80}ms` }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
-              <CardTitle className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{card.title}</CardTitle>
-              <div className={`${card.iconBg} p-2 rounded-lg`}>
-                <card.icon className={`h-4 w-4 ${card.color}`} />
-              </div>
-            </CardHeader>
-            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-              {loading ? (
-                <Skeleton className="h-8 w-20" />
-              ) : (
-                <div className={`text-2xl sm:text-3xl font-black ${card.isCurrency ? card.color : 'text-gray-900 dark:text-white'}`}>
-                  {card.value}
+          <Link key={card.title} to={statCardLinks[i]} className="block group">
+            <Card className={`${card.border} shadow-sm group-hover:shadow-md group-hover:scale-[1.02] transition-all duration-200 animate-fade-in-up`} style={{ animationDelay: `${i * 80}ms` }}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+                <CardTitle className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{card.title}</CardTitle>
+                <div className={`${card.iconBg} p-2 rounded-lg`}>
+                  <card.icon className={`h-4 w-4 ${card.color}`} />
                 </div>
-              )}
-              {/* Mini progress bar for visual interest */}
-              {!loading && card.title !== 'Total Earnings' && (
-                <div className="mt-2 h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full rounded-full transition-all duration-700 ${card.title === 'Live Trips' ? 'bg-orange-500' : card.title === 'New Requests' ? 'bg-yellow-500' : 'bg-green-500'}`}
-                    style={{ width: `${Math.min(100, (card.title === 'Live Trips' ? stats.activeTrips : card.title === 'New Requests' ? stats.pendingRequests : stats.completedTrips) * 20)}%` }}
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                {loading ? (
+                  <Skeleton className="h-8 w-20" />
+                ) : (
+                  <div className={`text-2xl sm:text-3xl font-black ${card.isCurrency ? card.color : 'text-gray-900 dark:text-white'}`}>
+                    {card.value}
+                  </div>
+                )}
+                {/* Mini progress bar for visual interest */}
+                {!loading && card.title !== 'Total Earnings' && (
+                  <div className="mt-2 h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-700 ${card.title === 'Live Trips' ? 'bg-orange-500' : card.title === 'New Requests' ? 'bg-yellow-500' : 'bg-green-500'}`}
+                      style={{ width: `${Math.min(100, (card.title === 'Live Trips' ? stats.activeTrips : card.title === 'New Requests' ? stats.pendingRequests : stats.completedTrips) * 20)}%` }}
+                    />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
