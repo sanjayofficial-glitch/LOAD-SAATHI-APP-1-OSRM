@@ -586,7 +586,7 @@ export const articles: Record<string, BlogArticle> = {
   "truck-transport-cost-per-km-india-2026": {
     category: "Trucker Tips",
     title: "Truck Transport Cost per km in India 2026 (Mini, Medium & Container)",
-    coverImage: "/blog/og/freight-rates-east-india.svg",
+    coverImage: "/blog/og/truck-transport-cost-per-km-india-2026.svg",
     date: "August 8, 2026",
     readTime: "6 min read",
     author: "Sanjaya Sahu",
