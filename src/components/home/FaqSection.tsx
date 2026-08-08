@@ -8,6 +8,7 @@ const faqs = [
   { q: 'How does the credit score system work?', a: 'Every user on LoadSaathi has a digital freight credit score ranging from 300 to 900. The score is based on completion rate, on-time performance, bidirectional reviews, and tenure on the platform. Higher scores unlock better loads and preferential matching for truckers, and attract premium truckers for shippers.' },
   { q: 'Is my payment secure on LoadSaathi?', a: 'Yes. LoadSaathi uses an escrow-backed payment system. Funds are held securely and released in milestones as delivery progresses. Disputes are resolved through our built-in resolution system, and digital settlements mean faster, transparent payouts compared to traditional 30–60 day credit cycles.' },
   { q: 'Who can use LoadSaathi — shippers or truckers?', a: 'Both. Shippers (MSMEs, manufacturers, traders) can post loads and find truck space. Truckers (independent operators, fleet owners) can browse available loads, fill empty capacity, and earn on return trips. The platform is designed to eliminate empty kilometers for truckers and reduce freight costs for shippers.' },
+  { q: 'Is LoadSaathi a loan company?', a: 'No. LoadSaathi (loadsaathi.in) is a truck freight and logistics marketplace that connects shippers with truckers for PTL, FTL, and return loads across East India. It is not a loan, lending, or financial services company and has no connection to any "Loan Saathi" finance website.' },
 ] as const;
 
 const FaqSection = React.memo(() => (

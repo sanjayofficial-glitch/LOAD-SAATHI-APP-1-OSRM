@@ -109,6 +109,10 @@ const faqData = [
         q: "What insurance coverage is provided?",
         a: "All shipments on LoadSaathi are eligible for transit insurance coverage. Shippers can opt for additional insurance based on cargo value. Truckers are required to maintain valid insurance for their vehicles. Details are displayed clearly during the matching process.",
       },
+      {
+        q: "Is LoadSaathi a loan or finance company?",
+        a: "No. LoadSaathi (loadsaathi.in) is a truck freight and logistics marketplace that connects shippers with truckers for PTL, FTL, and return loads across East India. It is not a loan, lending, or financial services business, and it has no connection to any 'Loan Saathi' finance website.",
+      },
     ],
   },
   {

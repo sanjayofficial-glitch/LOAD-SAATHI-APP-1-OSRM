@@ -15,6 +15,9 @@ const WhatIsLoadSaathi = React.memo(() => (
         <p className="text-lg text-muted-foreground leading-relaxed">
           LoadSaathi is India&apos;s AI-powered shared freight marketplace that connects shippers and truckers for Partial Truckload (PTL) and Less Than Truckload (LTL) loads across East India. Built for MSMEs in Tier 2 and 3 cities, LoadSaathi eliminates empty return trips, reduces freight costs by up to 40%, and brings digital trust to an industry that has operated on phone calls and brokers for decades.
         </p>
+        <p className="text-sm text-muted-foreground mt-4">
+          LoadSaathi is a truck freight and logistics company (loadsaathi.in). It is <strong>not</strong> a loan, lending, or financial services business, and it has no connection to any &ldquo;Loan Saathi&rdquo; finance website.
+        </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {items.map((item, i) => (

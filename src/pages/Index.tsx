@@ -346,6 +346,14 @@ const Index = () => {
                 "@type": "Answer",
                 "text": "Both. Shippers (MSMEs, manufacturers, traders) can post loads and find truck space. Truckers (independent operators, fleet owners) can browse available loads, fill empty capacity, and earn on return trips."
               }
+            },
+            {
+              "@type": "Question",
+              "name": "Is LoadSaathi a loan company?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. LoadSaathi (loadsaathi.in) is a truck freight and logistics marketplace that connects shippers with truckers for PTL, FTL, and return loads. It is not a loan, lending, or financial services company and has no connection to any 'Loan Saathi' finance website."
+              }
             }
           ]
         }}
