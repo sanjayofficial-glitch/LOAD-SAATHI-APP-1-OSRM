@@ -12,6 +12,7 @@ import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import { showError } from '@/utils/toast';
 import { supabase as supabaseAnon } from '@/integrations/supabase/client';
+import { authorizeRealtime } from '@/utils/realtime';
 
 interface ChatConversation {
   id: string;
@@ -126,19 +127,32 @@ const ChatList = () => {
   useEffect(() => {
     if (!userProfile?.id) return;
 
-    const channel = supabaseAnon
-      .channel('chatlist-updates')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'messages',
-      }, () => {
-        fetchConversations();
-      })
-      .subscribe();
+    let cancelled = false;
+    let channel: ReturnType<typeof supabaseAnon.channel> | null = null;
 
-    return () => { supabaseAnon.removeChannel(channel); };
-  }, [userProfile?.id, fetchConversations]);
+    void (async () => {
+      // Authorize the shared realtime socket with the Clerk JWT — RLS on
+      // `messages` is `TO authenticated`, anon is denied.
+      await authorizeRealtime(getToken);
+      if (cancelled) return;
+
+      channel = supabaseAnon
+        .channel('chatlist-updates')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+        }, () => {
+          fetchConversations();
+        })
+        .subscribe();
+    })();
+
+    return () => {
+      cancelled = true;
+      if (channel) supabaseAnon.removeChannel(channel);
+    };
+  }, [userProfile?.id, fetchConversations, getToken]);
 
   const getRequestTitle = (conv: ChatConversation) => {
     return `${conv.other_user.full_name}`;

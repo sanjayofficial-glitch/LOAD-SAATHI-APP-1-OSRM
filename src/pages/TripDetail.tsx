@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { supabase } from '@/integrations/supabase/client';
+import { authorizeRealtime } from '@/utils/realtime';
 import { Trip } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,39 +113,51 @@ const TripDetail = () => {
   useEffect(() => {
     if (!trip || trip.status !== 'in_transit' || !trip.trucker_id) return;
 
-    const channel = supabase
-      .channel(`driver-loc-${trip.trucker_id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'driver_locations',
-          filter: `driver_id=eq.${trip.trucker_id}`,
-        },
-        (payload) => {
-          const loc = payload.new as { lat: number; lng: number; heading: number | null; speed: number | null; updated_at: string };
-          setTruckerLocation({
-            id: `track-${trip.trucker_id}`,
-            driverId: trip.trucker_id,
-            driverName: trip.trucker?.full_name || 'Trucker',
-            lat: loc.lat,
-            lng: loc.lng,
-            heading: loc.heading,
-            speed: loc.speed,
-            tripId: trip.id,
-            originCity: trip.origin_city,
-            destinationCity: trip.destination_city,
-            lastUpdated: loc.updated_at,
-          });
-        }
-      )
-      .subscribe();
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    void (async () => {
+      // RLS on driver_locations is `TO authenticated` — the anon realtime
+      // socket receives nothing (verified live: 401 permission denied). Set
+      // the Clerk JWT before subscribing so events flow for this driver.
+      await authorizeRealtime(() => getToken({ template: 'supabase' }));
+      if (cancelled) return;
+
+      channel = supabase
+        .channel(`driver-loc-${trip.trucker_id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'driver_locations',
+            filter: `driver_id=eq.${trip.trucker_id}`,
+          },
+          (payload) => {
+            const loc = payload.new as { lat: number; lng: number; heading: number | null; speed: number | null; updated_at: string };
+            setTruckerLocation({
+              id: `track-${trip.trucker_id}`,
+              driverId: trip.trucker_id,
+              driverName: trip.trucker?.full_name || 'Trucker',
+              lat: loc.lat,
+              lng: loc.lng,
+              heading: loc.heading,
+              speed: loc.speed,
+              tripId: trip.id,
+              originCity: trip.origin_city,
+              destinationCity: trip.destination_city,
+              lastUpdated: loc.updated_at,
+            });
+          }
+        )
+        .subscribe();
+    })();
 
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
     };
-  }, [trip?.status, trip?.trucker_id, trip?.id, trip]);
+  }, [trip?.status, trip?.trucker_id, trip?.id, trip, getToken]);
 
   const handleRequest = async () => {
     if (!userProfile) return navigate('/login');

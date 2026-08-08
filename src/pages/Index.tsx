@@ -75,7 +75,7 @@ const Index = () => {
           }
           const script = document.createElement('script');
           script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-          script.integrity = 'sha256-BZoSyD7WzSm13Yl6VvN0VYmRv2DqS0X3aJl8Q3K0t3Y=';
+          script.integrity = 'sha256-knS7zsjZYWhibHMrXTHHdaqM+36qBZm+wMF1kIosHOI=';
           script.crossOrigin = 'anonymous';
           script.onload = () => resolve((window as any).THREE);
           script.onerror = () => {

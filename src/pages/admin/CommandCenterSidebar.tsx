@@ -57,13 +57,13 @@ function QuickStatCard({
   const c = colorMap[color] ?? colorMap.orange ?? { bg: 'bg-orange-500/10', text: 'text-orange-400', dot: 'bg-orange-500' };
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 flex flex-col gap-1">
+    <div className="bg-slate-800/70 border border-slate-700/70 rounded-lg p-3 flex flex-col gap-1">
       <div className="flex items-center justify-between">
         <Icon className={`h-3.5 w-3.5 ${c.text}`} />
         <div className={`h-1.5 w-1.5 rounded-full ${c.dot} animate-pulse`} />
       </div>
-      <p className="text-lg font-mono font-bold text-slate-100">{value}</p>
-      <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">{label}</p>
+      <p className="text-xl font-mono font-bold text-white">{value}</p>
+      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{label}</p>
     </div>
   );
 }
@@ -89,15 +89,15 @@ function PanelSection({
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/50 shrink-0">
+    <div className="rounded-xl border border-slate-700/70 bg-slate-900/70 overflow-hidden shrink-0">
+      <div className="flex items-center justify-between px-3 py-2.5 border-b border-slate-700/60 shrink-0">
         <div className="flex items-center gap-2">
           <Icon className={`h-3.5 w-3.5 ${colorMap[color] || 'text-slate-400'}`} />
-          <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">{title}</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-200">{title}</h2>
         </div>
         {badge}
       </div>
-      <div className="p-4 overflow-y-auto min-h-0">
+      <div className="p-3">
         {children}
       </div>
     </div>
@@ -117,80 +117,74 @@ export default function CommandCenterSidebar({
   const onTripCount = locations.filter(l => l.trip_id).length;
 
   return (
-    <div className="h-full flex flex-col bg-slate-950/95 backdrop-blur-xl border-l border-slate-800 overflow-hidden">
+    <div className="h-full flex flex-col bg-slate-950/95 backdrop-blur-xl border-l border-slate-700/60 overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-800 shrink-0">
+      <div className="px-4 py-3 border-b border-slate-700/60 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="bg-orange-600 p-1.5 rounded-lg">
               <Navigation className="h-3.5 w-3.5 text-white" />
             </div>
             <div>
-              <h1 className="text-[11px] font-black tracking-tight uppercase text-slate-200">Command Center</h1>
+              <h1 className="text-[11px] font-black tracking-tight uppercase text-white">Command Center</h1>
               <div className="flex items-center gap-1.5">
                 <span className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">System Live</span>
+                <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">System Live</span>
               </div>
             </div>
           </div>
-          <Badge variant="outline" className="border-green-800 bg-green-900/20 text-green-400 font-mono text-[9px] px-2 py-0.5">
+          <Badge variant="outline" className="border-green-700 bg-green-900/30 text-green-400 font-mono text-[9px] px-2 py-0.5">
             <Activity className="h-2.5 w-2.5 mr-1" />
             {onlineCount} LIVE
           </Badge>
         </div>
       </div>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
-        {/* Quick Stats */}
-        <div className="p-4 pb-2">
-          <div className="grid grid-cols-2 gap-2">
-            <QuickStatCard icon={Navigation} label="Online" value={onlineCount} color="orange" />
-            <QuickStatCard icon={Clock} label="On Trip" value={onTripCount} color="green" />
-            <QuickStatCard icon={Package} label="Loads" value={shipments.length} color="blue" />
-            <QuickStatCard icon={Truck} label="Trips" value={trips.length} color="purple" />
+      {/* Scrollable content — every section lives in its own contained card */}
+      <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div className="p-3 space-y-2.5">
+          {/* Quick Stats */}
+          <div className="rounded-xl border border-slate-700/70 bg-slate-900/70 p-3 shrink-0">
+            <div className="grid grid-cols-2 gap-2">
+              <QuickStatCard icon={Navigation} label="Online" value={onlineCount} color="orange" />
+              <QuickStatCard icon={Clock} label="On Trip" value={onTripCount} color="green" />
+              <QuickStatCard icon={Package} label="Loads" value={shipments.length} color="blue" />
+              <QuickStatCard icon={Truck} label="Trips" value={trips.length} color="purple" />
+            </div>
           </div>
+
+          {/* System Metrics */}
+          <PanelSection icon={BarChart3} title="System" color="blue">
+            <SystemMetricsPanel metrics={metrics} />
+          </PanelSection>
+
+          {/* Business Metrics */}
+          <PanelSection icon={Briefcase} title="Business" color="purple">
+            <BusinessMetricsPanel metrics={businessMetrics} />
+          </PanelSection>
+
+          {/* Live Event Feed */}
+          <PanelSection icon={Terminal} title="Console" color="green">
+            <LiveEventFeed events={events} />
+          </PanelSection>
+
+          {/* User Activity */}
+          <PanelSection
+            icon={Activity}
+            title="Users"
+            color="orange"
+            badge={
+              <Badge variant="outline" className="border-slate-600 bg-slate-800/70 text-slate-300 font-mono text-[9px] px-1.5 py-0">
+                {users.length}
+              </Badge>
+            }
+          >
+            <UserActivityTable users={users} />
+          </PanelSection>
+
+          {/* Bottom spacer */}
+          <div className="h-2" />
         </div>
-
-        <div className="h-px bg-slate-800/50 mx-4" />
-
-        {/* System Metrics */}
-        <PanelSection icon={BarChart3} title="System" color="blue">
-          <SystemMetricsPanel metrics={metrics} />
-        </PanelSection>
-
-        <div className="h-px bg-slate-800/50 mx-4" />
-
-        {/* Business Metrics */}
-        <PanelSection icon={Briefcase} title="Business" color="purple">
-          <BusinessMetricsPanel metrics={businessMetrics} />
-        </PanelSection>
-
-        <div className="h-px bg-slate-800/50 mx-4" />
-
-        {/* Live Event Feed */}
-        <PanelSection icon={Terminal} title="Console" color="green">
-          <LiveEventFeed events={events} />
-        </PanelSection>
-
-        <div className="h-px bg-slate-800/50 mx-4" />
-
-        {/* User Activity */}
-        <PanelSection
-          icon={Activity}
-          title="Users"
-          color="orange"
-          badge={
-            <Badge variant="outline" className="border-slate-700 bg-slate-800/50 text-slate-400 font-mono text-[9px] px-1.5 py-0">
-              {users.length}
-            </Badge>
-          }
-        >
-          <UserActivityTable users={users} />
-        </PanelSection>
-
-        {/* Bottom spacer */}
-        <div className="h-4" />
       </div>
     </div>
   );

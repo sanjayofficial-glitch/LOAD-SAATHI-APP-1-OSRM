@@ -24,35 +24,35 @@ interface UserActivityTableProps {
 const UserActivityTable: React.FC<UserActivityTableProps> = ({ users }) => {
   return (
     <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1 w-full rounded-md border border-slate-800 bg-slate-900/30">
+      <ScrollArea className="flex-1 w-full rounded-md border border-slate-700/60 bg-slate-900/30">
         <Table>
-          <TableHeader className="bg-slate-900/50 sticky top-0 z-10">
-            <TableRow className="border-slate-800 hover:bg-transparent">
-              <TableHead className="text-[10px] uppercase font-black text-slate-500 h-10">User</TableHead>
-              <TableHead className="text-[10px] uppercase font-black text-slate-500 h-10">Role</TableHead>
-              <TableHead className="text-[10px] uppercase font-black text-slate-500 h-10">Activity</TableHead>
+          <TableHeader className="bg-slate-900/70 sticky top-0 z-10">
+            <TableRow className="border-slate-700/60 hover:bg-transparent">
+              <TableHead className="text-[10px] uppercase font-black text-slate-400 h-10">User</TableHead>
+              <TableHead className="text-[10px] uppercase font-black text-slate-400 h-10">Role</TableHead>
+              <TableHead className="text-[10px] uppercase font-black text-slate-400 h-10">Activity</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center py-8 text-slate-500 text-xs">
+                <TableCell colSpan={3} className="text-center py-8 text-slate-400 text-xs">
                   No active users detected
                 </TableCell>
               </TableRow>
             ) : (
               users.map((user) => (
-                <TableRow key={user.id} className="border-slate-800 hover:bg-slate-800/50 transition-colors">
+                <TableRow key={user.id} className="border-slate-700/60 hover:bg-slate-800/50 transition-colors">
                   <TableCell className="py-3">
                     <div className="flex items-center gap-2">
                       <div className="h-7 w-7 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
-                        <User className="h-3.5 w-3.5 text-slate-400" />
+                        <User className="h-3.5 w-3.5 text-slate-300" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-200 truncate max-w-[120px]">
+                        <p className="text-xs font-bold text-white truncate max-w-[120px]">
                           {user.full_name || 'Anonymous'}
                         </p>
-                        <p className="text-[9px] text-slate-500 font-mono truncate">
+                        <p className="text-[9px] text-slate-400 font-mono truncate">
                           {user.id.split('-')[0]}...
                         </p>
                       </div>
@@ -70,7 +70,7 @@ const UserActivityTable: React.FC<UserActivityTableProps> = ({ users }) => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1.5 text-slate-400">
+                    <div className="flex items-center gap-1.5 text-slate-300">
                       <Clock className="h-3 w-3" />
                       <span className="text-[10px] font-mono">
                         {new Date(user.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

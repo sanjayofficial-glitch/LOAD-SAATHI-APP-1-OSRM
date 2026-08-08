@@ -1,15 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Menu, LayoutDashboard } from "lucide-react";
+import {
+  ArrowRight,
+  Menu,
+  LayoutDashboard,
+  Home,
+  Sparkles,
+  Tag,
+  Phone,
+  BookOpen,
+  Calculator,
+  Info,
+  HelpCircle,
+  Newspaper,
+  Images,
+} from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import OfflineBanner from "./OfflineBanner";
 import { Button } from "./ui/button";
 import LogoMark from "./LogoMark";
 import MobileMenu from "./MobileMenu";
-import DockNav, { publicBottomNavItems } from "./DockNav";
+import MobileTabBar, { type MobileTabItem } from "./MobileTabBar";
+import type { BottomNavItem } from "./DockNav";
+
+// Desktop-only animated dock. Lazy so framer-motion (~130KB) is never
+// downloaded on phones — the lightweight MobileTabBar handles mobile nav.
+const DockNav = lazy(() => import("./DockNav"));
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./ui/tooltip";
 import { socialLinks } from "@/data/socialLinks";
 import { useAuth } from "@/contexts/AuthContext";
+
+const publicBottomNavItems: BottomNavItem[] = [
+  { label: "Home", path: "/", icon: <Home className="h-5 w-5" /> },
+  { label: "Features", path: "/features", icon: <Sparkles className="h-5 w-5" /> },
+  { label: "How It Works", path: "/how-it-works", icon: <BookOpen className="h-5 w-5" /> },
+  { label: "Pricing", path: "/pricing", icon: <Tag className="h-5 w-5" /> },
+  { label: "Contact", path: "/contact", icon: <Phone className="h-5 w-5" /> },
+];
+
+// Mobile-only bottom bar: 4 quick tabs + a hamburger "Menu" button that opens
+// the bottom sheet with the remaining pages (no horizontal scrolling).
+const publicMobileTabs: MobileTabItem[] = [
+  { label: "Home", path: "/", icon: <Home className="h-5 w-5" /> },
+  { label: "Features", path: "/features", icon: <Sparkles className="h-5 w-5" /> },
+  { label: "Pricing", path: "/pricing", icon: <Tag className="h-5 w-5" /> },
+  { label: "Contact", path: "/contact", icon: <Phone className="h-5 w-5" /> },
+];
+
+const publicMobileMenuItems: MobileTabItem[] = [
+  { label: "How It Works", path: "/how-it-works", icon: <BookOpen className="h-5 w-5" /> },
+  { label: "Fare Calculator", path: "/fare-calculator", icon: <Calculator className="h-5 w-5" /> },
+  { label: "About", path: "/about", icon: <Info className="h-5 w-5" /> },
+  { label: "FAQ", path: "/faq", icon: <HelpCircle className="h-5 w-5" /> },
+  { label: "Blog", path: "/blog", icon: <Newspaper className="h-5 w-5" /> },
+  { label: "Gallery", path: "/gallery", icon: <Images className="h-5 w-5" /> },
+];
 
 const footerLinks = {
   Platform: [
@@ -46,6 +91,20 @@ const footerLinks = {
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { userProfile } = useAuth();
+  // Whether we're on a desktop viewport. Initialized synchronously from the
+  // media query so phones never render (and never download) the animated dock
+  // — useIsMobile() starts as falsy until its effect runs, which would load
+  // the dock's lazy chunk on mobile. Listens for changes so rotating a phone
+  // to landscape still swaps the dock in/out.
+  const [isDesktopView, setIsDesktopView] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+  );
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 768px)");
+    const onChange = (e: MediaQueryListEvent) => setIsDesktopView(e.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
   const dashboardPath = userProfile?.user_type === 'admin'
     ? '/admin/dashboard'
@@ -57,8 +116,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       <OfflineBanner />
-      <nav className="fixed top-0 w-full z-[100] bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 h-16">
-        <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-full">
+      <nav className="fixed top-0 w-full z-[100] bg-background/70 dark:bg-[#050816]/70 backdrop-blur-xl border-b border-border dark:border-white/10 pt-[env(safe-area-inset-top)]">
+        <div className="flex justify-between items-center w-full px-6 sm:px-12 max-w-[1440px] mx-auto h-16">
           <Link to="/" className="flex items-center gap-2">
             <LogoMark size="h-11 w-11" />
             <span className="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-400">LoadSaathi</span>
@@ -85,7 +144,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-lg text-foreground hover:bg-accent transition-all"
+              className="md:hidden p-2.5 rounded-lg text-foreground hover:bg-accent transition-all min-h-11 min-w-11 flex items-center justify-center"
               aria-label="Open menu"
             >
               <Menu className="h-6 w-6" />
@@ -93,7 +152,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
       </nav>
-      <main className="pt-16 min-h-screen pb-24">
+      <main className="pt-[calc(4rem+env(safe-area-inset-top))] min-h-screen pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-24">
         {children}
       </main>
       <footer className="bg-muted dark:bg-[#0B1220] border-t border-border dark:border-white/5 w-full pt-16 pb-24">
@@ -152,7 +211,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         </div>
       </footer>
       <MobileMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
-      <DockNav items={publicBottomNavItems} />
+      {isDesktopView && <DockNav items={publicBottomNavItems} className="hidden md:flex" />}
+      <MobileTabBar tabs={publicMobileTabs} menuItems={publicMobileMenuItems} />
     </div>
   );
 }

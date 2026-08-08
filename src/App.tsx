@@ -7,7 +7,6 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Skeleton } from "./components/ui/skeleton";
-import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { ThemeProvider, useTheme } from "@/theme/theme";
@@ -16,6 +15,9 @@ import { GoogleAnalyticsTracker } from "./components/GoogleAnalytics";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
 
+// Layout (authenticated shell) is lazy so public pages never download its
+// heavy dependencies (framer-motion dock, NotificationBell, supabase client).
+const Layout = lazy(() => import("./components/Layout"));
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
@@ -127,7 +129,7 @@ function App() {
               <ScrollToTop />
               <GoogleAnalyticsTracker />
               <HelmetProvider>
-              <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Suspense fallback={<Skeleton className="h-dvh w-full" />}>
                 <Routes>
                   {/* Public routes with individual error boundaries */}
                   <Route path="/login" element={<ErrorBoundary><Login /></ErrorBoundary>} />

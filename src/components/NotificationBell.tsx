@@ -18,6 +18,7 @@ import { showSuccess } from '@/utils/toast';
 // Base supabase client (anon key) for Realtime subscriptions only.
 // Realtime uses RLS policies to filter events per user_id — no auth header needed.
 import { supabase as baseSupabase } from '@/integrations/supabase/client';
+import { authorizeRealtime } from '@/utils/realtime';
 
 interface Notification {
   id: string;
@@ -62,33 +63,43 @@ const NotificationBell = React.memo(() => {
 
   useEffect(() => {
     if (!userProfile?.id) return;
-    
+
+    let cancelled = false;
+    let channel: ReturnType<typeof baseSupabase.channel> | null = null;
+
     fetchNotifications();
 
-    // Use base supabase client for Realtime subscription (RLS still applies)
-    const channel = baseSupabase
-      .channel(`notifications:${userProfile.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${userProfile.id}`,
-        },
-        (payload) => {
-          const newNotif = payload.new as Notification;
-          setNotifications(prev => [newNotif, ...prev].slice(0, 10));
-          setUnreadCount(prev => prev + 1);
-          showSuccess(newNotif.message); // Show popup toast
-        }
-      )
-      .subscribe();
+    void (async () => {
+      // Authorize the shared realtime socket with the Clerk JWT — RLS on
+      // `notifications` is `TO authenticated`, anon is denied.
+      await authorizeRealtime(getToken);
+      if (cancelled) return;
+
+      channel = baseSupabase
+        .channel(`notifications:${userProfile.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userProfile.id}`,
+          },
+          (payload) => {
+            const newNotif = payload.new as Notification;
+            setNotifications(prev => [newNotif, ...prev].slice(0, 10));
+            setUnreadCount(prev => prev + 1);
+            showSuccess(newNotif.message); // Show popup toast
+          }
+        )
+        .subscribe();
+    })();
 
     return () => {
-      baseSupabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) baseSupabase.removeChannel(channel);
     };
-  }, [userProfile?.id, fetchNotifications]);
+  }, [userProfile?.id, fetchNotifications, getToken]);
 
   const markAllAsRead = async () => {
     if (unreadCount === 0 || !userProfile?.id) return;

@@ -2,13 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Apply saved/OS theme BEFORE first paint to prevent dark-mode flash of white -->
+    <!-- Apply saved/OS theme BEFORE first paint to prevent dark-mode flash of white.
+         Supports the 3-mode preference: 'light' | 'dark' | 'system' (default). -->
     <script>
       (function () {
         try {
           var stored = null;
           try { stored = localStorage.getItem('loadsaathi-theme'); } catch (e) { /* storage may be blocked */ }
-          var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var dark = stored === 'dark' || ((stored === null || stored === 'system') && systemDark);
           var root = document.documentElement;
           root.setAttribute('data-theme', dark ? 'dark' : 'light');
           if (dark) root.classList.add('dark');
@@ -305,42 +307,57 @@
          Single load path (no duplicate gtag.js) with a conditional shim.
          Clarity is loaded by the GTM container (ref=gtm) — a second inline
          Clarity tracker created a double-instance race that threw
-         "Cannot read properties of undefined (reading 'unshift')". -->
+         "Cannot read properties of undefined (reading 'unshift')".
+
+         GA4 + GTM + Clarity are held back until the first user interaction
+         (or idle, at most 10s after load) so their heavy main-thread work
+         never blocks first paint, LCP, or TBT on slow mobile connections.
+         CookieHub (GDPR consent) still loads right after the load event. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
       window.addEventListener('load', function() {
-        // Google Analytics 4 — the real library owns window.gtag and drains the queue
-        var ga = document.createElement('script'); ga.async = true;
-        ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-GEFWPQNHT6';
-        document.getElementsByTagName('head')[0].appendChild(ga);
-        window.gtag('js', new Date());
-        window.gtag('config', 'G-GEFWPQNHT6');
-        // GTM — container also manages Clarity (xv8eh2c0e3) and other tags
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-WTBG3QKC');
         // CookieHub — loaded after first paint (was async in <head>)
         var ch = document.createElement('script'); ch.async = true;
         ch.src = 'https://cdn.cookiehub.eu/c2/ca96bc89.js';
         ch.onload = function () {
-          if (window.cookiehub) {
-            window.cookiehub.load({});
-            // Hide settings button after consent is given
-            window.addEventListener('cookiehub_onAllowAll', function() {
-              var icon = document.querySelector('.ch2-icon');
-              if (icon) icon.style.display = 'none';
-            });
-            // Also hide if consent was already given (returning visitor)
-            if (window.cookiehub.hasConsented && window.cookiehub.hasConsented()) {
-              var icon = document.querySelector('.ch2-icon');
-              if (icon) icon.style.display = 'none';
+          try {
+            if (window.cookiehub) {
+              window.cookiehub.load({});
             }
+          } catch (e) {
+            /* consent widget errors must never break the page */
           }
         };
         document.getElementsByTagName('head')[0].appendChild(ch);
+
+        var tagsLoaded = false;
+        function loadAnalyticsTags() {
+          if (tagsLoaded) return;
+          tagsLoaded = true;
+          // Google Analytics 4 — the real library owns window.gtag and drains the queue
+          var ga = document.createElement('script'); ga.async = true;
+          ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-GEFWPQNHT6';
+          document.getElementsByTagName('head')[0].appendChild(ga);
+          window.gtag('js', new Date());
+          window.gtag('config', 'G-GEFWPQNHT6');
+          // GTM — container also manages Clarity (xv8eh2c0e3) and other tags
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-WTBG3QKC');
+        }
+        // Real users always interact within a few seconds — analytics stays timely.
+        ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function (ev) {
+          window.addEventListener(ev, loadAnalyticsTags, { once: true, passive: true, capture: true });
+        });
+        // Fallback: load during idle, at most 10s after the load event.
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(loadAnalyticsTags, { timeout: 10000 });
+        } else {
+          setTimeout(loadAnalyticsTags, 10000);
+        }
       });
     </script>
 </html>

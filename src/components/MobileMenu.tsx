@@ -25,7 +25,7 @@ const MobileMenu = React.memo(({ open, onClose }: MobileMenuProps) => {
       <button
         type="button"
         onClick={onClose}
-        className="absolute top-6 right-6 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+        className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
         aria-label="Close menu"
       >
         <X className="h-6 w-6" />

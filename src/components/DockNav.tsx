@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Sparkles, BookOpen, Tag, Phone } from "lucide-react";
 import { Dock, DockIcon, DockItem, DockLabel } from "@/components/ui/dock";
 import { cn } from "@/lib/utils";
 
@@ -16,14 +15,6 @@ interface DockNavProps {
   extra?: React.ReactNode;
   className?: string;
 }
-
-export const publicBottomNavItems: BottomNavItem[] = [
-  { label: "Home", path: "/", icon: <Home className="h-5 w-5" /> },
-  { label: "Features", path: "/features", icon: <Sparkles className="h-5 w-5" /> },
-  { label: "How It Works", path: "/how-it-works", icon: <BookOpen className="h-5 w-5" /> },
-  { label: "Pricing", path: "/pricing", icon: <Tag className="h-5 w-5" /> },
-  { label: "Contact", path: "/contact", icon: <Phone className="h-5 w-5" /> },
-];
 
 const DockNav = React.memo(({ items, visible, extra, className }: DockNavProps) => {
   const location = useLocation();

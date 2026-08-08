@@ -44,7 +44,7 @@ export const TILE_LAYERS: TileLayerOption[] = [
 ];
 
 export function getTileLayer(id: TileLayerId): TileLayerOption {
-  return TILE_LAYERS.find((l) => l.id === id) || TILE_LAYERS[0];
+  return TILE_LAYERS.find((l) => l.id === id) ?? TILE_LAYERS[0]!;
 }
 
 interface TileLayerSwitcherProps {
@@ -99,7 +99,7 @@ export default React.memo(function TileLayerSwitcher({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 shadow-xl shadow-black/10 dark:shadow-black/40 backdrop-blur-md text-gray-700 dark:text-gray-200 hover:bg-orange-50 dark:hover:bg-orange-950/40 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+          className="w-11 h-11 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 shadow-xl shadow-black/10 dark:shadow-black/40 backdrop-blur-md text-gray-700 dark:text-gray-200 hover:bg-orange-50 dark:hover:bg-orange-950/40 hover:text-orange-600 dark:hover:text-orange-400 transition-colors active:scale-95"
           aria-label="Change map style"
           title="Change map style"
         >

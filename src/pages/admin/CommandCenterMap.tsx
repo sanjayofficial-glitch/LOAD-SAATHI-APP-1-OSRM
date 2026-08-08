@@ -6,6 +6,7 @@ import { Loader2, Navigation } from 'lucide-react';
 import MapControls, { type MapFilters } from '@/components/MapControls';
 import ZoomControls, { fitPositionsToBounds } from '@/components/maps/ZoomControls';
 import { useMapUserInteraction } from '@/components/maps/useMapUserInteraction';
+import type { LoadLocation } from '@/components/maps/LoadMarker';
 import { cn } from '@/lib/utils';
 
 // ── Leaflet icon fix for Vite ────────────────────────────────────────────────
@@ -55,6 +56,19 @@ const onTripIcon = new L.DivIcon({
 
 const originIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/1048/1048313.png', iconSize: [20, 20], iconAnchor: [10, 10] });
 const destIcon = new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3233/3233005.png', iconSize: [20, 20], iconAnchor: [10, 20] });
+
+// Business / load pin — a shipper's posted load placed at their address
+const loadIcon = new L.DivIcon({
+  className: 'load-marker',
+  html: `<div style="position:relative;width:28px;height:28px;">
+    <div style="position:absolute;inset:0;border-radius:8px;background:rgba(59,130,246,0.25);"></div>
+    <div style="position:absolute;inset:3px;border-radius:6px;background:#2563eb;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(59,130,246,0.55);border:1px solid rgba(255,255,255,0.35);">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    </div>
+  </div>`,
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+});
 
 // ── City coordinate cache (Odisha/East India focus) ─────────────────────────
 const coordCache: Record<string, [number, number]> = {
@@ -152,6 +166,7 @@ interface CommandCenterMapProps {
     status: string;
     shipper?: { full_name: string };
   }>;
+  loads?: LoadLocation[];
   loading?: boolean;
 }
 
@@ -237,6 +252,7 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
   locations,
   trips,
   shipments,
+  loads = [],
   loading = false,
 }) => {
   const [filters, setFilters] = useState<MapFilters>({
@@ -312,6 +328,11 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
   // All visible points (for the "fit all" zoom button)
   const allPositions = useMemo<[number, number][]>(() => {
     const pts: [number, number][] = filteredLocations.map((loc) => [loc.lat, loc.lng]);
+    if (filters.showShippers) {
+      loads.forEach((l) => {
+        if (l.origin_lat != null && l.origin_lng != null) pts.push([l.origin_lat, l.origin_lng]);
+      });
+    }
     if (filters.showRoutes) {
       resolvedTrips.forEach((t) => {
         pts.push(t.origin);
@@ -323,7 +344,7 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
       });
     }
     return pts;
-  }, [filteredLocations, resolvedTrips, resolvedShipments, filters.showRoutes]);
+  }, [filteredLocations, resolvedTrips, resolvedShipments, loads, filters.showRoutes, filters.showShippers]);
 
   const fitBoundsKey = useMemo(
     () => filteredLocations.map((l) => l.driver_id).sort().join(','),
@@ -351,7 +372,7 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
         center={[22.5, 84.0]}
         zoom={7}
         className="absolute inset-0"
-        style={{ background: '#020617', position: 'relative' }}
+        style={{ background: '#020617' }}
         scrollWheelZoom
         touchZoom
         zoomControl={false}
@@ -407,6 +428,36 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
           );
         })}
 
+        {/* Business / load pins (shipper's posted address) */}
+        {filters.showShippers && loads.map((load) => {
+          if (load.origin_lat == null || load.origin_lng == null) return null;
+          return (
+            <Marker
+              key={`load-${load.id}`}
+              position={[load.origin_lat, load.origin_lng]}
+              icon={loadIcon}
+            >
+              <Popup>
+                <div className="min-w-[200px]">
+                  <p className="font-bold text-sm text-gray-900">
+                    📦 {load.origin_city} → {load.dest_city}
+                  </p>
+                  {(load.weight_tonnes != null || load.budget_per_tonne != null) && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      {load.weight_tonnes != null && `${load.weight_tonnes}T`}
+                      {load.weight_tonnes != null && load.budget_per_tonne != null && ' • '}
+                      {load.budget_per_tonne != null && `₹${load.budget_per_tonne.toLocaleString('en-IN')}/T`}
+                    </p>
+                  )}
+                  <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold">
+                    Business address location
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+
         {/* Route lines for active trips */}
         {filters.showRoutes && resolvedTrips.map(t => (
           <React.Fragment key={`trip-${t.id}`}>
@@ -448,16 +499,16 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
         onTripCount={onTripCount}
       />
 
-      {/* Stats bar at bottom-left */}
-      <div className="absolute bottom-4 left-4 z-[1000] flex items-center gap-3">
-        <div className="bg-slate-950/90 border border-slate-800 px-3 py-1.5 rounded-lg backdrop-blur-md shadow-2xl flex items-center gap-2">
+      {/* Stats bar at bottom-left — pinned to viewport */}
+      <div className="fixed bottom-4 left-4 z-[9999] flex items-center gap-3">
+        <div className="bg-slate-950/95 border border-slate-700/60 px-3 py-1.5 rounded-lg backdrop-blur-md shadow-2xl flex items-center gap-2">
           <Navigation className="h-3 w-3 text-orange-400" />
-          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          <span className="text-[9px] font-black uppercase tracking-widest text-slate-200">
             {filteredLocations.length} USERS ON MAP
           </span>
         </div>
         {filters.showHeatmap && (
-          <div className="bg-slate-950/90 border border-red-800/50 px-3 py-1.5 rounded-lg backdrop-blur-md shadow-2xl flex items-center gap-2">
+          <div className="bg-slate-950/95 border border-red-800/60 px-3 py-1.5 rounded-lg backdrop-blur-md shadow-2xl flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
             <span className="text-[9px] font-black uppercase tracking-widest text-red-400">
               HEATMAP ACTIVE
@@ -466,11 +517,11 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
         )}
       </div>
 
-      {/* Loading overlay */}
+      {/* Loading overlay — pinned to viewport */}
       {loading && (
-        <div className="absolute bottom-4 right-4 z-[1000] bg-slate-950/90 border border-slate-800 px-4 py-2 rounded-full flex items-center gap-3 shadow-2xl">
+        <div className="fixed bottom-4 right-4 z-[9999] bg-slate-950/95 border border-slate-700/60 px-4 py-2 rounded-full flex items-center gap-3 shadow-2xl">
           <Loader2 className="h-4 w-4 text-orange-500 animate-spin" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-200">
             Syncing positions...
           </span>
         </div>
@@ -482,7 +533,7 @@ const CommandCenterMap: React.FC<CommandCenterMapProps> = ({
           0% { transform: scale(0.8); opacity: 1; }
           100% { transform: scale(2.2); opacity: 0; }
         }
-        .trucker-marker, .shipper-marker, .ontrip-marker {
+        .trucker-marker, .shipper-marker, .ontrip-marker, .load-marker {
           background: transparent !important;
           border: none !important;
         }

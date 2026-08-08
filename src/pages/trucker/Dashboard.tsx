@@ -275,7 +275,7 @@ const TruckerDashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {statCards.map((card, i) => (
-          <Link key={card.title} to={statCardLinks[i]} className="block group">
+          <Link key={card.title} to={statCardLinks[i] ?? '/'} className="block group">
             <Card className={`${card.border} shadow-sm group-hover:shadow-md group-hover:scale-[1.02] transition-all duration-200 animate-fade-in-up`} style={{ animationDelay: `${i * 80}ms` }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
                 <CardTitle className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{card.title}</CardTitle>

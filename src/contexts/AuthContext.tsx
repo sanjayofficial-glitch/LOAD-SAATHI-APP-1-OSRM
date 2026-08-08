@@ -1,7 +1,6 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useUser, useSession, useClerk } from '@clerk/clerk-react';
-import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { User } from '@/types';
 import { showError } from '@/utils/toast';
 
@@ -18,6 +17,17 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Lazy-load the supabase client factory so the ~200KB supabase-js chunk is
+// only downloaded for signed-in users (public pages never fetch it). Cached
+// so concurrent/retried profile fetches reuse a single import.
+let supabaseClientModule: Promise<typeof import('@/utils/supabaseClient')> | null = null;
+function loadSupabaseClient() {
+  if (!supabaseClientModule) {
+    supabaseClientModule = import('@/utils/supabaseClient');
+  }
+  return supabaseClientModule;
+}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoaded: clerkLoaded } = useUser();
@@ -50,6 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return null;
       }
 
+      const { createClerkSupabaseClient } = await loadSupabaseClient();
       const supabaseClient = createClerkSupabaseClient(supabaseToken);
       const { data, error } = await supabaseClient
         .from('users')

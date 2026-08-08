@@ -64,7 +64,7 @@ export default React.memo(function ZoomControls({ positions }: ZoomControlsProps
   };
 
   const buttonClass =
-    'w-9 h-9 flex items-center justify-center text-gray-700 dark:text-gray-200 ' +
+    'w-11 h-11 flex items-center justify-center text-gray-700 dark:text-gray-200 ' +
     'transition-colors duration-150 ' +
     'hover:bg-orange-50 dark:hover:bg-orange-950/40 hover:text-orange-600 dark:hover:text-orange-400 ' +
     'active:scale-90 disabled:opacity-35 disabled:pointer-events-none';

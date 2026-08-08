@@ -31,10 +31,10 @@ const LiveEventFeed: React.FC<LiveEventFeedProps> = ({ events }) => {
   };
 
   return (
-    <ScrollArea className="flex-1 w-full rounded-md border border-slate-800 bg-slate-900/20 p-4">
+    <ScrollArea className="flex-1 w-full rounded-md border border-slate-700/60 bg-slate-900/30 p-4">
       <div className="space-y-4">
         {events.length === 0 ? (
-          <p className="text-[10px] text-slate-500 text-center py-8 uppercase font-bold tracking-widest">
+          <p className="text-[10px] text-slate-400 text-center py-8 uppercase font-bold tracking-widest">
             Waiting for system events...
           </p>
         ) : (
@@ -44,10 +44,10 @@ const LiveEventFeed: React.FC<LiveEventFeedProps> = ({ events }) => {
                 {getIcon(event.type)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-slate-300 leading-tight">
+                <p className="text-[11px] text-slate-200 leading-tight">
                   {event.message}
                 </p>
-                <p className="text-[9px] font-mono text-slate-500 mt-1">
+                <p className="text-[9px] font-mono text-slate-400 mt-1">
                   {event.time}
                 </p>
               </div>

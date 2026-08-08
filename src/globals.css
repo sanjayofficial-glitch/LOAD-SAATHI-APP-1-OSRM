@@ -92,6 +92,9 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
+    /* Prevent iOS Safari from inflating text when rotating to landscape. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     /* The consent manager (CookieHub) sets body{overflow:hidden} while its dialog is open
        and can leave it stuck when the dialog is dismissed, which propagates to the viewport
        and makes the whole app unscrollable (with a phantom second scrollbar). An explicit
@@ -109,6 +112,24 @@
 
   body {
     @apply bg-background text-foreground;
+    /* App-like feel on phones: don't pull-to-refresh or chain overscroll past the page edge. */
+    overscroll-behavior-y: none;
+    /* Remove the grey flash on tap in Chrome/Safari for snappier taps. */
+    -webkit-tap-highlight-color: transparent;
+    /* Smoothly cross-fade background/text when the theme is toggled. */
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  /* Kill the legacy 300ms tap delay and double-tap zoom jank on interactive
+     elements — makes taps feel instant on mobile without disabling zoom. */
+  a,
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea,
+  label {
+    touch-action: manipulation;
   }
 }
 
@@ -234,6 +255,11 @@
   .text-balance {
     text-wrap: balance;
   }
+  /* Notch / Dynamic Island: extra top padding for fixed & sticky headers. */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  /* Home indicator / gesture bar: extra bottom padding for fixed footers. */
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -398,7 +424,36 @@
   background: hsl(var(--muted)) !important;
 }
 
+/* iOS Safari auto-zooms into any form control whose font-size is under 16px.
+   Fields at 16px on phones keeps the tap-focus from zooming while remaining
+   readable — desktop layouts keep their own sizing. */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* Hide the persistent CookieHub floating settings button */
 .ch2-icon.ch2-visible {
   display: none !important;
+}
+
+/* Keep the CookieHub v2 consent widget as a floating, non-blocking card.
+   When blockUI is enabled in the dashboard, CookieHub turns .ch2-container
+   into a full-screen fixed overlay (position:fixed; inset:0;
+   z-index:2147483647). On mobile that overlay sits directly over the
+   footer, so taps on the Blog/About/Contact/Gallery links are swallowed
+   and never reach the router <Link>s. Make the whole overlay click-through
+   (including when ch2-block is not applied) while keeping the banner card
+   (.ch2-dialog) and the settings panel (.ch2-settings) — both children of
+   the container — fully interactive. !important guards against any
+   injection-order conflict with the widget's own stylesheet. */
+.ch2-container {
+  pointer-events: none !important;
+}
+.ch2-dialog,
+.ch2-settings {
+  pointer-events: auto !important;
 }

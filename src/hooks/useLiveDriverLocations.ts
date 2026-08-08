@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
+import { authorizeRealtime } from '@/utils/realtime';
 import type { TruckLocation } from '@/components/maps/TruckMarker';
 
 /**
@@ -14,17 +15,21 @@ import type { TruckLocation } from '@/components/maps/TruckMarker';
  */
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
-export function useLiveDriverLocations(getToken?: () => Promise<string | null>) {
+export function useLiveDriverLocations(
+  getToken?: (options?: { template?: string }) => Promise<string | null>,
+) {
   const [locations, setLocations] = useState<Map<string, TruckLocation>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   // Fetch initial positions with Clerk-authenticated client
   const fetchInitial = useCallback(async () => {
     try {
       let client = supabase;
       if (getToken) {
-        const token = await getToken();
+        // The 'supabase' template is required — the default Clerk session
+        // token fails Supabase JWT verification (wrong aud claim), so reads
+        // would 401 and return nothing.
+        const token = await getToken({ template: 'supabase' });
         if (token) {
           client = createClerkSupabaseClient(token);
         }
@@ -78,7 +83,14 @@ export function useLiveDriverLocations(getToken?: () => Promise<string | null>) 
   }, [getToken]);
 
   // Subscribe to real-time changes
-  const subscribe = useCallback(() => {
+  const subscribe = useCallback(async () => {
+    // The shared realtime socket starts as the `anon` role, which RLS denies
+    // on driver_locations (`TO authenticated` only) — verified live against
+    // the backend (401 "permission denied for table driver_locations"). Set
+    // the Clerk JWT on the realtime connection BEFORE the first subscribe so
+    // postgres_changes events actually flow.
+    if (getToken) await authorizeRealtime(getToken);
+
     const channel = supabase
       .channel('driver-locations-realtime')
       .on(
@@ -111,12 +123,23 @@ export function useLiveDriverLocations(getToken?: () => Promise<string | null>) 
           });
 
           if (!name) {
-            const { data: user } = await supabase
-              .from('users')
-              .select('full_name')
-              .eq('id', row.driver_id)
-              .single();
-            name = user?.full_name;
+            // The anon client is denied reads on `users` too (RLS is
+            // `TO authenticated`), so look the name up with the
+            // Clerk-authenticated client.
+            let fullName: string | undefined;
+            if (getToken) {
+              const token = await getToken({ template: 'supabase' });
+              if (token) {
+                const authClient = createClerkSupabaseClient(token);
+                const { data: user } = await authClient
+                  .from('users')
+                  .select('full_name')
+                  .eq('id', row.driver_id)
+                  .single();
+                fullName = user?.full_name;
+              }
+            }
+            name = fullName;
           }
 
           const loc: TruckLocation = {
@@ -144,17 +167,31 @@ export function useLiveDriverLocations(getToken?: () => Promise<string | null>) 
       )
       .subscribe();
 
-    channelRef.current = channel;
-  }, []);
+    return channel;
+  }, [getToken]);
 
   useEffect(() => {
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
     fetchInitial();
-    subscribe();
+    void (async () => {
+      try {
+        channel = await subscribe();
+      } catch (err) {
+        console.error('[useLiveDriverLocations] Realtime subscribe error:', err);
+        return;
+      }
+      // Unmounted (or re-run) while the token was being fetched — tear the
+      // channel down instead of leaking it.
+      if (cancelled) {
+        supabase.removeChannel(channel);
+      }
+    })();
 
     return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-      }
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
     };
   }, [fetchInitial, subscribe]);
 

@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { RefreshCw } from 'lucide-react';
 import CommandCenterMap, { type UserLocation } from './CommandCenterMap';
 import CommandCenterSidebar from './CommandCenterSidebar';
+import type { LoadLocation } from '@/components/maps/LoadMarker';
 import type { User, Trip, Shipment } from '@/types';
 
 interface Event {
@@ -20,6 +21,7 @@ const MonitoringDashboard = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [locations, setLocations] = useState<UserLocation[]>([]);
+  const [loads, setLoads] = useState<LoadLocation[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [metrics, setMetrics] = useState({
     active_connections: 0,
@@ -72,6 +74,18 @@ const MonitoringDashboard = () => {
         .order('created_at', { ascending: false });
       queryTimes.push(performance.now() - qs);
       if (shipmentData) setShipments(shipmentData);
+
+      // Business / load locations — shippers post their load at their address.
+      // These are shown on the map so every business is visible even without
+      // live GPS broadcasting.
+      qs = performance.now();
+      const { data: loadData } = await supabaseClient
+        .from('load_locations')
+        .select('*, shipper:users!load_locations_shipper_id_fkey(full_name)')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+      queryTimes.push(performance.now() - qs);
+      if (loadData) setLoads(loadData as unknown as LoadLocation[]);
 
       // Live driver locations
       qs = performance.now();
@@ -225,6 +239,7 @@ const MonitoringDashboard = () => {
         .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, debouncedFetch)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, debouncedFetch)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'driver_locations' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'load_locations' }, debouncedFetch)
         .subscribe();
     });
 
@@ -240,31 +255,33 @@ const MonitoringDashboard = () => {
   }, [fetchData]);
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] flex flex-col bg-slate-950 text-slate-50 overflow-hidden">
+    <div className="h-[calc(100dvh-3.5rem)] sm:h-[calc(100dvh-4rem)] flex flex-col bg-slate-950 text-slate-50 overflow-hidden">
       {/* Full-screen map + sidebar layout */}
       <div className="flex-1 flex min-h-0">
         {/* Map — fills remaining width */}
         <div className="flex-1 relative min-w-0">
           <CommandCenterMap
             locations={locations}
+            loads={loads}
             trips={trips}
             shipments={shipments}
             loading={loading}
           />
-          {/* Floating refresh + error bar */}
-          <div className="absolute top-4 left-4 z-[1000] flex items-center gap-2">
+          {/* Floating refresh + error bar — pinned to viewport below the
+              sticky top nav so it never scrolls away or gets covered */}
+          <div className="fixed top-[calc(3.5rem+1rem)] sm:top-[calc(4rem+1rem)] left-4 z-[9999] flex items-center gap-2">
             {error && (
-              <span className="text-[9px] text-red-400 font-mono bg-slate-950/90 border border-red-800/50 px-2.5 py-1 rounded-lg backdrop-blur-md">
+              <span className="text-[9px] text-red-300 font-mono bg-slate-950/95 border border-red-700/60 px-2.5 py-1 rounded-lg backdrop-blur-md">
                 {error}
               </span>
             )}
-            <span className="text-[9px] text-slate-500 font-mono bg-slate-950/90 border border-slate-800 px-2.5 py-1 rounded-lg backdrop-blur-md hidden sm:inline">
+            <span className="text-[9px] text-slate-400 font-mono bg-slate-950/95 border border-slate-700/60 px-2.5 py-1 rounded-lg backdrop-blur-md hidden sm:inline">
               {lastUpdated.toLocaleTimeString()}
             </span>
             <button
               onClick={fetchData}
               disabled={loading}
-              className="bg-slate-950/90 border border-slate-800 px-2.5 py-1 rounded-lg backdrop-blur-md text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-300 hover:border-slate-700 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              className="bg-slate-950/95 border border-slate-700/60 px-2.5 py-1 rounded-lg backdrop-blur-md text-[9px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:border-slate-600 transition-colors disabled:opacity-50 flex items-center gap-1.5"
             >
               <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
               Refresh

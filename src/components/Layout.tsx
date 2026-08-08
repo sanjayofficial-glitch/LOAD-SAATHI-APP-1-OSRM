@@ -5,6 +5,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth as useClerkAuth } from "@clerk/clerk-react";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
 import { supabase as supabaseAnon } from "@/integrations/supabase/client";
+import { authorizeRealtime } from "@/utils/realtime";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -40,6 +41,7 @@ import ThemeToggle from "./ThemeToggle";
 import VerificationBadge from "./VerificationBadge";
 import AutoGpsTracker from "./AutoGpsTracker";
 import DockNav from "./DockNav";
+import MobileTabBar, { type MobileTabItem } from "./MobileTabBar";
 import { DockItem, DockIcon, DockLabel } from "@/components/ui/dock";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -173,30 +175,43 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     fetchUnread();
 
-    const channel = supabaseAnon
-      .channel('layout-unread')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `recipient_id=eq.${userProfile.id}`,
-      }, () => {
-        setUnreadCount(prev => prev + 1);
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'messages',
-        filter: `recipient_id=eq.${userProfile.id}`,
-      }, (payload) => {
-        if (payload.new?.is_read) {
-          setUnreadCount(prev => Math.max(0, prev - 1));
-        }
-      })
-      .subscribe();
+    let cancelled = false;
+    let channel: ReturnType<typeof supabaseAnon.channel> | null = null;
 
-    return () => { supabaseAnon.removeChannel(channel); };
-  }, [userProfile?.id]);
+    void (async () => {
+      // Authorize the shared realtime socket with the Clerk JWT — RLS on
+      // `messages` is `TO authenticated`, anon is denied.
+      await authorizeRealtime(getToken);
+      if (cancelled) return;
+
+      channel = supabaseAnon
+        .channel('layout-unread')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `recipient_id=eq.${userProfile.id}`,
+        }, () => {
+          setUnreadCount(prev => prev + 1);
+        })
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `recipient_id=eq.${userProfile.id}`,
+        }, (payload) => {
+          if (payload.new?.is_read) {
+            setUnreadCount(prev => Math.max(0, prev - 1));
+          }
+        })
+        .subscribe();
+    })();
+
+    return () => {
+      cancelled = true;
+      if (channel) supabaseAnon.removeChannel(channel);
+    };
+  }, [userProfile?.id, getToken]);
 
   const navItems = useMemo(() => {
     if (userProfile?.user_type === 'admin') {
@@ -234,6 +249,68 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     [navItems]
   );
 
+  const isAdmin = userProfile?.user_type === "admin";
+  const isTrucker = userProfile?.user_type === "trucker";
+
+  // Mobile-only bottom bar: a few quick tabs + a hamburger "Menu" button that
+  // opens a bottom sheet with the full navigation. No horizontal scrolling.
+  const mobileTabs = useMemo<MobileTabItem[]>(() => {
+    if (isAdmin) {
+      return [
+        { label: "Command Center", path: "/admin/monitoring", icon: <ShieldCheck className="h-5 w-5" /> },
+        { label: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+        { label: "Messages", path: "/messages", icon: <MessageSquare className="h-5 w-5" /> },
+      ];
+    }
+    return [
+      {
+        label: "Dashboard",
+        path: isTrucker ? "/trucker/dashboard" : "/shipper/dashboard",
+        icon: <Clock className="h-5 w-5" />,
+      },
+      {
+        label: isTrucker ? "Find Goods" : "Find Trucks",
+        path: isTrucker ? "/trucker/browse-shipments" : "/browse-trucks",
+        icon: <Search className="h-5 w-5" />,
+      },
+      {
+        label: "Chat",
+        path: "/messages",
+        icon: (
+          <span className="relative">
+            <MessageSquare className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-orange-600 text-[9px] font-bold text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </span>
+        ),
+      },
+    ];
+  }, [isAdmin, isTrucker, unreadCount]);
+
+  const mobileCenterAction = useMemo<MobileTabItem | undefined>(() => {
+    if (isAdmin) return undefined;
+    return {
+      label: isTrucker ? "Post Trip" : "Post Load",
+      path: isTrucker ? "/trucker/post-trip" : "/shipper/post-shipment",
+      icon: <PlusCircle className="h-6 w-6" />,
+    };
+  }, [isAdmin, isTrucker]);
+
+  const mobileMenuItems = useMemo<MobileTabItem[]>(() => {
+    const bumpIcon = (node: React.ReactNode) =>
+      React.isValidElement<{ className?: string }>(node)
+        ? React.cloneElement(node, { className: "h-5 w-5" })
+        : node;
+    return [
+      ...navItems.map((item) => ({ ...item, icon: bumpIcon(item.icon) })),
+      { label: "Profile", path: "/profile", icon: <User className="h-5 w-5" /> },
+      { label: "Credit Score", path: "/credit-score", icon: <Shield className="h-5 w-5" /> },
+    ];
+  }, [navItems]);
+
   const handleSignOut = useCallback(async () => {
     await signOut();
     navigate("/");
@@ -245,7 +322,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       
       {userProfile?.user_type !== 'admin' && <AutoGpsTracker />}
       
-      <nav className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-[100] shadow-sm backdrop-blur-xl">
+      <nav className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-[100] shadow-sm backdrop-blur-xl pt-[env(safe-area-inset-top)]">
         <div className="container mx-auto px-4">
           <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center gap-4 sm:gap-8">
@@ -263,7 +340,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <NotificationBell />
 
               <Link to="/messages">
-                <Button variant="ghost" size="icon" className="relative text-gray-600 dark:text-gray-400 h-9 w-9 sm:h-10 sm:w-10">
+                <Button variant="ghost" size="icon" className="relative text-gray-600 dark:text-gray-400 h-11 w-11">
                   <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-orange-600 text-[10px] font-bold text-white flex items-center justify-center shadow-sm">
@@ -273,11 +350,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Button>
               </Link>
 
-              <div className="lg:hidden">
+              <div className="hidden md:block lg:hidden">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-gray-600 dark:text-gray-400 h-9 w-9 sm:h-10 sm:w-10"
+                  className="text-gray-600 dark:text-gray-400 h-11 w-11"
                   onClick={() => setMobileNavOpen(!mobileNavOpen)}
                   aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
                 >
@@ -287,7 +364,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-gray-600 dark:text-gray-400 h-9 w-9 sm:h-10 sm:w-10 rounded-full">
+                  <Button variant="ghost" size="icon" className="text-gray-600 dark:text-gray-400 h-11 w-11 rounded-full">
                     <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold">
                       {(userProfile?.full_name || 'U').charAt(0).toUpperCase()}
                     </div>
@@ -343,7 +420,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         )}
       </nav>
 
-      <main className="flex-grow pb-24">
+      <main className="flex-grow pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-24">
         {children}
       </main>
 
@@ -351,6 +428,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         items={dockNavItems}
         visible={mobileNavOpen}
         extra={<DockNavExtra currentPath={currentPath} />}
+        className="hidden md:flex"
+      />
+      <MobileTabBar
+        tabs={mobileTabs}
+        menuItems={mobileMenuItems}
+        centerAction={mobileCenterAction}
+        visible={mobileNavOpen}
+        footer={
+          <Button
+            variant="ghost"
+            className="w-full text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+            onClick={handleSignOut}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign Out
+          </Button>
+        }
       />
 
       <footer className="hidden lg:block bg-white/80 dark:bg-gray-900/80 border-t border-gray-200 dark:border-gray-800 pt-6 sm:pt-8 pb-24 mt-auto backdrop-blur-xl">

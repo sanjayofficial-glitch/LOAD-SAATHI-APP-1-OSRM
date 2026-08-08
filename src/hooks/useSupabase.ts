@@ -9,7 +9,13 @@ export const useSupabase = () => {
   const getAuthenticatedClient = useCallback(async () => {
     const token = await getToken({ template: "supabase" });
     if (!token) throw new Error("No authentication token found");
-    return createClerkSupabaseClient(token);
+    const client = createClerkSupabaseClient(token);
+    // Realtime sockets do NOT inherit the global Authorization header — set
+    // the JWT on this client's own realtime connection so postgres_changes
+    // subscriptions made on it authorize as `authenticated` (RLS is
+    // `TO authenticated`; the anon role is denied).
+    client.realtime.setAuth(token);
+    return client;
   }, [getToken]);
 
   /**

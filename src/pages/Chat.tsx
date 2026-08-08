@@ -86,10 +86,16 @@ const Chat = () => {
 
         if (cancelled) return;
 
-        channel = subscribeToMessages(requestId, (msg) => {
+        channel = await subscribeToMessages(requestId, (msg) => {
           setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
           if (msg.recipient_id === userProfile.id) markMessagesAsRead(requestId, userProfile.id, () => getTokenRef.current({ template: 'supabase' }), chatKindRef.current);
-        }, chatKindRef.current);
+        }, chatKindRef.current, getTokenRef.current);
+
+        // Unmounted while the subscription was being set up — tear it down.
+        if (cancelled) {
+          if (channel) supabase.removeChannel(channel);
+          return;
+        }
 
         setLoading(false);
       } catch (err: unknown) {

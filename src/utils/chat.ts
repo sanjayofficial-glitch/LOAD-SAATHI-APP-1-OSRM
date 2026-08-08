@@ -1,9 +1,11 @@
 import { createClerkSupabaseClient } from '@/utils/supabaseClient';
 import { Message } from '@/types/chat';
-// The base supabase client (anon key, no auth header) is used ONLY for Realtime
-// subscriptions. Realtime uses RLS policies to filter events — no auth header needed.
+// The base supabase client (anon key) is used for Realtime subscriptions. The
+// socket is authorized with the Clerk JWT via authorizeRealtime() before
+// subscribing so RLS (`TO authenticated`) lets events through.
 // All mutations use the Clerk-authenticated client below.
 import { supabase } from '@/integrations/supabase/client';
+import { authorizeRealtime } from '@/utils/realtime';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -139,12 +141,17 @@ export const markMessagesAsRead = async (
 
 /**
  * Subscribe to real-time message updates.
+ *
+ * Authorizes the shared realtime socket with the Clerk JWT first — RLS on
+ * `messages` is `TO authenticated`, and the anon role is denied, so events
+ * would never arrive otherwise.
  */
-export const subscribeToMessages = (
+export const subscribeToMessages = async (
   requestId: string,
   onNewMessage: (message: Message) => void,
-  kind: ChatKind = 'request'
-): RealtimeChannel => {
+  kind: ChatKind = 'request',
+  getToken?: (options?: { template?: string }) => Promise<string | null>,
+): Promise<RealtimeChannel> => {
   const channelName = `chat:${requestId}`;
 
   // Remove any existing channel with this name to prevent the
@@ -152,9 +159,11 @@ export const subscribeToMessages = (
   const existingChannels = supabase.getChannels();
   for (const ch of existingChannels) {
     if (ch.topic === channelName) {
-      supabase.removeChannel(ch);
+      await supabase.removeChannel(ch);
     }
   }
+
+  if (getToken) await authorizeRealtime(getToken);
 
   const channel = supabase
     .channel(channelName)
