@@ -10,6 +10,7 @@ const guideData: Record<string, {
   readTime: string;
   content: string[];
   internalLinks: { label: string; path: string }[];
+  steps: { name: string; text: string }[];
 }> = {
   "ptl-vs-ftl": {
     title: "PTL vs FTL: Which Freight Option Is Right for Your Business?",
@@ -17,6 +18,12 @@ const guideData: Record<string, {
     author: "LoadSaathi Team",
     authorBio: "The LoadSaathi engineering and product team builds AI-powered logistics tools for India's freight industry.",
     readTime: "6 min read",
+    steps: [
+      { name: "Measure your shipment weight and volume", text: "Weigh your goods and measure their dimensions. Shipments under 3 tonnes are typically more cost-effective as PTL, while loads over 7 tonnes generally require FTL." },
+      { name: "Set your delivery timeline", text: "If your cargo is urgent or time-sensitive, choose FTL for direct point-to-point delivery. If you have 1-2 extra days of buffer, PTL saves you 30-40%." },
+      { name: "Compare costs for your route", text: "Use the LoadSaathi Fare Calculator to compare PTL and FTL pricing on your specific corridor before committing." },
+      { name: "Book through LoadSaathi", text: "Post your shipment and the platform's AI automatically recommends the most cost-effective option based on weight, volume, and delivery requirements." },
+    ],
     content: [
       "One of the most common questions from new shippers is whether to book PTL or FTL for their freight. The answer depends on your shipment size, budget, timeline, and the specific route you're shipping on.",
       "PTL (Part Truck Load) is a shared freight model where your goods share truck space with other shipments heading in the same direction. It's ideal for shipments under 3 tonnes and typically costs 30-40% less than booking an entire truck. The tradeoff is slightly longer transit times due to multiple pickups and deliveries.",
@@ -36,6 +43,12 @@ const guideData: Record<string, {
     author: "Amit Verma",
     authorBio: "Amit Verma is a supply chain consultant who helps SMEs in East India digitize their freight operations.",
     readTime: "8 min read",
+    steps: [
+      { name: "Identify your origin and destination corridors", text: "Rates vary by route. Short corridors like Rourkela–Ranchi (180 km) are cheaper per tonne than long-haul routes like Rourkela–Kolkata (430 km)." },
+      { name: "Estimate cargo weight and type", text: "PTL rates are quoted per tonne while FTL rates are per vehicle. Steel and heavy industrial cargo typically command a premium." },
+      { name: "Check current market rates", text: "Reference corridor averages such as ₹1,800-2,500/tonne for Rourkela–Ranchi PTL and ₹9,000-12,000 for a 7-ton FTL on the same route." },
+      { name: "Use LoadSaathi's AI Price Predictor", text: "Post your shipment and the AI analyzes live market conditions, fuel, and truck availability to recommend fair pricing." },
+    ],
     content: [
       "Understanding freight rates across East India's industrial corridors is essential for MSMEs looking to optimize their logistics budgets. Rates vary significantly based on distance, cargo type, vehicle availability, and seasonal demand.",
       "The Rourkela–Ranchi corridor (180 km) is one of the busiest, with PTL rates averaging ₹1,800-2,500 per tonne. Full truckload rates range from ₹9,000-12,000 for a 7-ton truck to ₹22,000-28,000 for a 25-ton trailer.",
@@ -55,6 +68,12 @@ const guideData: Record<string, {
     author: "Rajesh Kumar",
     authorBio: "Rajesh Kumar is a logistics operations specialist with 12 years of experience in Indian trucking corridors.",
     readTime: "7 min read",
+    steps: [
+      { name: "Choose the right truck type", text: "Use covered or waterproofed trucks to prevent rust on TMT bars, HR coils, CR sheets, and structural steel, especially during monsoon months." },
+      { name: "Distribute weight evenly", text: "Balance the load across axles to avoid overloading penalties and comply with RTO regulations." },
+      { name: "Secure all loads properly", text: "Use steel straps or chains rated for the cargo weight so the load does not shift during transit." },
+      { name: "Post exact specs on LoadSaathi", text: "Include the steel grade, dimensions, and weight when posting so the AI matches you with trucks that have the right equipment." },
+    ],
     content: [
       "India is the world's second-largest steel producer, and moving steel products from mills to customers is a massive logistical operation. Whether you're shipping TMT bars, HR coils, CR sheets, or structural steel, proper transport practices protect both your cargo and the carriers.",
       "The key steel shipping corridors in East India include Rourkela–Jamshedpur (connecting two of India's largest steel plants), Jamshedpur–Kolkata (steel to port and consumer markets), and Bhubaneswar–Vizag (coastal corridor).",
@@ -91,22 +110,62 @@ export default function GuidePage() {
 
   const schema = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: guide.title,
-    description: guide.summary.substring(0, 160),
-    author: {
-      "@type": "Person",
-      name: guide.author,
-      description: guide.authorBio,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "LoadSaathi",
-      url: "https://loadsaathi.in",
-      logo: { "@type": "ImageObject", url: "https://loadsaathi.in/logo-512.png" },
-    },
-    mainEntityOfPage: { "@type": "WebPage", "@id": `https://loadsaathi.in/guide/${slug}` },
-    wordCount: guide.content.join(" ").split(/\s+/).length,
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: guide.title,
+        description: guide.summary.substring(0, 160),
+        datePublished: "2026-06-01",
+        dateModified: "2026-08-08",
+        image: "https://loadsaathi.in/og-image.png",
+        author: {
+          "@type": "Person",
+          name: guide.author,
+          description: guide.authorBio,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "LoadSaathi",
+          url: "https://loadsaathi.in",
+          logo: { "@type": "ImageObject", url: "https://loadsaathi.in/logo-512.png" },
+        },
+        mainEntityOfPage: { "@type": "WebPage", "@id": `https://loadsaathi.in/guide/${slug}` },
+        wordCount: guide.content.join(" ").split(/\s+/).length,
+      },
+      {
+        "@type": "HowTo",
+        name: guide.title,
+        description: guide.summary.substring(0, 160),
+        datePublished: "2026-06-01",
+        dateModified: "2026-08-08",
+        image: "https://loadsaathi.in/og-image.png",
+        author: {
+          "@type": "Person",
+          name: guide.author,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "LoadSaathi",
+          url: "https://loadsaathi.in",
+          logo: { "@type": "ImageObject", url: "https://loadsaathi.in/logo-512.png" },
+        },
+        totalTime: guide.readTime,
+        step: guide.steps.map((step, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          name: step.name,
+          text: step.text,
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://loadsaathi.in" },
+          { "@type": "ListItem", position: 2, name: "Guides", item: "https://loadsaathi.in/blog" },
+          { "@type": "ListItem", position: 3, name: guide.title, item: `https://loadsaathi.in/guide/${slug}` },
+        ],
+      },
+    ],
   };
 
   return (

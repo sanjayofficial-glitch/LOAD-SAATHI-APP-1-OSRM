@@ -31,3 +31,4 @@ dist-ssr
 
 # Android build cache
 android/.gradle_home
+.env*

@@ -125,7 +125,7 @@ export default function TruckerSolution() {
           <h3>When do I get paid?</h3>
           <p>Payments are released instantly after GPS + ePOD delivery confirmation.</p>
           <h3>What fees does LoadSaathi charge?</h3>
-          <p>10-15% per load (capped per plan). No hidden charges, fuel surcharges, or commissions.</p>
+          <p>2-4% per completed trip, reduced for high credit scores. No hidden charges, fuel surcharges, or commissions.</p>
         </div>
       </noscript>
       <SeoMeta
@@ -159,7 +159,7 @@ export default function TruckerSolution() {
               name: "What fees does LoadSaathi charge?",
               acceptedAnswer: {
                 "@type": "Answer",
-                text: "10-15% per load (capped per plan). No hidden charges, fuel surcharges, or commissions.",
+                text: "2-4% per completed trip, reduced for high credit scores. No hidden charges, fuel surcharges, or commissions.",
               },
             },
           ],

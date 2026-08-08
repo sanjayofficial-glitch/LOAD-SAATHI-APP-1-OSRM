@@ -63,6 +63,9 @@ export default function BlogArticle() {
 
   const isoDate = parseDate(article.date);
   const isoLastUpdated = article.lastUpdated ? parseDate(article.lastUpdated) : isoDate;
+  const coverImage = article.coverImage
+    ? `https://loadsaathi.in${article.coverImage}`
+    : "https://loadsaathi.in/logo-512.png";
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -93,7 +96,7 @@ export default function BlogArticle() {
         },
         articleSection: article.category,
         wordCount: article.content.join(" ").split(/\s+/).length,
-        image: "https://loadsaathi.in/og-image.png",
+        image: coverImage,
       },
       {
         "@type": "BreadcrumbList",
@@ -209,6 +212,7 @@ export default function BlogArticle() {
       description={article.summary.substring(0, 160)}
       canonical={`/blog/${slug}`}
       type="article"
+      image={coverImage}
       publishedTime={isoDate}
       author={article.author}
       jsonLd={faqSchema ? [articleSchema, faqSchema] : articleSchema}

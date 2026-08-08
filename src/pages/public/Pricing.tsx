@@ -154,40 +154,30 @@ const Pricing = () => {
       <noscript>
         <div style={{maxWidth:800,margin:'0 auto',padding:'32px',fontFamily:'system-ui'}}>
           <h1>LoadSaathi Pricing — Simple, Transparent, No Hidden Fees</h1>
-          <p>LoadSaathi offers a free platform for shippers and truckers to connect. No subscription fees. Pay only for services you use — AI matching, ePOD verification, advanced analytics, and credit monitoring.</p>
-          <h2>Shipper Plans</h2>
-          <h3>Starter (Free Forever)</h3>
-          <p>For small shippers getting started. Includes unlimited posting, unlimited bids, AI matching, dashboard, payment protection, and 50km free tracking.</p>
-          <h3>Professional (Most Popular)</h3>
-          <p>₹499/month. For growing shippers. Includes unlimited tracking, 20 ePODs/month, advanced analytics, priority support, route optimization, and 3 credit reports.</p>
-          <h3>Enterprise</h3>
-          <p>Custom pricing. For large shippers. Includes dedicated account manager, API integration, bulk operations, custom SLAs, unlimited tracking and ePODs, full analytics, and priority support.</p>
-          <h2>Trucker Plans</h2>
-          <h3>Basic (Free Forever)</h3>
-          <p>For individual truckers. Includes unlimited loads, AI matching, GPS tracking, dashboard, payment protection, and basic analytics.</p>
-          <h3>Professional (Most Popular)</h3>
-          <p>₹299/month. Includes 15% fee cap, 30 ePODs, advanced analytics, load alerts, and priority support.</p>
-          <h3>Fleet</h3>
-          <p>₹999/month. For fleet operators. Includes 10% fee cap, unlimited ePODs, full analytics, API access, and fleet management.</p>
-          <h2>AI Services (Pay Per Use)</h2>
+          <p>LoadSaathi offers a free platform for shippers and truckers to connect. No subscription fees, no registration costs, no minimum commitments. You only pay when you complete a transaction through the platform.</p>
+          <h2>For Shippers</h2>
+          <p>Free to join. Ship smarter, pay less. Includes free account registration and profile setup, AI-powered transporter matching, real-time shipment tracking, digital documentation and e-way bill integration, access to a verified transporter network, escrow-backed payment protection, and an analytics dashboard with reports.</p>
+          <h2>For Truckers &amp; Fleet Owners</h2>
+          <p>Free to join. Fill every kilometer with profit. Includes free account and fleet registration, AI-matched load discovery, route optimization and planning, live GPS tracking integration, milestone-based payment releases, digital freight credit score building, and an earnings dashboard with trip history.</p>
+          <h2>Transaction Fee Breakdown</h2>
+          <p>A small service fee is charged on each completed transaction to cover platform operations, payment processing, and AI matching infrastructure.</p>
           <ul>
-            <li>AI Price Predictor: ₹99/analysis</li>
-            <li>ePOD Verification: ₹50/verification</li>
-            <li>Dynamic Credit Monitoring: ₹199/month</li>
-            <li>Advanced Route Optimization: ₹149/trip</li>
+            <li>Shippers: 3-5% of shipment value, varies by shipment size and route complexity</li>
+            <li>Truckers: 2-4% of trip value, reduced for repeat performers with high credit scores</li>
           </ul>
-          <h2>Transaction Fees</h2>
-          <ul>
-            <li>Shipper: 0% on first ₹50,000, then 1.5%</li>
-            <li>Trucker: 10-15% (capped per plan)</li>
-          </ul>
+          <h2>LoadSaathi vs Traditional Brokers</h2>
+          <p>LoadSaathi charges a 2-5% transaction fee per completed shipment, compared to 10-20% broker margins from traditional intermediaries.</p>
           <h2>Frequently Asked Questions</h2>
-          <h3>How is LoadSaathi different from other platforms?</h3>
-          <p>We combine AI-powered matching, real-time tracking, freight credit scoring, and secure payments in one platform. No hidden fees, no brokerage.</p>
-          <h3>Can I switch plans anytime?</h3>
-          <p>Yes. All plans are month-to-month with no lock-in contracts.</p>
-          <h3>What payment methods do you accept?</h3>
-          <p>UPI, net banking, debit/credit cards, NEFT, and RTGS.</p>
+          <h3>Is it really free to join?</h3>
+          <p>Absolutely. There are no registration fees, subscription charges, or monthly minimums. You only pay when you complete a transaction through the platform.</p>
+          <h3>How are transaction fees calculated?</h3>
+          <p>Fees are a small percentage of the total shipment value, calculated transparently before you confirm a match. You'll always see the exact fee before committing to a transaction.</p>
+          <h3>Are there any hidden charges?</h3>
+          <p>None. We believe in radical transparency. Every fee, charge, or deduction is clearly displayed before any transaction is confirmed. What you see is what you pay.</p>
+          <h3>Do truckers pay to bid on loads?</h3>
+          <p>No. Truckers can browse and bid on available loads for free. Platform fees are only applied when a load is successfully completed and payment is processed.</p>
+          <h3>Is there a volume discount for high-volume shippers?</h3>
+          <p>Yes. Enterprise shippers shipping 50+ loads per month qualify for reduced transaction fees. Contact our sales team for custom pricing.</p>
         </div>
       </noscript>
       <SeoMeta
@@ -195,10 +185,9 @@ const Pricing = () => {
         description="LoadSaathi's transparent pricing: free registration, pay only 2-5% on completed shipments. No hidden fees, no subscriptions. Compare plans for shippers and truckers."
         keywords="LoadSaathi pricing, freight platform fees, logistics commission rates, trucking platform pricing India"
         canonical="/pricing"
-        jsonLd={pricingSchema}
+        jsonLd={[pricingSchema, pricingFaqSchema]}
         breadcrumbs={[{ name: "Pricing", url: "/pricing" }]}
       />
-      <script type="application/ld+json">{JSON.stringify(pricingFaqSchema)}</script>
       <div className="min-h-screen bg-background dark:bg-[#050816] text-foreground antialiased overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
