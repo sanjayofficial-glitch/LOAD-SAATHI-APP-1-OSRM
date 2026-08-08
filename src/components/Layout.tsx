@@ -40,7 +40,7 @@ import OfflineBanner from "./OfflineBanner";
 import ThemeToggle from "./ThemeToggle";
 import VerificationBadge from "./VerificationBadge";
 import AutoGpsTracker from "./AutoGpsTracker";
-import DockNav from "./DockNav";
+import DockNav, { type NavAccent } from "./DockNav";
 import MobileTabBar, { type MobileTabItem } from "./MobileTabBar";
 import { DockItem, DockIcon, DockLabel } from "@/components/ui/dock";
 import { cn } from "@/lib/utils";
@@ -81,29 +81,43 @@ const NavLinks = React.memo(({ navItems, currentPath, onClick, mobile }: { navIt
 ));
 NavLinks.displayName = "NavLinks";
 
-const DockNavExtra = React.memo(({ currentPath }: { currentPath: string }) => (
-  <Link to="/messages" aria-label="Chat" className="outline-none min-w-11 min-h-11 flex items-center justify-center rounded-2xl focus-visible:outline-2 focus-visible:outline-orange-500 focus-visible:outline-offset-1">
-    <DockItem
-      className={cn(
-        currentPath === "/messages" && "text-orange-600 dark:text-orange-400"
-      )}
-    >
-      <DockIcon>
-        <span
-          className={cn(
-            "flex h-full w-full items-center justify-center rounded-2xl transition-colors",
-            currentPath === "/messages"
-              ? "bg-orange-500/15 text-orange-600 dark:bg-orange-400/15 dark:text-orange-400"
-              : "bg-transparent text-gray-500 hover:bg-black/5 dark:text-gray-400 dark:hover:bg-white/10"
-          )}
-        >
-          <MessageSquare className="h-6 w-6" />
-        </span>
-      </DockIcon>
-      <DockLabel>Chat</DockLabel>
-    </DockItem>
-  </Link>
-));
+const DOCK_ACCENTS: Record<NavAccent, { text: string; pill: string }> = {
+  orange: {
+    text: "text-orange-600 dark:text-orange-400",
+    pill: "bg-orange-500/15 text-orange-600 dark:bg-orange-400/15 dark:text-orange-400",
+  },
+  blue: {
+    text: "text-blue-600 dark:text-blue-400",
+    pill: "bg-blue-500/15 text-blue-600 dark:bg-blue-400/15 dark:text-blue-400",
+  },
+};
+
+const DockNavExtra = React.memo(({ currentPath, accent = "orange" }: { currentPath: string; accent?: NavAccent }) => {
+  const a = DOCK_ACCENTS[accent];
+  return (
+    <Link to="/messages" aria-label="Chat" className="outline-none min-w-11 min-h-11 flex items-center justify-center rounded-2xl focus-visible:outline-2 focus-visible:outline-orange-500 focus-visible:outline-offset-1">
+      <DockItem
+        className={cn(
+          currentPath === "/messages" && a.text
+        )}
+      >
+        <DockIcon>
+          <span
+            className={cn(
+              "flex h-full w-full items-center justify-center rounded-2xl transition-colors",
+              currentPath === "/messages"
+                ? a.pill
+                : "bg-transparent text-gray-500 hover:bg-black/5 dark:text-gray-400 dark:hover:bg-white/10"
+            )}
+          >
+            <MessageSquare className="h-6 w-6" />
+          </span>
+        </DockIcon>
+        <DockLabel>Chat</DockLabel>
+      </DockItem>
+    </Link>
+  );
+});
 DockNavExtra.displayName = "DockNavExtra";
 
 const FooterSocialLinks = React.memo(() => (
@@ -251,6 +265,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const isAdmin = userProfile?.user_type === "admin";
   const isTrucker = userProfile?.user_type === "trucker";
+  // Truckers get the brand orange accent, shippers get blue.
+  const navAccent: NavAccent = isTrucker ? "orange" : "blue";
 
   // Mobile-only bottom bar: a few quick tabs + a hamburger "Menu" button that
   // opens a bottom sheet with the full navigation. No horizontal scrolling.
@@ -427,13 +443,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <DockNav
         items={dockNavItems}
         visible={mobileNavOpen}
-        extra={<DockNavExtra currentPath={currentPath} />}
+        extra={<DockNavExtra currentPath={currentPath} accent={navAccent} />}
+        accent={navAccent}
         className="hidden md:flex"
       />
       <MobileTabBar
         tabs={mobileTabs}
         menuItems={mobileMenuItems}
         centerAction={mobileCenterAction}
+        accent={navAccent}
         visible={mobileNavOpen}
         footer={
           <Button

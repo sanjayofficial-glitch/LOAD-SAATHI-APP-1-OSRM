@@ -9,14 +9,29 @@ export interface BottomNavItem {
   icon: React.ReactNode;
 }
 
+export type NavAccent = "orange" | "blue";
+
 interface DockNavProps {
   items: BottomNavItem[];
   visible?: boolean;
   extra?: React.ReactNode;
+  /** Role accent for the active item (trucker: orange, shipper: blue). */
+  accent?: NavAccent;
   className?: string;
 }
 
-const DockNav = React.memo(({ items, visible, extra, className }: DockNavProps) => {
+const ACCENTS: Record<NavAccent, { text: string; pill: string }> = {
+  orange: {
+    text: "text-orange-600 dark:text-orange-400",
+    pill: "bg-orange-500/15 text-orange-600 dark:bg-orange-400/15 dark:text-orange-400",
+  },
+  blue: {
+    text: "text-blue-600 dark:text-blue-400",
+    pill: "bg-blue-500/15 text-blue-600 dark:bg-blue-400/15 dark:text-blue-400",
+  },
+};
+
+const DockNav = React.memo(({ items, visible, extra, accent = "orange", className }: DockNavProps) => {
   const location = useLocation();
   if (visible) return null;
 
@@ -26,6 +41,8 @@ const DockNav = React.memo(({ items, visible, extra, className }: DockNavProps) 
     }
     return location.pathname === path || location.pathname.startsWith(path + "/");
   };
+
+  const a = ACCENTS[accent];
 
   return (
     <div
@@ -42,13 +59,13 @@ const DockNav = React.memo(({ items, visible, extra, className }: DockNavProps) 
             : item.icon;
           return (
             <Link key={item.path} to={item.path} aria-label={item.label} className="outline-none min-w-11 min-h-11 flex items-center justify-center rounded-2xl focus-visible:outline-2 focus-visible:outline-orange-500 focus-visible:outline-offset-1">
-              <DockItem className={cn(active && "text-orange-600 dark:text-orange-400")}>
+              <DockItem className={cn(active && a.text)}>
                 <DockIcon>
                   <span
                     className={cn(
                       "flex h-full w-full items-center justify-center rounded-2xl transition-colors",
                       active
-                        ? "bg-orange-500/15 text-orange-600 dark:bg-orange-400/15 dark:text-orange-400"
+                        ? a.pill
                         : "bg-transparent text-gray-500 hover:bg-black/5 dark:text-gray-400 dark:hover:bg-white/10"
                     )}
                   >
