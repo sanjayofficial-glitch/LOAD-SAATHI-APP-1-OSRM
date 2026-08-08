@@ -47,6 +47,31 @@ LoadSaathi is India's AI-powered shared freight marketplace connecting shippers 
 - [Guide: Freight Rates East India](https://loadsaathi.in/guide/freight-rates-east-india)
 - [Guide: Shipping Steel](https://loadsaathi.in/guide/shipping-steel)
 
+## Social Media
+
+- X/Twitter: https://x.com/LoadSaathi
+- Facebook: https://www.facebook.com/people/Load-Saathi/61590859902405/
+- Instagram: https://www.instagram.com/loadsaathi/
+- LinkedIn: https://www.linkedin.com/in/load-saathi-119867422/
+- Reddit: https://www.reddit.com/user/Loadsaathi/
+
+## FAQ
+
+Q: What is LoadSaathi?
+A: LoadSaathi is India's AI-powered shared freight marketplace connecting shippers with verified truckers for PTL (Partial Truckload), FTL (Full Truckload), and return loads across East India. The platform uses AI matching, real-time GPS tracking, digital credit scores, and escrow-backed payments.
+
+Q: How is LoadSaathi different from a broker or LoanSathi?
+A: LoadSaathi (a freight marketplace) connects shippers directly with truckers using AI matching, eliminating middlemen and saving up to 40% on freight costs. It is not a loan consultancy and is unrelated to LoanSathi or LoadSarthi.
+
+Q: Which cities does LoadSaathi serve?
+A: LoadSaathi covers Rourkela, Ranchi, Bhubaneswar, Kolkata, Jamshedpur, and 50+ cities across Odisha, Jharkhand, and West Bengal with 25+ active freight corridors including Rourkela–Ranchi–Burdwan, Rourkela–Kolkata, and Bhubaneswar–Kolkata.
+
+Q: How much does LoadSaathi cost?
+A: LoadSaathi is free to join for both shippers and truckers. A transaction fee of 2–5% per completed shipment applies, with no subscriptions or hidden fees.
+
+Q: How does LoadSaathi's AI matching work?
+A: LoadSaathi's AI scoring engine analyzes route alignment, capacity fit, price compatibility, timeliness, historical performance, communication responsiveness, and tenure to match shippers with the best-suited truckers in seconds.
+
 ## Contact
 
 - Website: https://loadsaathi.in

@@ -20,7 +20,7 @@ interface SeoMetaProps {
 }
 
 const BASE_URL = "https://loadsaathi.in";
-const DEFAULT_IMAGE = "https://loadsaathi.in/og-image.png";
+const DEFAULT_IMAGE = "https://loadsaathi.in/logo-512.png";
 
 export default function SeoMeta({
   title,
