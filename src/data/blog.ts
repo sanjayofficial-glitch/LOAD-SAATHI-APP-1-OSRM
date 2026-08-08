@@ -564,6 +564,43 @@ export const articles: Record<string, BlogArticle> = {
       "Ready to optimize your dispatches, avoid check-post delays, and save up to 35% on shipping? Book shared freight (PTL/LTL) and instantly match partial cargo with top-rated returning trucks. Experience seamless e-Way Bill compliance with automatic Part-B carrier TRANS ID integration. Maximize profit margins by paying only for the space you occupy. Visit LoadSaathi.in today to calculate your shared freight rate or register your fleet.",
     ],
   },
+  "india-truck-freight-rates-2026": {
+    category: "Freight Rates",
+    title: "India Truck Freight Rates 2026: PTL, FTL & LTL Price Guide",
+    coverImage: "/blog/og/freight-rates-east-india.svg",
+    date: "August 8, 2026",
+    readTime: "7 min read",
+    author: "Sanjaya Sahu",
+    authorBio: "Sanjaya Sahu is the Founder & CEO of LoadSaathi, an AI-powered shared freight marketplace for East India's industrial corridors.",
+    summary: "India's road freight market is worth USD 167.5 billion in 2026 and growing at 8.8% CAGR (Mordor Intelligence). FTL is priced per km — roughly ₹35–₹85 per km for container trucks — while PTL and LTL are priced per kg or tonne and can cut freight bills by 25–35%. This guide explains 2026 PTL, FTL, and LTL rates, what drives them, and how to get the lowest per-tonne price on East India corridors.",
+    content: [
+      "India's road freight market is estimated at USD 167.51 billion in 2026, projected to reach USD 255.92 billion by 2031 — an 8.84% CAGR (Mordor Intelligence, 2026). With record GST e-way bill volumes (140.6 million in March 2026 alone, up 13% year on year — GSTN via Business Standard) and a 146,145 km national highway network, the country runs on trucks. Yet most shippers still overpay because they book the wrong freight mode.",
+      "There are three ways to move goods by road, and they are priced completely differently. Full Truckload (FTL) reserves an entire truck and is priced per kilometer — expect roughly ₹35–₹85 per km for container trucks, ₹18–₹40 per km for medium trucks, and ₹10–₹25 per km for mini trucks depending on route and fuel prices (TruckGuru, July 2026). Partial Truckload (PTL) and Less Than Truckload (LTL) share one truck across multiple shippers and are priced per kg or per tonne.",
+      "The 2026 trend that matters for shippers: PTL is expanding at 9.7% CAGR while the LTL market is projected to grow from USD 8.7 billion in 2026 to USD 22.99 billion by 2035 — an 11.4% CAGR (MarkWide Research, 2026). Why? Truckload capacity tightened sharply in 2026 as driver availability fell and fleet expansion stalled (ACT Research), pushing freight back into shared PTL/LTL networks. Roughly 58% of Indian SMEs already rely on partial-load freight (Market Reports World, 2026).",
+      "So what does a tonne actually cost in 2026? On dense two-way corridors — Delhi–Mumbai, Kolkata–Jamshedpur, Bhubaneswar–Rourkela — well-matched trucks are 10–15% cheaper because return loads are easy to find. Rates rise 15–20% during festivals, harvest months, and monsoon, and spike on one-way lanes where the truck must deadhead back empty. The cheapest rate is almost never the fixed 'per km' brochure price; it is the per-tonne shared price on a corridor with backhaul demand.",
+      "The biggest single saving in 2026 is switching from FTL to PTL for partial cargo. A 3-tonne shipment booked as a full truck pays 100% of the diesel FTL rate; the same 3 tonnes pooled into a shared PTL truck with two other shippers typically costs 25–35% less, because you pay only for the space you occupy. That is the same economics that drives digital load-pooling platforms, which cut empty truck miles by up to 80% (Mordor Intelligence, 2026).",
+      "Frequently Asked Questions. How much does truck transport cost per km in India? Mini trucks ₹10–₹25/km, medium trucks ₹18–₹40/km, and container trucks ₹35–₹85/km depending on route and fuel (TruckGuru, 2026). What is the difference between FTL and PTL pricing? FTL books the whole truck at a per-km rate; PTL shares the truck and is priced per kg or per tonne. Is PTL cheaper than FTL? For shipments under 8 tonnes, yes — typically 25–35% cheaper because you share capacity. When are truck rates highest in India? Festival season, harvest months, and monsoon, when rates can climb 15–20%. How can I cut 2026 freight costs? Book PTL for partial cargo, prefer corridors with return-load demand, and lock in rates before the festive-season spike.",
+      "Ready to move freight at 2026 market rates? Post your shipment on LoadSaathi.in — our AI matches your load with verified returning trucks on the Rourkela–Ranchi–Burdwan, Bhubaneswar–Kolkata, and Jamshedpur–Kolkata corridors, so you pay per tonne, not per empty truck. Compare rates, check trucker credit scores, and save up to 35%.",
+    ],
+  },
+  "truck-transport-cost-per-km-india-2026": {
+    category: "Trucker Tips",
+    title: "Truck Transport Cost per km in India 2026 (Mini, Medium & Container)",
+    coverImage: "/blog/og/freight-rates-east-india.svg",
+    date: "August 8, 2026",
+    readTime: "6 min read",
+    author: "Sanjaya Sahu",
+    authorBio: "Sanjaya Sahu is the Founder & CEO of LoadSaathi, an AI-powered shared freight marketplace for East India's industrial corridors.",
+    summary: "Truck transport costs ₹10–₹85 per km in India in 2026 depending on truck size: mini trucks ₹10–₹25/km, medium trucks ₹18–₹40/km, and container trucks ₹35–₹85/km (TruckGuru, 2026). The real number is driven by fuel, tolls, deadheading, and route density — and can drop 10–15% on corridors with return loads.",
+    content: [
+      "How much does truck transport actually cost per kilometer in India in 2026? The widely quoted ranges are mini trucks ₹10–₹25 per km, medium trucks ₹18–₹40 per km, and large container trucks ₹35–₹85 per km depending on route and fuel price (TruckGuru, July 2026). But the price on the invoice and the true cost to the truck owner are two very different numbers — and the gap is where smart shippers save money.",
+      "The real cost per km is built from five components: diesel, tolls (FASTag), driver wages, maintenance, and empty kilometers. India's road freight market sits at USD 167.5 billion in 2026 (Mordor Intelligence) precisely because these costs are volatile — fuel prices move monthly, toll charges grow with the 146,145 km highway network, and driver availability is tight, with a shortfall of roughly 2.4 million drivers pushing wages up (Mordor Intelligence, 2026).",
+      "The single largest hidden cost is deadheading — driving empty on the return leg. Roughly 40% of truck kilometers in India are driven empty, which quietly inflates the effective cost per loaded km by almost half. On a 1,000 km one-way haul with an empty return, the trucker must recover two legs of cost from one leg of revenue. This is why one-way lanes cost 15–20% more than dense two-way corridors where return loads are easy to find (TruckGuru, 2026).",
+      "How to get the true cost down. First, choose PTL/LTL for partial cargo: instead of paying ₹85/km for a whole container truck, pay per tonne and share the vehicle — typically 25–35% cheaper. Second, prefer corridors with backhaul demand such as Kolkata–Jamshedpur and Bhubaneswar–Rourkela, which run 10–15% below one-way rates because trucks can return loaded. Third, avoid peak windows — festive season, harvest, and monsoon push rates up 15–20%. Fourth, use a digital load platform that matches trucks in both directions, cutting empty kilometers and lowering the rate the trucker must quote.",
+      "Frequently Asked Questions. What is the cost of a mini truck per km in India? ₹10–₹25 per km depending on route and fuel (TruckGuru, 2026). How much does a container truck cost per km? ₹35–₹85 per km for large container trucks. What is the cheapest truck for a 3-tonne shipment? A mini or medium truck, or PTL space in a larger truck — PTL sharing is usually cheapest per tonne. Why do freight rates rise in monsoon? Heavy rain slows transit, raises breakdown risk, and compresses available capacity, adding 15–20% to peak-season rates. How do digital platforms reduce per-km cost? By matching return loads, platforms cut deadheading, which lowers the effective cost per loaded kilometer.",
+      "Stop paying per empty truck. Post your shipment on LoadSaathi.in and get per-tonne pricing on returning trucks across East India's corridors — verified truckers, live GPS tracking, and freight bills up to 35% lower.",
+    ],
+  },
 };
 
 export interface BlogListItem {
